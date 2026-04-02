@@ -57,7 +57,8 @@ jobs:
         working-directory: crates/mast-node
         run: |
           if [ "${{ matrix.use-zig }}" = "true" ]; then
-            npx napi build --release --features local-embedder --target ${{ matrix.target }} --zig
+            # Skip local-embedder for cross-compiled targets (fastembed/ONNX can't cross-compile)
+            npx napi build --release --target ${{ matrix.target }} --zig
           else
             npx napi build --release --features local-embedder --target ${{ matrix.target }}
           fi
