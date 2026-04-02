@@ -1,0 +1,16 @@
+{
+  "name": "mast-benchmarks",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "bench": "tsx src/main.ts"
+  },
+  "dependencies": {
+    "mast-memory": "file:../crates/mast-node",
+    "chromadb": "^1",
+    "@lancedb/lancedb": "^0.13",
+    "openai": "^4",
+    "tsx": "^4",
+    "typescript": "^5"
+  }
+}

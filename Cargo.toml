@@ -1,0 +1,13 @@
+[workspace]
+members = [
+    "crates/mast-core",
+    "crates/mast-embed-openai",
+    "crates/mast-embed-voyage",
+    "crates/mast-embed-local",
+    "crates/mast-cli",
+    "crates/mast-ffi",
+    "crates/mast-node",
+]
+# mast-py is a PyO3 cdylib — must be built with maturin, not cargo build.
+exclude = ["crates/mast-py"]
+resolver = "2"

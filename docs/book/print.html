@@ -1,0 +1,3304 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>MAST - Memory-Augmented Storage</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon-de23e50b.svg">
+        <link rel="shortcut icon" href="favicon-8114d1fc.png">
+        <link rel="stylesheet" href="css/variables-8adf115d.css">
+        <link rel="stylesheet" href="css/general-2459343d.css">
+        <link rel="stylesheet" href="css/chrome-ae938929.css">
+        <link rel="stylesheet" href="css/print-9e4910d8.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="fonts/fonts-9644e21d.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="mdbook-highlight-css" href="highlight-493f70e1.css">
+        <link rel="stylesheet" id="mdbook-tomorrow-night-css" href="tomorrow-night-4c0ae647.css">
+        <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="ayu-highlight-3fdfc3ac.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "ayu";
+            window.path_to_searchindex_js = "searchindex-588f9a82.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc-24faaabb.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="mdbook-body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="mdbook-sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("mdbook-sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="mdbook-sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="mdbook-sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="mdbook-page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="mdbook-menu-bar-hover-placeholder"></div>
+                <div id="mdbook-menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="mdbook-sidebar-toggle" class="icon-button" for="mdbook-sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="mdbook-sidebar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg></span>
+                        </label>
+                        <button id="mdbook-theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="mdbook-theme-list">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M371.3 367.1c27.3-3.9 51.9-19.4 67.2-42.9L600.2 74.1c12.6-19.5 9.4-45.3-7.6-61.2S549.7-4.4 531.1 9.6L294.4 187.2c-24 18-38.2 46.1-38.4 76.1L371.3 367.1zm-19.6 25.4l-116-104.4C175.9 290.3 128 339.6 128 400c0 3.9 .2 7.8 .6 11.6c1.8 17.5-10.2 36.4-27.8 36.4H96c-17.7 0-32 14.3-32 32s14.3 32 32 32H240c61.9 0 112-50.1 112-112c0-2.5-.1-5-.2-7.5z"/></svg></span>
+                        </button>
+                        <ul id="mdbook-theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-ayu">Ayu</button></li>
+                        </ul>
+                        <button id="mdbook-search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="mdbook-searchbar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352c79.5 0 144-64.5 144-144s-64.5-144-144-144S64 128.5 64 208s64.5 144 144 144z"/></svg></span>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">MAST - Memory-Augmented Storage</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <span class=fa-svg id="print-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zm-16-88c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24z"/></svg></span>
+                        </a>
+                        <a href="https://github.com/mast-memory/mast" title="Git repository" aria-label="Git repository">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg></span>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="mdbook-search-wrapper" class="hidden">
+                    <form id="mdbook-searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="mdbook-searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="mdbook-searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <span class=fa-svg id="fa-spin"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M304 48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zm0 416c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM48 304c26.5 0 48-21.5 48-48s-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48zm464-48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM142.9 437c18.7-18.7 18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zm0-294.2c18.7-18.7 18.7-49.1 0-67.9S93.7 56.2 75 75s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zM369.1 437c18.7 18.7 49.1 18.7 67.9 0s18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9z"/></svg></span>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="mdbook-searchresults-outer" class="searchresults-outer hidden">
+                        <div id="mdbook-searchresults-header" class="searchresults-header"></div>
+                        <ul id="mdbook-searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('mdbook-sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('mdbook-sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#mdbook-sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="mdbook-content" class="content">
+                    <main>
+                        <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<p>MAST (Memory Agent Storage Tiers) is an embeddable storage engine purpose-built for AI agent memory. Think of it as “the SQLite of agent memory” – a single-file, zero-server database that combines vector search, full-text search, metadata filtering, graph relationships, and time-tiered compaction into one package.</p>
+<h2 id="why-mast-exists"><a class="header" href="#why-mast-exists">Why MAST Exists</a></h2>
+<p>Every existing agent memory system wraps general-purpose databases – Postgres, Qdrant, Redis – because nothing purpose-built exists. Agent memory has unique requirements:</p>
+<ul>
+<li><strong>Time-tiered compaction as a first-class primitive.</strong> Memories evolve from raw events to distilled patterns to core identity. This should happen at the storage level.</li>
+<li><strong>Compaction as synthesis, not summarization.</strong> “User rejected salesy copy 15 times” compacts into “user hates salesy copy.” This is knowledge creation, not truncation.</li>
+<li><strong>Hybrid search in a single query.</strong> Vector similarity + metadata filters + full-text + tier blending, without orchestrating across multiple databases.</li>
+<li><strong>Graph relationships alongside flat memories.</strong> Entity relationships (user -&gt; prefers -&gt; dark mode) live next to the memories themselves.</li>
+<li><strong>Embeddable, zero-dependency.</strong> <code>pip install</code> a package, no Docker, no server.</li>
+</ul>
+<h2 id="key-features"><a class="header" href="#key-features">Key Features</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Feature</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Single-file storage</strong></td><td>redb-backed ACID storage in one file</td></tr>
+<tr><td><strong>Vector search</strong></td><td>Cosine similarity via usearch HNSW index</td></tr>
+<tr><td><strong>Full-text search</strong></td><td>Built-in BM25 with tokenizer and stop words</td></tr>
+<tr><td><strong>Hybrid search</strong></td><td>Min-max normalized blend of vector + full-text</td></tr>
+<tr><td><strong>Metadata filtering</strong></td><td>Eq, In, And, Or filters with nesting</td></tr>
+<tr><td><strong>Memory tiers</strong></td><td>Core, Active, Background, Archive</td></tr>
+<tr><td><strong>Compaction</strong></td><td>Pluggable synthesis via <code>Compactor</code> trait</td></tr>
+<tr><td><strong>Graph layer</strong></td><td>Weighted edges, BFS traversal, entity relations</td></tr>
+<tr><td><strong>TTL and expiry</strong></td><td>Per-memory TTL with vacuum cleanup</td></tr>
+<tr><td><strong>Snapshots</strong></td><td>JSONL export/import for portability</td></tr>
+<tr><td><strong>Pluggable embeddings</strong></td><td><code>Embedder</code> trait – bring your own model</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="language-support"><a class="header" href="#language-support">Language Support</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Language</th><th>Crate / Package</th><th>Binding</th></tr>
+</thead>
+<tbody>
+<tr><td>Rust</td><td><code>mast-core</code></td><td>Native</td></tr>
+<tr><td>Python</td><td><code>mast-memory</code></td><td>PyO3 via maturin</td></tr>
+<tr><td>Node.js</td><td><code>mast-memory</code></td><td>napi-rs</td></tr>
+<tr><td>C/C++</td><td><code>mast-ffi</code></td><td>C FFI with callback vtable</td></tr>
+<tr><td>CLI</td><td><code>mast-cli</code></td><td>Command-line interface</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="architecture-at-a-glance"><a class="header" href="#architecture-at-a-glance">Architecture at a Glance</a></h2>
+<pre><code>MAST Engine
++-- Storage Layer: redb (single-file ACID, key-value)
++-- Vector Index: usearch HNSW (per-collection, cosine metric)
++-- Full-Text Index: BM25 (per-collection, redb-backed posting lists)
++-- Metadata Index: inverted index (redb-backed posting lists)
++-- Graph Layer: forward/reverse edge indexes for entity relationships
++-- Compaction Engine: pluggable Compactor trait for tier promotion
++-- Serialization: bincode (storage) + serde_json (snapshots)
+</code></pre>
+<h2 id="what-mast-is-not"><a class="header" href="#what-mast-is-not">What MAST Is Not</a></h2>
+<ul>
+<li><strong>Not a general-purpose database.</strong> No SQL. No arbitrary queries.</li>
+<li><strong>Not a vector database.</strong> Vector search is one component of a larger memory system.</li>
+<li><strong>Not a framework.</strong> It does not tell you how to build agents.</li>
+<li><strong>Not an LLM.</strong> It has a pluggable LLM interface for compaction, but ships no model.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="quick-start"><a class="header" href="#quick-start">Quick Start</a></h1>
+<p>Get MAST running in 5 minutes with Rust.</p>
+<h2 id="add-dependencies"><a class="header" href="#add-dependencies">Add Dependencies</a></h2>
+<pre><code class="language-toml">[dependencies]
+mast-core = { path = "crates/mast-core" }
+mast-embed-openai = { path = "crates/mast-embed-openai" }  # optional
+tokio = { version = "1", features = ["full"] }
+</code></pre>
+<h2 id="open-a-database"><a class="header" href="#open-a-database">Open a Database</a></h2>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use mast_core::config::MastConfig;
+use mast_core::Mast;
+
+let config = MastConfig::default()
+    .with_db_path("my_agent.mast")
+    .with_default_dimensions(1536);
+
+let mut mast = Mast::open(config)?;
+<span class="boring">}</span></code></pre>
+<h2 id="set-up-an-embedder"><a class="header" href="#set-up-an-embedder">Set Up an Embedder</a></h2>
+<p>Using OpenAI:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use mast_embed_openai::OpenAIEmbedder;
+
+let embedder = OpenAIEmbedder::new(std::env::var("OPENAI_API_KEY")?)
+    .with_model("text-embedding-3-small")
+    .with_dimensions(1536);
+<span class="boring">}</span></code></pre>
+<p>Or bring your own by implementing the <code>Embedder</code> trait (see <a href="#embeddings">Embeddings</a>).</p>
+<h2 id="store-a-memory"><a class="header" href="#store-a-memory">Store a Memory</a></h2>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use mast_core::types::*;
+use std::collections::HashMap;
+
+let memory = mast.store(
+    StoreRequest {
+        collection: "user:alice".into(),
+        content: "Alice prefers dark mode and dislikes notifications".into(),
+        embedding: None,  // auto-generated via embedder
+        metadata: HashMap::from([
+            ("source".into(), "conversation".into()),
+        ]),
+        tier: Tier::Active,
+        ttl: None,
+    },
+    &amp;embedder,
+).await?;
+
+println!("Stored: {}", memory.id);
+<span class="boring">}</span></code></pre>
+<h2 id="recall-memories"><a class="header" href="#recall-memories">Recall Memories</a></h2>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let results = mast.recall(
+    RecallRequest {
+        collection: "user:alice".into(),
+        query: Some("What are Alice's UI preferences?".into()),
+        query_embedding: None,
+        text_query: None,
+        search_mode: SearchMode::Vector,
+        limit: 5,
+        filter: None,
+        tier_weights: None,
+        time_decay: None,
+    },
+    &amp;embedder,
+).await?;
+
+for result in &amp;results {
+    println!("[{:.4}] {}", result.score, result.memory.content);
+}
+<span class="boring">}</span></code></pre>
+<h2 id="full-text-search"><a class="header" href="#full-text-search">Full-Text Search</a></h2>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let results = mast.recall(
+    RecallRequest {
+        collection: "user:alice".into(),
+        query: None,
+        query_embedding: None,
+        text_query: Some("dark mode".into()),
+        search_mode: SearchMode::FullText,
+        limit: 5,
+        filter: None,
+        tier_weights: None,
+        time_decay: None,
+    },
+    &amp;embedder,
+).await?;
+<span class="boring">}</span></code></pre>
+<h2 id="create-a-graph-relationship"><a class="header" href="#create-a-graph-relationship">Create a Graph Relationship</a></h2>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use mast_core::types::RelateRequest;
+
+mast.relate(RelateRequest {
+    collection: "user:alice".into(),
+    source: "alice".into(),
+    target: "dark_mode".into(),
+    relation: "prefers".into(),
+    weight: 0.9,
+    memory_ids: vec![memory.id],
+})?;
+<span class="boring">}</span></code></pre>
+<h2 id="close-the-database"><a class="header" href="#close-the-database">Close the Database</a></h2>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>mast.close()?;
+<span class="boring">}</span></code></pre>
+<p>The database also flushes indexes automatically on <code>Drop</code>, but calling <code>close()</code> explicitly lets you handle errors.</p>
+<h2 id="next-steps"><a class="header" href="#next-steps">Next Steps</a></h2>
+<ul>
+<li><a href="#memories">Memories</a> – understand the data model</li>
+<li><a href="#search">Search</a> – vector, full-text, and hybrid search</li>
+<li><a href="#compaction">Compaction</a> – tier-based memory synthesis</li>
+<li><a href="#rust-guide">Rust Guide</a> – complete Rust usage guide</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="memories"><a class="header" href="#memories">Memories</a></h1>
+<p>A <strong>Memory</strong> is the fundamental unit of data in MAST. It combines content, a vector embedding, metadata, tier classification, and lifecycle tracking into a single record.</p>
+<h2 id="memory-struct"><a class="header" href="#memory-struct">Memory Struct</a></h2>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct Memory {
+    pub id: Ulid,                          // Time-sortable unique ID
+    pub collection: String,                // Namespace (e.g., "user:alice")
+    pub content: String,                   // The memory text
+    pub embedding: Vec&lt;f32&gt;,               // Vector embedding
+    pub metadata: HashMap&lt;String, String&gt;, // Arbitrary key-value pairs
+    pub tier: Tier,                        // Core | Active | Background | Archive
+    pub created_at: i64,                   // Unix timestamp (seconds)
+    pub access_count: u64,                 // Number of times recalled
+    pub last_accessed: i64,                // Last recall timestamp
+    pub ttl: Option&lt;i64&gt;,                  // Time-to-live in seconds (None = no expiry)
+    pub compacted_at: Option&lt;i64&gt;,         // When this memory was compacted
+    pub parent_ids: Vec&lt;Ulid&gt;,             // Source memories (compaction provenance)
+}
+<span class="boring">}</span></code></pre>
+<h2 id="fields-in-detail"><a class="header" href="#fields-in-detail">Fields in Detail</a></h2>
+<h3 id="id"><a class="header" href="#id">id</a></h3>
+<p>A ULID (Universally Unique Lexicographically Sortable Identifier). Generated automatically on <code>store()</code>. ULIDs are time-sortable, so newer memories have lexicographically greater IDs.</p>
+<h3 id="collection"><a class="header" href="#collection">collection</a></h3>
+<p>A namespace string that isolates memories. Each collection has its own vector index, full-text index, and graph. See <a href="#collections">Collections</a>.</p>
+<h3 id="content"><a class="header" href="#content">content</a></h3>
+<p>The raw text of the memory. This is indexed for full-text search and passed to the embedder for vector generation.</p>
+<h3 id="embedding"><a class="header" href="#embedding">embedding</a></h3>
+<p>A dense float vector produced by the embedder. All memories in a collection must share the same dimensionality. You can provide a pre-computed embedding via <code>StoreRequest.embedding</code>, or let MAST generate one via the <code>Embedder</code> trait.</p>
+<h3 id="metadata"><a class="header" href="#metadata">metadata</a></h3>
+<p>Arbitrary string key-value pairs. Useful for tagging memories with source, session ID, topic, or any domain-specific labels. Metadata is indexed and can be filtered during recall.</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>HashMap::from([
+    ("source".into(), "conversation".into()),
+    ("session".into(), "abc123".into()),
+    ("topic".into(), "preferences".into()),
+])
+<span class="boring">}</span></code></pre>
+<h3 id="tier"><a class="header" href="#tier">tier</a></h3>
+<p>One of four tiers that classify a memory’s lifecycle stage:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Tier</th><th>Weight</th><th>Purpose</th></tr>
+</thead>
+<tbody>
+<tr><td><code>Core</code></td><td>1.0</td><td>Foundational knowledge, rarely changes</td></tr>
+<tr><td><code>Active</code></td><td>0.9</td><td>Recent, frequently accessed (default)</td></tr>
+<tr><td><code>Background</code></td><td>0.7</td><td>Older, less accessed</td></tr>
+<tr><td><code>Archive</code></td><td>0.5</td><td>Historical, low relevance</td></tr>
+</tbody>
+</table>
+</div>
+<p>Tiers affect recall scoring. See <a href="#compaction">Compaction</a> for tier promotion.</p>
+<h3 id="ttl"><a class="header" href="#ttl">ttl</a></h3>
+<p>Optional time-to-live in seconds. A memory expires when <code>now - created_at &gt;= ttl</code>. Expired memories are excluded from <code>recall()</code> results automatically. Call <code>vacuum()</code> to hard-delete expired memories.</p>
+<h3 id="compacted_at"><a class="header" href="#compacted_at">compacted_at</a></h3>
+<p>Set when a memory has been compacted into a higher-tier synthesis. Compacted memories are excluded from <code>recall()</code> but remain visible in <code>list()</code> for provenance tracing.</p>
+<h3 id="parent_ids"><a class="header" href="#parent_ids">parent_ids</a></h3>
+<p>Links a compacted memory to its source memories. This preserves provenance – you can always trace a high-tier insight back to the raw events that produced it.</p>
+<h2 id="storerequest"><a class="header" href="#storerequest">StoreRequest</a></h2>
+<p>To create a memory, build a <code>StoreRequest</code>:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct StoreRequest {
+    pub collection: String,
+    pub content: String,
+    pub embedding: Option&lt;Vec&lt;f32&gt;&gt;,       // None = auto-embed
+    pub metadata: HashMap&lt;String, String&gt;,
+    pub tier: Tier,                         // defaults to Active
+    pub ttl: Option&lt;i64&gt;,                   // None = no expiry
+}
+<span class="boring">}</span></code></pre>
+<p>If <code>embedding</code> is <code>None</code>, MAST calls the provided <code>Embedder</code> to generate one. If <code>Some</code>, the provided vector is used directly.</p>
+<h2 id="lifecycle"><a class="header" href="#lifecycle">Lifecycle</a></h2>
+<ol>
+<li><strong>Created</strong> via <code>store()</code> – assigned a ULID, embedded, indexed</li>
+<li><strong>Recalled</strong> via <code>recall()</code> – <code>access_count</code> incremented, <code>last_accessed</code> updated</li>
+<li><strong>Compacted</strong> via <code>compact()</code> – marked with <code>compacted_at</code>, hidden from recall</li>
+<li><strong>Expired</strong> – excluded from recall when TTL elapsed</li>
+<li><strong>Vacuumed</strong> via <code>vacuum()</code> – hard-deleted from storage and indexes</li>
+<li><strong>Deleted</strong> via <code>delete()</code> – removed from storage and indexes immediately</li>
+</ol>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="collections"><a class="header" href="#collections">Collections</a></h1>
+<p>Collections are namespaces that isolate memories, indexes, and graph edges from each other. Every memory belongs to exactly one collection.</p>
+<h2 id="what-a-collection-provides"><a class="header" href="#what-a-collection-provides">What a Collection Provides</a></h2>
+<p>Each collection maintains its own:</p>
+<ul>
+<li><strong>Vector index</strong> (usearch HNSW) with a fixed dimensionality</li>
+<li><strong>Full-text index</strong> (BM25 posting lists)</li>
+<li><strong>Metadata index</strong> (inverted index)</li>
+<li><strong>Graph edges</strong> (forward and reverse indexes)</li>
+<li><strong>Memory count and stats</strong></li>
+</ul>
+<h2 id="creating-collections"><a class="header" href="#creating-collections">Creating Collections</a></h2>
+<p>Collections are created implicitly on first write. There is no explicit “create collection” operation. The first <code>store()</code> call to a new collection name creates it and sets its vector dimensions based on the first embedding.</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// This creates the "user:alice" collection with 1536 dimensions
+mast.store(
+    StoreRequest {
+        collection: "user:alice".into(),
+        content: "Alice likes dark mode".into(),
+        embedding: None,  // embedder produces 1536-dim vector
+        ..Default::default()
+    },
+    &amp;embedder,
+).await?;
+<span class="boring">}</span></code></pre>
+<h2 id="dimension-enforcement"><a class="header" href="#dimension-enforcement">Dimension Enforcement</a></h2>
+<p>The first memory stored in a collection defines its vector dimensions. All subsequent memories must have embeddings with the same dimensionality. Mismatches are rejected with an error:</p>
+<pre><code>embedding dimensions 768 do not match collection dimensions 1536
+</code></pre>
+<h2 id="collection-info"><a class="header" href="#collection-info">Collection Info</a></h2>
+<p>Use <code>info()</code> to list all collections and their stats:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct CollectionInfo {
+    pub name: String,        // collection name
+    pub dimensions: usize,   // vector dimensionality
+    pub memory_count: u64,   // number of stored memories
+    pub created_at: i64,     // creation timestamp
+}
+<span class="boring">}</span></code></pre>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let collections = mast.info()?;
+for col in &amp;collections {
+    println!("{}: {} memories, {} dims", col.name, col.memory_count, col.dimensions);
+}
+<span class="boring">}</span></code></pre>
+<h2 id="naming-conventions"><a class="header" href="#naming-conventions">Naming Conventions</a></h2>
+<p>Collection names are arbitrary strings. Common patterns:</p>
+<pre><code>"user:alice"               // all memories about a user
+"agent:assistant"          // the agent's own memories
+"user:alice:assistant"     // session-scoped memories
+"project:acme"             // project-scoped memories
+</code></pre>
+<h2 id="isolation"><a class="header" href="#isolation">Isolation</a></h2>
+<p>Collections are fully isolated:</p>
+<ul>
+<li>A <code>recall()</code> on collection A never returns results from collection B.</li>
+<li><code>vacuum()</code> only affects the specified collection.</li>
+<li><code>snapshot()</code> exports a single collection.</li>
+<li>Graph edges are scoped to a collection.</li>
+</ul>
+<h2 id="operations-by-collection"><a class="header" href="#operations-by-collection">Operations by Collection</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Operation</th><th>Scope</th></tr>
+</thead>
+<tbody>
+<tr><td><code>store()</code></td><td>Single collection</td></tr>
+<tr><td><code>recall()</code></td><td>Single collection</td></tr>
+<tr><td><code>get()</code></td><td>Single collection</td></tr>
+<tr><td><code>delete()</code></td><td>Single collection</td></tr>
+<tr><td><code>list()</code></td><td>Single collection</td></tr>
+<tr><td><code>vacuum()</code></td><td>Single collection</td></tr>
+<tr><td><code>compact()</code></td><td>Single collection</td></tr>
+<tr><td><code>relate()</code></td><td>Single collection</td></tr>
+<tr><td><code>traverse()</code></td><td>Single collection</td></tr>
+<tr><td><code>subgraph()</code></td><td>Single collection</td></tr>
+<tr><td><code>snapshot()</code></td><td>Single collection</td></tr>
+<tr><td><code>info()</code></td><td>All collections</td></tr>
+</tbody>
+</table>
+</div>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="embeddings"><a class="header" href="#embeddings">Embeddings</a></h1>
+<p>MAST does not include an embedding model. Instead, it provides a pluggable <code>Embedder</code> trait that you implement or use a provided implementation.</p>
+<h2 id="the-embedder-trait"><a class="header" href="#the-embedder-trait">The Embedder Trait</a></h2>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[async_trait]
+pub trait Embedder: Send + Sync {
+    /// Embed a single text into a vector.
+    async fn embed(&amp;self, text: &amp;str) -&gt; Result&lt;Vec&lt;f32&gt;, MastError&gt;;
+
+    /// Embed multiple texts in a batch (for efficiency).
+    async fn embed_batch(&amp;self, texts: &amp;[String]) -&gt; Result&lt;Vec&lt;Vec&lt;f32&gt;&gt;, MastError&gt;;
+
+    /// Return the vector dimensionality.
+    fn dimensions(&amp;self) -&gt; usize;
+}
+<span class="boring">}</span></code></pre>
+<p>The <code>Embedder</code> is passed to <code>store()</code> and <code>recall()</code> as a reference. MAST calls it when:</p>
+<ul>
+<li><code>store()</code> is called without a pre-computed embedding (<code>StoreRequest.embedding = None</code>)</li>
+<li><code>recall()</code> is called with a text query (<code>RecallRequest.query = Some(...)</code>) and no <code>query_embedding</code></li>
+<li><code>store_batch()</code> needs to embed items without pre-computed embeddings</li>
+<li><code>compact()</code> needs to embed the synthesized content</li>
+</ul>
+<h2 id="openai-embedder"><a class="header" href="#openai-embedder">OpenAI Embedder</a></h2>
+<p>The <code>mast-embed-openai</code> crate provides an OpenAI-compatible embedder:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use mast_embed_openai::OpenAIEmbedder;
+
+let embedder = OpenAIEmbedder::new("sk-your-api-key".into())
+    .with_model("text-embedding-3-small")   // default
+    .with_dimensions(1536)                   // default
+    .with_base_url("https://api.openai.com"); // default
+<span class="boring">}</span></code></pre>
+<h3 id="builder-methods"><a class="header" href="#builder-methods">Builder Methods</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Method</th><th>Default</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>with_model(model)</code></td><td><code>text-embedding-3-small</code></td><td>OpenAI model name</td></tr>
+<tr><td><code>with_dimensions(dims)</code></td><td><code>1536</code></td><td>Output vector dimensions</td></tr>
+<tr><td><code>with_base_url(url)</code></td><td><code>https://api.openai.com</code></td><td>API base URL (for proxies or compatible APIs)</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="compatible-apis"><a class="header" href="#compatible-apis">Compatible APIs</a></h3>
+<p>The <code>with_base_url()</code> method lets you point to any OpenAI-compatible API:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Azure OpenAI
+let embedder = OpenAIEmbedder::new(api_key)
+    .with_base_url("https://your-resource.openai.azure.com");
+
+// Local proxy or compatible service
+let embedder = OpenAIEmbedder::new(api_key)
+    .with_base_url("http://localhost:8080");
+<span class="boring">}</span></code></pre>
+<h2 id="pre-computed-embeddings"><a class="header" href="#pre-computed-embeddings">Pre-Computed Embeddings</a></h2>
+<p>If you already have embeddings, skip the embedder entirely:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let memory = mast.store(
+    StoreRequest {
+        collection: "notes".into(),
+        content: "some text".into(),
+        embedding: Some(vec![0.1, 0.2, 0.3, /* ... */]),
+        metadata: HashMap::new(),
+        tier: Tier::Active,
+        ttl: None,
+    },
+    &amp;embedder,  // not called when embedding is Some
+).await?;
+<span class="boring">}</span></code></pre>
+<p>For recall with a pre-computed query vector:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let results = mast.recall(
+    RecallRequest {
+        collection: "notes".into(),
+        query: None,
+        query_embedding: Some(vec![0.1, 0.2, 0.3, /* ... */]),
+        text_query: None,
+        search_mode: SearchMode::Vector,
+        limit: 10,
+        filter: None,
+        tier_weights: None,
+        time_decay: None,
+    },
+    &amp;embedder,  // not called when query_embedding is Some
+).await?;
+<span class="boring">}</span></code></pre>
+<h2 id="writing-a-custom-embedder"><a class="header" href="#writing-a-custom-embedder">Writing a Custom Embedder</a></h2>
+<p>Implement the <code>Embedder</code> trait for any embedding provider:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use async_trait::async_trait;
+use mast_core::embed::Embedder;
+use mast_core::error::MastError;
+
+struct MyEmbedder { /* ... */ }
+
+#[async_trait]
+impl Embedder for MyEmbedder {
+    async fn embed(&amp;self, text: &amp;str) -&gt; Result&lt;Vec&lt;f32&gt;, MastError&gt; {
+        // Call your embedding service
+        let vector = my_api_call(text).await
+            .map_err(|e| MastError::Embedder(e.to_string()))?;
+        Ok(vector)
+    }
+
+    async fn embed_batch(&amp;self, texts: &amp;[String]) -&gt; Result&lt;Vec&lt;Vec&lt;f32&gt;&gt;, MastError&gt; {
+        // Batch embed for efficiency, or fall back to sequential
+        let mut results = Vec::with_capacity(texts.len());
+        for text in texts {
+            results.push(self.embed(text).await?);
+        }
+        Ok(results)
+    }
+
+    fn dimensions(&amp;self) -&gt; usize {
+        768
+    }
+}
+<span class="boring">}</span></code></pre>
+<h2 id="mockembedder-testing"><a class="header" href="#mockembedder-testing">MockEmbedder (Testing)</a></h2>
+<p>MAST includes a <code>MockEmbedder</code> for testing that generates deterministic unit vectors from text hashes:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use mast_core::embed::MockEmbedder;
+
+let embedder = MockEmbedder::new(128); // 128 dimensions
+// Same text always produces the same vector
+// Different text produces different vectors
+<span class="boring">}</span></code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="search"><a class="header" href="#search">Search</a></h1>
+<p>MAST supports three search modes: <strong>Vector</strong>, <strong>FullText</strong>, and <strong>Hybrid</strong>. All searches are scoped to a single collection and return scored results sorted by relevance.</p>
+<h2 id="search-modes"><a class="header" href="#search-modes">Search Modes</a></h2>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub enum SearchMode {
+    Vector,                              // Cosine similarity via usearch
+    FullText,                            // BM25 keyword search
+    Hybrid { vector_weight: f32, text_weight: f32 }, // Blended
+}
+<span class="boring">}</span></code></pre>
+<h2 id="vector-search"><a class="header" href="#vector-search">Vector Search</a></h2>
+<p>Uses cosine similarity via the usearch HNSW index. Requires either a <code>query</code> (text to embed) or a <code>query_embedding</code> (pre-computed vector).</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let results = mast.recall(
+    RecallRequest {
+        collection: "notes".into(),
+        query: Some("machine learning concepts".into()),
+        query_embedding: None,
+        text_query: None,
+        search_mode: SearchMode::Vector,
+        limit: 10,
+        filter: None,
+        tier_weights: None,
+        time_decay: None,
+    },
+    &amp;embedder,
+).await?;
+<span class="boring">}</span></code></pre>
+<p><strong>Score formula:</strong> <code>score = similarity * tier_weight * time_decay</code></p>
+<p>Where:</p>
+<ul>
+<li><code>similarity = 1.0 - cosine_distance</code></li>
+<li><code>tier_weight</code> from <code>TierWeights</code> (Core=1.0, Active=0.9, Background=0.7, Archive=0.5)</li>
+<li><code>time_decay = 0.5^(age_secs / half_life_secs)</code> (1.0 if no decay configured)</li>
+</ul>
+<h2 id="full-text-search-1"><a class="header" href="#full-text-search-1">Full-Text Search</a></h2>
+<p>Uses BM25 scoring with a built-in tokenizer. The tokenizer lowercases text, splits on non-alphanumeric characters, removes tokens shorter than 2 characters, and filters stop words.</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let results = mast.recall(
+    RecallRequest {
+        collection: "notes".into(),
+        query: None,
+        query_embedding: None,
+        text_query: Some("dark mode preferences".into()),
+        search_mode: SearchMode::FullText,
+        limit: 10,
+        filter: None,
+        tier_weights: None,
+        time_decay: None,
+    },
+    &amp;embedder,
+).await?;
+<span class="boring">}</span></code></pre>
+<p><strong>Score formula:</strong> <code>score = bm25_score * tier_weight * time_decay</code></p>
+<p>BM25 parameters: <code>k1 = 1.2</code>, <code>b = 0.75</code>.</p>
+<p>Full-text search does not require an embedder. The <code>text_query</code> field is used; if absent, <code>query</code> is used as fallback.</p>
+<h2 id="hybrid-search"><a class="header" href="#hybrid-search">Hybrid Search</a></h2>
+<p>Runs both vector and full-text search, normalizes scores with min-max normalization, and blends them using configurable weights.</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let results = mast.recall(
+    RecallRequest {
+        collection: "notes".into(),
+        query: Some("dark mode".into()),
+        query_embedding: None,
+        text_query: Some("dark mode".into()),
+        search_mode: SearchMode::Hybrid {
+            vector_weight: 0.7,
+            text_weight: 0.3,
+        },
+        limit: 10,
+        filter: None,
+        tier_weights: None,
+        time_decay: None,
+    },
+    &amp;embedder,
+).await?;
+<span class="boring">}</span></code></pre>
+<p><strong>Score formula:</strong> <code>score = vector_weight * norm(vec_score) + text_weight * norm(ft_score)</code></p>
+<p>Where <code>norm()</code> is min-max normalization to [0, 1] across the result set.</p>
+<h2 id="metadata-filtering"><a class="header" href="#metadata-filtering">Metadata Filtering</a></h2>
+<p>All search modes support metadata filtering. Filters are applied after the initial search and before scoring.</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub enum MetadataFilter {
+    Eq(String, String),           // key == value
+    In(String, Vec&lt;String&gt;),      // key in [values]
+    And(Vec&lt;MetadataFilter&gt;),     // all must match
+    Or(Vec&lt;MetadataFilter&gt;),      // any must match
+}
+<span class="boring">}</span></code></pre>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let results = mast.recall(
+    RecallRequest {
+        collection: "notes".into(),
+        query: Some("preferences".into()),
+        filter: Some(MetadataFilter::And(vec![
+            MetadataFilter::Eq("source".into(), "conversation".into()),
+            MetadataFilter::In("topic".into(), vec!["ui".into(), "ux".into()]),
+        ])),
+        ..Default::default()
+    },
+    &amp;embedder,
+).await?;
+<span class="boring">}</span></code></pre>
+<h2 id="tier-weights"><a class="header" href="#tier-weights">Tier Weights</a></h2>
+<p>Customize how tier membership affects scoring:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct TierWeights {
+    pub core: f32,        // default: 1.0
+    pub active: f32,      // default: 0.9
+    pub background: f32,  // default: 0.7
+    pub archive: f32,     // default: 0.5
+}
+<span class="boring">}</span></code></pre>
+<h2 id="time-decay"><a class="header" href="#time-decay">Time Decay</a></h2>
+<p>Apply exponential time decay to favor recent memories:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct TimeDecay {
+    pub half_life_secs: i64,  // time for score to halve
+}
+<span class="boring">}</span></code></pre>
+<p>Example: with <code>half_life_secs = 86400</code> (1 day), a 2-day-old memory scores 0.25x vs. a new one.</p>
+<h2 id="exclusion-rules"><a class="header" href="#exclusion-rules">Exclusion Rules</a></h2>
+<p>Recall automatically excludes:</p>
+<ul>
+<li>Memories with <code>compacted_at.is_some()</code> (already compacted)</li>
+<li>Memories with expired TTL (<code>now - created_at &gt;= ttl</code>)</li>
+</ul>
+<h2 id="access-stats"><a class="header" href="#access-stats">Access Stats</a></h2>
+<p>After recall, all returned memories have their <code>access_count</code> incremented and <code>last_accessed</code> updated. This data feeds into compaction strategies.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="compaction"><a class="header" href="#compaction">Compaction</a></h1>
+<p>Compaction is MAST’s mechanism for evolving memories from raw events into distilled knowledge. It promotes memories from one tier to a higher tier by synthesizing multiple memories into new, higher-order insights.</p>
+<h2 id="how-it-works"><a class="header" href="#how-it-works">How It Works</a></h2>
+<ol>
+<li><strong>Select candidates</strong> from the source tier based on a strategy</li>
+<li><strong>Group into batches</strong> of <code>max_batch_size</code></li>
+<li><strong>Synthesize</strong> each batch via the <code>Compactor</code> trait (typically an LLM call)</li>
+<li><strong>Store</strong> the synthesized memory in the target tier with <code>parent_ids</code> linking to sources</li>
+<li><strong>Mark</strong> source memories as compacted (<code>compacted_at</code> timestamp set)</li>
+</ol>
+<p>Compacted memories are hidden from <code>recall()</code> but remain in storage for provenance.</p>
+<h2 id="tiers"><a class="header" href="#tiers">Tiers</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Tier</th><th>Purpose</th><th>Default Weight</th></tr>
+</thead>
+<tbody>
+<tr><td><code>Core</code></td><td>Foundational knowledge, rarely changes</td><td>1.0</td></tr>
+<tr><td><code>Active</code></td><td>Recent, frequently accessed</td><td>0.9</td></tr>
+<tr><td><code>Background</code></td><td>Older, less accessed</td><td>0.7</td></tr>
+<tr><td><code>Archive</code></td><td>Historical, low relevance</td><td>0.5</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="compaction-strategies"><a class="header" href="#compaction-strategies">Compaction Strategies</a></h2>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub enum CompactionStrategy {
+    /// Compact memories older than a threshold
+    Age { older_than_secs: i64 },
+
+    /// Compact memories with zero access count
+    AccessDecay,
+
+    /// Combine age (&gt;24h) and low access (&lt;3)
+    Hybrid,
+
+    /// Compact specific memory IDs
+    Manual { ids: Vec&lt;Ulid&gt; },
+}
+<span class="boring">}</span></code></pre>
+<h3 id="age-strategy"><a class="header" href="#age-strategy">Age Strategy</a></h3>
+<p>Selects memories from the source tier where <code>now - created_at &gt; older_than_secs</code>.</p>
+<h3 id="accessdecay-strategy"><a class="header" href="#accessdecay-strategy">AccessDecay Strategy</a></h3>
+<p>Selects memories with <code>access_count == 0</code> – never recalled since stored.</p>
+<h3 id="hybrid-strategy"><a class="header" href="#hybrid-strategy">Hybrid Strategy</a></h3>
+<p>Selects memories that are both old (&gt;24 hours) and rarely accessed (&lt;3 times).</p>
+<h3 id="manual-strategy"><a class="header" href="#manual-strategy">Manual Strategy</a></h3>
+<p>Selects specific memories by ID. Useful for explicit curation.</p>
+<h2 id="the-compactor-trait"><a class="header" href="#the-compactor-trait">The Compactor Trait</a></h2>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[async_trait]
+pub trait Compactor: Send + Sync {
+    async fn synthesize(&amp;self, memories: &amp;[Memory]) -&gt; Result&lt;CompactedMemory, MastError&gt;;
+}
+
+pub struct CompactedMemory {
+    pub content: String,
+    pub metadata: HashMap&lt;String, String&gt;,
+}
+<span class="boring">}</span></code></pre>
+<p>The <code>Compactor</code> receives a batch of source memories and produces a single synthesized output. This is not summarization – it is knowledge creation. The implementation typically calls an LLM.</p>
+<h3 id="example-llm-based-compactor"><a class="header" href="#example-llm-based-compactor">Example: LLM-Based Compactor</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>struct LlmCompactor { client: OpenAIClient }
+
+#[async_trait]
+impl Compactor for LlmCompactor {
+    async fn synthesize(&amp;self, memories: &amp;[Memory]) -&gt; Result&lt;CompactedMemory, MastError&gt; {
+        let prompt = format!(
+            "Synthesize these memories into a single higher-order insight:\n{}",
+            memories.iter().map(|m| m.content.as_str()).collect::&lt;Vec&lt;_&gt;&gt;().join("\n- ")
+        );
+        let content = self.client.complete(&amp;prompt).await?;
+        Ok(CompactedMemory { content, metadata: HashMap::new() })
+    }
+}
+<span class="boring">}</span></code></pre>
+<h2 id="compactrequest"><a class="header" href="#compactrequest">CompactRequest</a></h2>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct CompactRequest {
+    pub collection: String,
+    pub source_tier: Tier,
+    pub target_tier: Tier,
+    pub strategy: CompactionStrategy,
+    pub max_batch_size: usize,   // must be &gt; 0
+    pub dry_run: bool,           // preview without writing
+}
+<span class="boring">}</span></code></pre>
+<h2 id="compactresult"><a class="header" href="#compactresult">CompactResult</a></h2>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct CompactResult {
+    pub collection: String,
+    pub source_count: usize,         // candidates found
+    pub compacted_count: usize,      // memories compacted
+    pub new_memory_ids: Vec&lt;Ulid&gt;,   // IDs of synthesized memories
+    pub source_memory_ids: Vec&lt;Ulid&gt;, // IDs of source memories
+}
+<span class="boring">}</span></code></pre>
+<h2 id="dry-run"><a class="header" href="#dry-run">Dry Run</a></h2>
+<p>Set <code>dry_run: true</code> to preview candidates without writing:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let result = mast.compact(
+    CompactRequest {
+        collection: "user:alice".into(),
+        source_tier: Tier::Active,
+        target_tier: Tier::Background,
+        strategy: CompactionStrategy::Age { older_than_secs: 86400 },
+        max_batch_size: 10,
+        dry_run: true,
+    },
+    &amp;compactor,
+    &amp;embedder,
+).await?;
+
+println!("{} candidates found", result.source_count);
+<span class="boring">}</span></code></pre>
+<h2 id="provenance"><a class="header" href="#provenance">Provenance</a></h2>
+<p>Every compacted memory records its <code>parent_ids</code>. You can trace any high-tier memory back to the raw events that produced it:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let memory = mast.get("user:alice", &amp;compacted_id)?.unwrap();
+for parent_id in &amp;memory.parent_ids {
+    let parent = mast.get("user:alice", parent_id)?;
+    // trace back to source
+}
+<span class="boring">}</span></code></pre>
+<h2 id="safety"><a class="header" href="#safety">Safety</a></h2>
+<ul>
+<li><code>max_batch_size</code> must be &gt; 0 (validated, returns error otherwise)</li>
+<li>If vector index insertion fails for the synthesized memory, the storage write is rolled back</li>
+<li>Source memories are only marked as compacted after successful synthesis and storage</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="graph"><a class="header" href="#graph">Graph</a></h1>
+<p>MAST includes a graph layer for modeling entity relationships alongside memories. Entities are connected by weighted, typed edges within a collection.</p>
+<h2 id="data-model"><a class="header" href="#data-model">Data Model</a></h2>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct Edge {
+    pub id: Ulid,                // Unique edge ID
+    pub collection: String,      // Scoped to a collection
+    pub source: String,          // Source entity name
+    pub target: String,          // Target entity name
+    pub relation: String,        // Relation type (e.g., "prefers", "knows")
+    pub weight: f32,             // Confidence / strength (0.0 to 1.0)
+    pub memory_ids: Vec&lt;Ulid&gt;,   // Supporting memories
+    pub created_at: i64,         // Creation timestamp
+    pub updated_at: i64,         // Last update timestamp
+}
+<span class="boring">}</span></code></pre>
+<h2 id="creating-edges"><a class="header" href="#creating-edges">Creating Edges</a></h2>
+<p>Use <code>relate()</code> to create or update an edge. If an edge with the same (source, target, relation) already exists, the weight and memory_ids are updated (upsert).</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let edge_id = mast.relate(RelateRequest {
+    collection: "user:alice".into(),
+    source: "alice".into(),
+    target: "dark_mode".into(),
+    relation: "prefers".into(),
+    weight: 0.9,
+    memory_ids: vec![memory_id],
+})?;
+<span class="boring">}</span></code></pre>
+<h3 id="upsert-behavior"><a class="header" href="#upsert-behavior">Upsert Behavior</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// First call creates the edge
+mast.relate(RelateRequest {
+    source: "alice".into(),
+    target: "dark_mode".into(),
+    relation: "prefers".into(),
+    weight: 0.7,
+    ..
+})?;
+
+// Second call updates weight (same source+target+relation)
+mast.relate(RelateRequest {
+    source: "alice".into(),
+    target: "dark_mode".into(),
+    relation: "prefers".into(),
+    weight: 0.95,  // updated
+    ..
+})?;
+<span class="boring">}</span></code></pre>
+<h2 id="removing-edges"><a class="header" href="#removing-edges">Removing Edges</a></h2>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>mast.unrelate("user:alice", "alice", "dark_mode", "prefers")?;
+<span class="boring">}</span></code></pre>
+<p>Returns an error if no matching edge exists.</p>
+<h2 id="traversal"><a class="header" href="#traversal">Traversal</a></h2>
+<p>BFS (breadth-first search) traversal from a starting entity:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let edges = mast.traverse(TraverseRequest {
+    collection: "user:alice".into(),
+    start: "alice".into(),
+    max_depth: 3,
+    relation_filter: Some("prefers".into()),  // optional
+    min_weight: Some(0.5),                     // optional
+})?;
+
+for edge in &amp;edges {
+    println!("{} --[{}]--&gt; {} (w={:.2})", edge.source, edge.relation, edge.target, edge.weight);
+}
+<span class="boring">}</span></code></pre>
+<h3 id="traverserequest-fields"><a class="header" href="#traverserequest-fields">TraverseRequest Fields</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Field</th><th>Type</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>collection</code></td><td><code>String</code></td><td>Collection to search</td></tr>
+<tr><td><code>start</code></td><td><code>String</code></td><td>Starting entity name</td></tr>
+<tr><td><code>max_depth</code></td><td><code>usize</code></td><td>Maximum BFS depth</td></tr>
+<tr><td><code>relation_filter</code></td><td><code>Option&lt;String&gt;</code></td><td>Only follow edges with this relation</td></tr>
+<tr><td><code>min_weight</code></td><td><code>Option&lt;f32&gt;</code></td><td>Only follow edges above this weight</td></tr>
+</tbody>
+</table>
+</div>
+<p>Traversal visits each entity at most once (cycle-safe). It returns all edges encountered during BFS, not just the final frontier.</p>
+<h2 id="subgraph"><a class="header" href="#subgraph">Subgraph</a></h2>
+<p>Get all edges in a collection:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let graph = mast.subgraph("user:alice")?;
+println!("{} edges in collection", graph.edges.len());
+<span class="boring">}</span></code></pre>
+<p>Returns a <code>Graph</code> struct:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct Graph {
+    pub collection: String,
+    pub edges: Vec&lt;Edge&gt;,
+}
+<span class="boring">}</span></code></pre>
+<h2 id="storage"><a class="header" href="#storage">Storage</a></h2>
+<p>Edges are stored in redb with three tables:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Table</th><th>Key</th><th>Value</th></tr>
+</thead>
+<tbody>
+<tr><td><code>EDGES</code></td><td><code>(collection, edge_id)</code></td><td>Serialized <code>Edge</code></td></tr>
+<tr><td><code>EDGE_INDEX_FWD</code></td><td><code>(collection, source, relation)</code></td><td>List of edge IDs</td></tr>
+<tr><td><code>EDGE_INDEX_REV</code></td><td><code>(collection, target, relation)</code></td><td>List of edge IDs</td></tr>
+</tbody>
+</table>
+</div>
+<p>Forward and reverse indexes enable O(1) entity lookups in both directions.</p>
+<h2 id="linking-edges-to-memories"><a class="header" href="#linking-edges-to-memories">Linking Edges to Memories</a></h2>
+<p>The <code>memory_ids</code> field connects an edge to the memories that support it. This creates a bridge between the flat memory store and the entity graph:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Extract a relationship from a memory
+let memory = mast.store(StoreRequest {
+    content: "Alice told me she prefers dark mode".into(),
+    ..
+}, &amp;embedder).await?;
+
+// Create a graph edge linking back to the memory
+mast.relate(RelateRequest {
+    source: "alice".into(),
+    target: "dark_mode".into(),
+    relation: "prefers".into(),
+    weight: 0.9,
+    memory_ids: vec![memory.id],
+    ..
+})?;
+<span class="boring">}</span></code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="rust-guide"><a class="header" href="#rust-guide">Rust Guide</a></h1>
+<p>Complete guide to using MAST from Rust.</p>
+<h2 id="dependencies"><a class="header" href="#dependencies">Dependencies</a></h2>
+<pre><code class="language-toml">[dependencies]
+mast-core = { path = "crates/mast-core" }
+mast-embed-openai = { path = "crates/mast-embed-openai" }  # optional
+tokio = { version = "1", features = ["full"] }
+</code></pre>
+<h2 id="configuration"><a class="header" href="#configuration">Configuration</a></h2>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use mast_core::config::MastConfig;
+
+let config = MastConfig::default()
+    .with_db_path("/path/to/agent.mast")
+    .with_default_collection("default")
+    .with_default_limit(10)
+    .with_default_dimensions(1536)
+    .with_default_tier_weights(TierWeights {
+        core: 1.0,
+        active: 0.9,
+        background: 0.7,
+        archive: 0.5,
+    })
+    .with_default_time_decay(TimeDecay { half_life_secs: 86400 });
+<span class="boring">}</span></code></pre>
+<p>All fields have sensible defaults. The only field you typically need to set is <code>db_path</code>.</p>
+<h2 id="opening-and-closing"><a class="header" href="#opening-and-closing">Opening and Closing</a></h2>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use mast_core::Mast;
+
+let mut mast = Mast::open(config)?;
+
+// ... use mast ...
+
+mast.close()?;  // explicit flush, propagates errors
+// Or let Drop handle it (logs errors but does not panic)
+<span class="boring">}</span></code></pre>
+<h2 id="storing-memories"><a class="header" href="#storing-memories">Storing Memories</a></h2>
+<h3 id="single-store"><a class="header" href="#single-store">Single Store</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use mast_core::types::*;
+use std::collections::HashMap;
+
+let memory = mast.store(
+    StoreRequest {
+        collection: "notes".into(),
+        content: "Rust's ownership system prevents data races".into(),
+        embedding: None,
+        metadata: HashMap::from([("topic".into(), "rust".into())]),
+        tier: Tier::Active,
+        ttl: None,
+    },
+    &amp;embedder,
+).await?;
+<span class="boring">}</span></code></pre>
+<h3 id="batch-store"><a class="header" href="#batch-store">Batch Store</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let memories = mast.store_batch(
+    BatchStoreRequest {
+        collection: "notes".into(),
+        items: vec![
+            BatchStoreItem {
+                content: "Item one".into(),
+                embedding: None,
+                metadata: HashMap::new(),
+                tier: Tier::Active,
+                ttl: None,
+            },
+            BatchStoreItem {
+                content: "Item two".into(),
+                embedding: None,
+                metadata: HashMap::new(),
+                tier: Tier::Active,
+                ttl: Some(3600),
+            },
+        ],
+    },
+    &amp;embedder,
+).await?;
+<span class="boring">}</span></code></pre>
+<p>Batch store uses <code>embed_batch()</code> for efficiency and is atomic – if any item fails, all are rolled back.</p>
+<h3 id="pre-computed-embeddings-1"><a class="header" href="#pre-computed-embeddings-1">Pre-Computed Embeddings</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let memory = mast.store(
+    StoreRequest {
+        collection: "notes".into(),
+        content: "pre-embedded text".into(),
+        embedding: Some(vec![0.1, 0.2, 0.3, /* ... */]),
+        metadata: HashMap::new(),
+        tier: Tier::Active,
+        ttl: None,
+    },
+    &amp;embedder,  // not called
+).await?;
+<span class="boring">}</span></code></pre>
+<h2 id="recalling-memories"><a class="header" href="#recalling-memories">Recalling Memories</a></h2>
+<h3 id="vector-search-1"><a class="header" href="#vector-search-1">Vector Search</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let results = mast.recall(
+    RecallRequest {
+        collection: "notes".into(),
+        query: Some("ownership and borrowing".into()),
+        query_embedding: None,
+        text_query: None,
+        search_mode: SearchMode::Vector,
+        limit: 5,
+        filter: None,
+        tier_weights: None,
+        time_decay: None,
+    },
+    &amp;embedder,
+).await?;
+<span class="boring">}</span></code></pre>
+<h3 id="full-text-search-2"><a class="header" href="#full-text-search-2">Full-Text Search</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let results = mast.recall(
+    RecallRequest {
+        collection: "notes".into(),
+        query: None,
+        query_embedding: None,
+        text_query: Some("ownership data races".into()),
+        search_mode: SearchMode::FullText,
+        limit: 5,
+        filter: None,
+        tier_weights: None,
+        time_decay: None,
+    },
+    &amp;embedder,
+).await?;
+<span class="boring">}</span></code></pre>
+<h3 id="hybrid-search-1"><a class="header" href="#hybrid-search-1">Hybrid Search</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let results = mast.recall(
+    RecallRequest {
+        collection: "notes".into(),
+        query: Some("ownership".into()),
+        query_embedding: None,
+        text_query: Some("ownership".into()),
+        search_mode: SearchMode::Hybrid {
+            vector_weight: 0.6,
+            text_weight: 0.4,
+        },
+        limit: 5,
+        filter: None,
+        tier_weights: None,
+        time_decay: None,
+    },
+    &amp;embedder,
+).await?;
+<span class="boring">}</span></code></pre>
+<h3 id="with-metadata-filter"><a class="header" href="#with-metadata-filter">With Metadata Filter</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let results = mast.recall(
+    RecallRequest {
+        collection: "notes".into(),
+        query: Some("systems programming".into()),
+        filter: Some(MetadataFilter::And(vec![
+            MetadataFilter::Eq("topic".into(), "rust".into()),
+            MetadataFilter::In("level".into(), vec!["advanced".into(), "expert".into()]),
+        ])),
+        ..Default::default()
+    },
+    &amp;embedder,
+).await?;
+<span class="boring">}</span></code></pre>
+<h2 id="crud-operations"><a class="header" href="#crud-operations">CRUD Operations</a></h2>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Get by ID
+let memory = mast.get("notes", &amp;memory_id)?;
+
+// Delete by ID
+mast.delete("notes", &amp;memory_id)?;
+
+// List all memories in a collection
+let all = mast.list("notes")?;
+
+// List all collections
+let collections = mast.info()?;
+<span class="boring">}</span></code></pre>
+<h2 id="graph-operations"><a class="header" href="#graph-operations">Graph Operations</a></h2>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Create or update an edge
+let edge_id = mast.relate(RelateRequest {
+    collection: "notes".into(),
+    source: "rust".into(),
+    target: "memory_safety".into(),
+    relation: "provides".into(),
+    weight: 0.95,
+    memory_ids: vec![],
+})?;
+
+// Remove an edge
+mast.unrelate("notes", "rust", "memory_safety", "provides")?;
+
+// BFS traversal
+let edges = mast.traverse(TraverseRequest {
+    collection: "notes".into(),
+    start: "rust".into(),
+    max_depth: 3,
+    relation_filter: None,
+    min_weight: Some(0.5),
+})?;
+
+// Get all edges in a collection
+let graph = mast.subgraph("notes")?;
+<span class="boring">}</span></code></pre>
+<h2 id="compaction-1"><a class="header" href="#compaction-1">Compaction</a></h2>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use mast_core::compact::Compactor;
+
+let result = mast.compact(
+    CompactRequest {
+        collection: "notes".into(),
+        source_tier: Tier::Active,
+        target_tier: Tier::Background,
+        strategy: CompactionStrategy::Age { older_than_secs: 86400 },
+        max_batch_size: 10,
+        dry_run: false,
+    },
+    &amp;compactor,   // implements Compactor trait
+    &amp;embedder,
+).await?;
+
+println!("Compacted {} into {} new memories",
+    result.compacted_count, result.new_memory_ids.len());
+<span class="boring">}</span></code></pre>
+<h2 id="ttl-and-vacuum"><a class="header" href="#ttl-and-vacuum">TTL and Vacuum</a></h2>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Store with TTL (expires after 1 hour)
+mast.store(StoreRequest {
+    ttl: Some(3600),
+    ..
+}, &amp;embedder).await?;
+
+// Remove expired memories
+let result = mast.vacuum("notes")?;
+println!("Removed {} expired memories", result.expired_count);
+<span class="boring">}</span></code></pre>
+<h2 id="snapshots"><a class="header" href="#snapshots">Snapshots</a></h2>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Export
+let mut file = std::fs::File::create("backup.jsonl")?;
+let result = mast.snapshot("notes", &amp;mut file)?;
+
+// Import (collection must not already exist)
+let file = std::fs::File::open("backup.jsonl")?;
+let mut reader = std::io::BufReader::new(file);
+let result = mast.restore(&amp;mut reader)?;
+<span class="boring">}</span></code></pre>
+<h2 id="error-handling"><a class="header" href="#error-handling">Error Handling</a></h2>
+<p>All operations return <code>Result&lt;T, MastError&gt;</code>:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub enum MastError {
+    Storage(String),       // redb errors
+    Index(String),         // usearch errors
+    Embedder(String),      // embedding failures
+    NotFound(String),      // entity not found
+    InvalidInput(String),  // validation errors
+    Serialization(String), // bincode/serde errors
+    Compaction(String),    // compaction failures
+    Graph(String),         // graph operation errors
+    Snapshot(String),      // snapshot/restore errors
+}
+<span class="boring">}</span></code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="python-guide"><a class="header" href="#python-guide">Python Guide</a></h1>
+<p>MAST provides native Python bindings via PyO3 and maturin, published as the <code>mast-memory</code> package.</p>
+<h2 id="installation"><a class="header" href="#installation">Installation</a></h2>
+<pre><code class="language-bash"># From source (requires Rust toolchain + maturin)
+cd crates/mast-py
+pip install maturin
+maturin develop --release
+</code></pre>
+<h2 id="basic-usage"><a class="header" href="#basic-usage">Basic Usage</a></h2>
+<pre><code class="language-python">from mast import Mast
+
+# Open a database
+db = Mast("my_agent.mast")
+</code></pre>
+<h2 id="embedder-protocol"><a class="header" href="#embedder-protocol">Embedder Protocol</a></h2>
+<p>MAST’s Python bindings accept any object with an <code>embed(text) -&gt; list[float]</code> method and a <code>dimensions() -&gt; int</code> method:</p>
+<pre><code class="language-python">class MyEmbedder:
+    def embed(self, text: str) -&gt; list[float]:
+        # Call your embedding API
+        return openai.embeddings.create(input=text, model="text-embedding-3-small").data[0].embedding
+
+    def embed_batch(self, texts: list[str]) -&gt; list[list[float]]:
+        # Optional: batch embedding for efficiency
+        result = openai.embeddings.create(input=texts, model="text-embedding-3-small")
+        return [d.embedding for d in result.data]
+
+    def dimensions(self) -&gt; int:
+        return 1536
+
+embedder = MyEmbedder()
+</code></pre>
+<p>If <code>embed_batch</code> is not defined, MAST falls back to calling <code>embed</code> sequentially.</p>
+<h2 id="storing-memories-1"><a class="header" href="#storing-memories-1">Storing Memories</a></h2>
+<pre><code class="language-python">memory = db.store(
+    collection="user:alice",
+    content="Alice prefers dark mode and dislikes notifications",
+    embedder=embedder,
+    metadata={"source": "conversation", "session": "abc123"},
+    tier="active",    # optional, default: "active"
+    ttl=3600,         # optional, seconds
+)
+
+print(f"Stored: {memory.id}")
+print(f"Content: {memory.content}")
+print(f"Tier: {memory.tier}")
+</code></pre>
+<h2 id="recalling-memories-1"><a class="header" href="#recalling-memories-1">Recalling Memories</a></h2>
+<pre><code class="language-python"># Vector search
+results = db.recall(
+    collection="user:alice",
+    embedder=embedder,
+    query="What are Alice's UI preferences?",
+    limit=5,
+)
+
+for r in results:
+    print(f"[{r.score:.4f}] {r.memory.content}")
+    print(f"  id={r.memory.id}, tier={r.memory.tier}")
+
+# Full-text search
+results = db.recall(
+    collection="user:alice",
+    embedder=embedder,
+    text_query="dark mode",
+    search_mode="fulltext",
+)
+
+# Hybrid search
+results = db.recall(
+    collection="user:alice",
+    embedder=embedder,
+    query="dark mode",
+    text_query="dark mode",
+    search_mode="hybrid",
+)
+
+# With metadata filter
+results = db.recall(
+    collection="user:alice",
+    embedder=embedder,
+    query="preferences",
+    filter={"source": "conversation"},
+)
+</code></pre>
+<h2 id="crud-operations-1"><a class="header" href="#crud-operations-1">CRUD Operations</a></h2>
+<pre><code class="language-python"># Get by ID
+memory = db.get("user:alice", "01H0000000000000000000000")
+
+# Delete by ID
+db.delete("user:alice", "01H0000000000000000000000")
+
+# List all memories
+memories = db.list("user:alice")
+for m in memories:
+    print(f"{m.id}: {m.content[:60]}")
+
+# Collection info
+collections = db.info()
+for c in collections:
+    print(f"{c.name}: {c.memory_count} memories, {c.dimensions} dims")
+</code></pre>
+<h2 id="graph-operations-1"><a class="header" href="#graph-operations-1">Graph Operations</a></h2>
+<pre><code class="language-python"># Create an edge
+edge_id = db.relate(
+    collection="user:alice",
+    source="alice",
+    target="dark_mode",
+    relation="prefers",
+    weight=0.9,
+)
+
+# Remove an edge
+db.unrelate("user:alice", "alice", "dark_mode", "prefers")
+
+# Traverse from an entity
+edges = db.traverse(
+    collection="user:alice",
+    start="alice",
+    max_depth=3,
+    relation="prefers",   # optional filter
+    min_weight=0.5,       # optional threshold
+)
+
+for e in edges:
+    print(f"{e.source} --[{e.relation}]--&gt; {e.target} (w={e.weight:.2f})")
+</code></pre>
+<h2 id="ttl-and-vacuum-1"><a class="header" href="#ttl-and-vacuum-1">TTL and Vacuum</a></h2>
+<pre><code class="language-python"># Store with TTL
+db.store(
+    collection="temp",
+    content="ephemeral data",
+    embedder=embedder,
+    ttl=3600,  # expires in 1 hour
+)
+
+# Remove expired memories
+expired_count = db.vacuum("temp")
+print(f"Removed {expired_count} expired memories")
+</code></pre>
+<h2 id="snapshots-1"><a class="header" href="#snapshots-1">Snapshots</a></h2>
+<pre><code class="language-python"># Export a collection
+result = db.snapshot("user:alice", "backup.jsonl")
+print(f"Exported {result.memory_count} memories, {result.edge_count} edges")
+
+# Import into a new database (collection must not exist)
+result = db.restore("backup.jsonl")
+print(f"Restored {result.memory_count} memories")
+if result.warnings:
+    for w in result.warnings:
+        print(f"  warning: {w}")
+</code></pre>
+<h2 id="cleanup"><a class="header" href="#cleanup">Cleanup</a></h2>
+<pre><code class="language-python">db.close()  # explicit flush
+</code></pre>
+<h2 id="return-types"><a class="header" href="#return-types">Return Types</a></h2>
+<h3 id="pymemory"><a class="header" href="#pymemory">PyMemory</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Attribute</th><th>Type</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>id</code></td><td><code>str</code></td><td>ULID string</td></tr>
+<tr><td><code>collection</code></td><td><code>str</code></td><td>Collection name</td></tr>
+<tr><td><code>content</code></td><td><code>str</code></td><td>Memory text</td></tr>
+<tr><td><code>metadata</code></td><td><code>dict[str, str]</code></td><td>Key-value pairs</td></tr>
+<tr><td><code>tier</code></td><td><code>str</code></td><td>“core”, “active”, “background”, “archive”</td></tr>
+<tr><td><code>created_at</code></td><td><code>int</code></td><td>Unix timestamp</td></tr>
+<tr><td><code>access_count</code></td><td><code>int</code></td><td>Recall count</td></tr>
+<tr><td><code>last_accessed</code></td><td><code>int</code></td><td>Last recall timestamp</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="pyrecallresult"><a class="header" href="#pyrecallresult">PyRecallResult</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Attribute</th><th>Type</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>memory</code></td><td><code>PyMemory</code></td><td>The recalled memory</td></tr>
+<tr><td><code>score</code></td><td><code>float</code></td><td>Relevance score</td></tr>
+</tbody>
+</table>
+</div>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="nodejs-guide"><a class="header" href="#nodejs-guide">Node.js Guide</a></h1>
+<p>MAST provides native Node.js bindings via napi-rs, published as the <code>mast-memory</code> package.</p>
+<h2 id="installation-1"><a class="header" href="#installation-1">Installation</a></h2>
+<pre><code class="language-bash"># From source (requires Rust toolchain)
+cd crates/mast-node
+npm install
+npm run build
+</code></pre>
+<h2 id="basic-usage-1"><a class="header" href="#basic-usage-1">Basic Usage</a></h2>
+<pre><code class="language-javascript">const { MastDb } = require('mast-memory');
+
+const db = new MastDb('my_agent.mast');
+</code></pre>
+<h2 id="embedder-function"><a class="header" href="#embedder-function">Embedder Function</a></h2>
+<p>The Node.js bindings accept an embedding function and a dimensions count. The function receives a string and must return <code>number[]</code>:</p>
+<pre><code class="language-javascript">const OpenAI = require('openai');
+const openai = new OpenAI();
+
+async function embed(text) {
+  const response = await openai.embeddings.create({
+    input: text,
+    model: 'text-embedding-3-small',
+  });
+  return response.data[0].embedding;
+}
+
+const DIMS = 1536;
+</code></pre>
+<h2 id="storing-memories-2"><a class="header" href="#storing-memories-2">Storing Memories</a></h2>
+<pre><code class="language-javascript">const memory = db.store(
+  'user:alice',                    // collection
+  'Alice prefers dark mode',       // content
+  embed,                           // embed function
+  DIMS,                            // dimensions
+  { source: 'conversation' },      // metadata (optional)
+  'active',                        // tier (optional)
+  null,                            // ttl in seconds (optional)
+);
+
+console.log(`Stored: ${memory.id}`);
+console.log(`Content: ${memory.content}`);
+</code></pre>
+<h2 id="recalling-memories-2"><a class="header" href="#recalling-memories-2">Recalling Memories</a></h2>
+<pre><code class="language-javascript">// Vector search
+const results = db.recall(
+  'user:alice',     // collection
+  embed,            // embed function
+  DIMS,             // dimensions
+  'UI preferences', // query (optional)
+  null,             // text_query (optional)
+  'vector',         // search_mode (optional): "vector", "fulltext", "hybrid"
+  5,                // limit (optional)
+);
+
+for (const r of results) {
+  console.log(`[${r.score.toFixed(4)}] ${r.memory.content}`);
+}
+
+// Full-text search
+const ftResults = db.recall(
+  'user:alice',
+  embed,
+  DIMS,
+  null,             // query
+  'dark mode',      // text_query
+  'fulltext',
+  5,
+);
+
+// Hybrid search
+const hybridResults = db.recall(
+  'user:alice',
+  embed,
+  DIMS,
+  'dark mode',      // query (for vector)
+  'dark mode',      // text_query (for fulltext)
+  'hybrid',
+  5,
+);
+</code></pre>
+<h2 id="crud-operations-2"><a class="header" href="#crud-operations-2">CRUD Operations</a></h2>
+<pre><code class="language-javascript">// Get by ID
+const memory = db.get('user:alice', '01H0000000000000000000000');
+
+// Delete by ID
+db.delete('user:alice', '01H0000000000000000000000');
+
+// List all memories
+const memories = db.list('user:alice');
+for (const m of memories) {
+  console.log(`${m.id}: ${m.content.substring(0, 60)}`);
+}
+
+// Collection info
+const collections = db.info();
+for (const c of collections) {
+  console.log(`${c.name}: ${c.memoryCount} memories, ${c.dimensions} dims`);
+}
+</code></pre>
+<h2 id="graph-operations-2"><a class="header" href="#graph-operations-2">Graph Operations</a></h2>
+<pre><code class="language-javascript">// Create an edge
+const edgeId = db.relate(
+  'user:alice',   // collection
+  'alice',        // source
+  'dark_mode',    // target
+  'prefers',      // relation
+  0.9,            // weight (optional, default: 1.0)
+);
+
+// Remove an edge
+db.unrelate('user:alice', 'alice', 'dark_mode', 'prefers');
+
+// Traverse from an entity
+const edges = db.traverse(
+  'user:alice',   // collection
+  'alice',        // start entity
+  3,              // max_depth (optional, default: 3)
+  'prefers',      // relation filter (optional)
+  0.5,            // min_weight (optional)
+);
+
+for (const e of edges) {
+  console.log(`${e.source} --[${e.relation}]--&gt; ${e.target} (w=${e.weight.toFixed(2)})`);
+}
+</code></pre>
+<h2 id="ttl-and-vacuum-2"><a class="header" href="#ttl-and-vacuum-2">TTL and Vacuum</a></h2>
+<pre><code class="language-javascript">// Store with TTL
+db.store('temp', 'ephemeral data', embed, DIMS, null, 'active', 3600);
+
+// Remove expired memories
+const expiredCount = db.vacuum('temp');
+console.log(`Removed ${expiredCount} expired memories`);
+</code></pre>
+<h2 id="snapshots-2"><a class="header" href="#snapshots-2">Snapshots</a></h2>
+<pre><code class="language-javascript">// Export a collection
+const snapResult = db.snapshot('user:alice', 'backup.jsonl');
+console.log(`Exported ${snapResult.memoryCount} memories, ${snapResult.edgeCount} edges`);
+
+// Import (collection must not exist)
+const restoreResult = db.restore('backup.jsonl');
+console.log(`Restored ${restoreResult.memoryCount} memories`);
+</code></pre>
+<h2 id="cleanup-1"><a class="header" href="#cleanup-1">Cleanup</a></h2>
+<pre><code class="language-javascript">db.close();
+</code></pre>
+<h2 id="return-types-1"><a class="header" href="#return-types-1">Return Types</a></h2>
+<h3 id="jsmemory"><a class="header" href="#jsmemory">JsMemory</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Property</th><th>Type</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>id</code></td><td><code>string</code></td><td>ULID string</td></tr>
+<tr><td><code>collection</code></td><td><code>string</code></td><td>Collection name</td></tr>
+<tr><td><code>content</code></td><td><code>string</code></td><td>Memory text</td></tr>
+<tr><td><code>metadata</code></td><td><code>Record&lt;string, string&gt;</code></td><td>Key-value pairs</td></tr>
+<tr><td><code>tier</code></td><td><code>string</code></td><td>“core”, “active”, “background”, “archive”</td></tr>
+<tr><td><code>createdAt</code></td><td><code>number</code></td><td>Unix timestamp</td></tr>
+<tr><td><code>accessCount</code></td><td><code>number</code></td><td>Recall count</td></tr>
+<tr><td><code>lastAccessed</code></td><td><code>number</code></td><td>Last recall timestamp</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="jsrecallresult"><a class="header" href="#jsrecallresult">JsRecallResult</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Property</th><th>Type</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>memory</code></td><td><code>JsMemory</code></td><td>The recalled memory</td></tr>
+<tr><td><code>score</code></td><td><code>number</code></td><td>Relevance score</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="jscollectioninfo"><a class="header" href="#jscollectioninfo">JsCollectionInfo</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Property</th><th>Type</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>name</code></td><td><code>string</code></td><td>Collection name</td></tr>
+<tr><td><code>dimensions</code></td><td><code>number</code></td><td>Vector dimensionality</td></tr>
+<tr><td><code>memoryCount</code></td><td><code>number</code></td><td>Number of memories</td></tr>
+</tbody>
+</table>
+</div>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="c-ffi-guide"><a class="header" href="#c-ffi-guide">C FFI Guide</a></h1>
+<p>MAST provides a C-compatible FFI via the <code>mast-ffi</code> crate. This enables integration with any language that can call C functions (Go, Swift, Ruby, etc.).</p>
+<h2 id="building"><a class="header" href="#building">Building</a></h2>
+<pre><code class="language-bash">cd crates/mast-ffi
+cargo build --release
+# Produces: target/release/libmast_ffi.dylib (macOS) or libmast_ffi.so (Linux)
+</code></pre>
+<h2 id="core-concepts"><a class="header" href="#core-concepts">Core Concepts</a></h2>
+<h3 id="masthandle"><a class="header" href="#masthandle">MastHandle</a></h3>
+<p>An opaque pointer to the MAST instance. Created with <code>mast_open()</code>, freed with <code>mast_close()</code>.</p>
+<h3 id="error-handling-1"><a class="header" href="#error-handling-1">Error Handling</a></h3>
+<p>All functions that can fail accept a <code>MastFfiError**</code> out-parameter. On error, the pointer is set to an allocated error struct:</p>
+<pre><code class="language-c">typedef struct {
+    int code;       // Error category (see table below)
+    char* message;  // Human-readable error message
+} MastFfiError;
+</code></pre>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Code</th><th>Category</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>Storage</td></tr>
+<tr><td>2</td><td>Index</td></tr>
+<tr><td>3</td><td>Embedder</td></tr>
+<tr><td>4</td><td>NotFound</td></tr>
+<tr><td>5</td><td>InvalidInput</td></tr>
+<tr><td>6</td><td>Serialization</td></tr>
+<tr><td>7</td><td>Compaction</td></tr>
+<tr><td>8</td><td>Graph</td></tr>
+<tr><td>9</td><td>Snapshot</td></tr>
+</tbody>
+</table>
+</div>
+<p>Always check the error pointer after each call and free it with <code>mast_free_error()</code>.</p>
+<h3 id="embedder-callbacks"><a class="header" href="#embedder-callbacks">Embedder Callbacks</a></h3>
+<p>The FFI uses a vtable of function pointers for embedding:</p>
+<pre><code class="language-c">typedef struct {
+    // Required: embed a single text
+    float* (*embed)(
+        void* user_data,
+        const char* text,
+        size_t* out_len,
+        MastFfiError** err
+    );
+
+    // Optional: batch embed (falls back to sequential if NULL)
+    float** (*embed_batch)(
+        void* user_data,
+        const char** texts,
+        size_t count,
+        size_t* out_lens,
+        MastFfiError** err
+    );
+
+    // Optional: return dimensions
+    size_t (*dimensions)(void* user_data);
+
+    // Opaque pointer passed to all callbacks
+    void* user_data;
+} MastEmbedderVtable;
+</code></pre>
+<p>The <code>embed</code> callback must return a heap-allocated <code>float*</code> array. MAST takes ownership via <code>Vec::from_raw_parts</code>.</p>
+<h2 id="usage-example"><a class="header" href="#usage-example">Usage Example</a></h2>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+
+// Forward declarations (from mast-ffi)
+typedef struct MastHandle MastHandle;
+typedef struct MastFfiError MastFfiError;
+typedef struct MastEmbedderVtable MastEmbedderVtable;
+typedef struct MastStoreResult MastStoreResult;
+typedef struct MastRecallResult MastRecallResult;
+
+extern MastHandle* mast_open(const char* path, MastFfiError** err);
+extern void mast_close(MastHandle* handle);
+extern MastStoreResult* mast_store(
+    MastHandle* handle, const char* collection, const char* content,
+    const MastEmbedderVtable* embedder, const void* metadata,
+    const char* tier, long long ttl, int has_ttl, MastFfiError** err
+);
+extern void mast_free_error(MastFfiError* err);
+extern void mast_free_store_result(MastStoreResult* result);
+
+int main() {
+    MastFfiError* err = NULL;
+
+    // Open database
+    MastHandle* db = mast_open("test.mast", &amp;err);
+    if (err) {
+        fprintf(stderr, "Error: %s\n", err-&gt;message);
+        mast_free_error(err);
+        return 1;
+    }
+
+    // Set up embedder vtable
+    MastEmbedderVtable vtable = {
+        .embed = my_embed_fn,
+        .embed_batch = NULL,  // optional
+        .dimensions = my_dims_fn,
+        .user_data = my_context,
+    };
+
+    // Store a memory
+    MastStoreResult* result = mast_store(
+        db, "notes", "hello world",
+        &amp;vtable, NULL, "active", 0, 0, &amp;err
+    );
+    if (err) {
+        fprintf(stderr, "Store error: %s\n", err-&gt;message);
+        mast_free_error(err);
+    } else {
+        printf("Stored: %s\n", result-&gt;id);
+        mast_free_store_result(result);
+    }
+
+    mast_close(db);
+    return 0;
+}
+</code></pre>
+<h2 id="api-functions"><a class="header" href="#api-functions">API Functions</a></h2>
+<h3 id="lifecycle-1"><a class="header" href="#lifecycle-1">Lifecycle</a></h3>
+<pre><code class="language-c">MastHandle* mast_open(const char* path, MastFfiError** err);
+void mast_close(MastHandle* handle);
+</code></pre>
+<h3 id="store-and-recall"><a class="header" href="#store-and-recall">Store and Recall</a></h3>
+<pre><code class="language-c">MastStoreResult* mast_store(
+    MastHandle* handle, const char* collection, const char* content,
+    const MastEmbedderVtable* embedder, const MastMetadata* metadata,
+    const char* tier, long long ttl, int has_ttl, MastFfiError** err
+);
+
+MastRecallResult* mast_recall(
+    MastHandle* handle, const char* collection, const char* query,
+    const MastEmbedderVtable* embedder, size_t limit, MastFfiError** err
+);
+</code></pre>
+<h3 id="crud"><a class="header" href="#crud">CRUD</a></h3>
+<pre><code class="language-c">int mast_get(MastHandle* handle, const char* collection,
+             const char* id, char** out_content, MastFfiError** err);
+int mast_delete(MastHandle* handle, const char* collection,
+                const char* id, MastFfiError** err);
+MastInfoResult* mast_info(MastHandle* handle, MastFfiError** err);
+int mast_vacuum(MastHandle* handle, const char* collection,
+                size_t* out_expired, MastFfiError** err);
+</code></pre>
+<h3 id="graph-1"><a class="header" href="#graph-1">Graph</a></h3>
+<pre><code class="language-c">int mast_relate(MastHandle* handle, const char* collection,
+                const char* source, const char* target, const char* relation,
+                float weight, char** out_id, MastFfiError** err);
+int mast_unrelate(MastHandle* handle, const char* collection,
+                  const char* source, const char* target, const char* relation,
+                  MastFfiError** err);
+</code></pre>
+<h3 id="snapshots-3"><a class="header" href="#snapshots-3">Snapshots</a></h3>
+<pre><code class="language-c">MastSnapshotResult* mast_snapshot(MastHandle* handle, const char* collection,
+                                   const char* output_path, MastFfiError** err);
+MastRestoreResult* mast_restore(MastHandle* handle, const char* input_path,
+                                 MastFfiError** err);
+</code></pre>
+<h3 id="free-functions"><a class="header" href="#free-functions">Free Functions</a></h3>
+<p>Every allocated result must be freed:</p>
+<pre><code class="language-c">void mast_free_error(MastFfiError* err);
+void mast_free_string(char* s);
+void mast_free_store_result(MastStoreResult* result);
+void mast_free_recall_result(MastRecallResult* result);
+void mast_free_info_result(MastInfoResult* result);
+void mast_free_snapshot_result(MastSnapshotResult* result);
+void mast_free_restore_result(MastRestoreResult* result);
+</code></pre>
+<h2 id="metadata-1"><a class="header" href="#metadata-1">Metadata</a></h2>
+<p>Pass metadata via the <code>MastMetadata</code> struct:</p>
+<pre><code class="language-c">typedef struct {
+    const char** keys;
+    const char** values;
+    size_t count;
+} MastMetadata;
+</code></pre>
+<pre><code class="language-c">const char* keys[] = {"source", "topic"};
+const char* values[] = {"conversation", "preferences"};
+MastMetadata meta = { .keys = keys, .values = values, .count = 2 };
+
+mast_store(db, "notes", "content", &amp;vtable, &amp;meta, "active", 0, 0, &amp;err);
+</code></pre>
+<p>Pass <code>NULL</code> for no metadata.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="snapshots-4"><a class="header" href="#snapshots-4">Snapshots</a></h1>
+<p>MAST supports exporting and importing collections as JSONL (JSON Lines) files. This enables backup, migration, and portability between MAST instances.</p>
+<h2 id="jsonl-format"><a class="header" href="#jsonl-format">JSONL Format</a></h2>
+<p>A snapshot file consists of:</p>
+<ol>
+<li><strong>Header line</strong> – JSON object with metadata</li>
+<li><strong>Data lines</strong> – one JSON object per memory or edge</li>
+</ol>
+<h3 id="header"><a class="header" href="#header">Header</a></h3>
+<pre><code class="language-json">{"mast_snapshot":"1.0","collection":"user:alice","memory_count":42,"edge_count":5}
+</code></pre>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Field</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>mast_snapshot</code></td><td>Format version (currently “1.0”)</td></tr>
+<tr><td><code>collection</code></td><td>Collection name</td></tr>
+<tr><td><code>memory_count</code></td><td>Number of memories</td></tr>
+<tr><td><code>edge_count</code></td><td>Number of edges</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="memory-lines"><a class="header" href="#memory-lines">Memory Lines</a></h3>
+<pre><code class="language-json">{"type":"memory","data":{"id":"01H...","collection":"user:alice","content":"Alice prefers dark mode","embedding":[0.1,0.2,...],"metadata":{"source":"conversation"},"tier":"Active","created_at":1700000000,"access_count":3,"last_accessed":1700001000,"ttl":null,"compacted_at":null,"parent_ids":[]}}
+</code></pre>
+<h3 id="edge-lines"><a class="header" href="#edge-lines">Edge Lines</a></h3>
+<pre><code class="language-json">{"type":"edge","data":{"id":"01H...","collection":"user:alice","source":"alice","target":"dark_mode","relation":"prefers","weight":0.9,"memory_ids":[],"created_at":1700000000,"updated_at":1700000000}}
+</code></pre>
+<h2 id="creating-a-snapshot"><a class="header" href="#creating-a-snapshot">Creating a Snapshot</a></h2>
+<h3 id="rust"><a class="header" href="#rust">Rust</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let mut file = std::fs::File::create("backup.jsonl")?;
+let result = mast.snapshot("user:alice", &amp;mut file)?;
+println!("Exported {} memories, {} edges", result.memory_count, result.edge_count);
+<span class="boring">}</span></code></pre>
+<p>The <code>snapshot()</code> method accepts any <code>&amp;mut dyn Write</code>, so you can write to files, buffers, or network streams.</p>
+<h3 id="cli"><a class="header" href="#cli">CLI</a></h3>
+<pre><code class="language-bash">mast snapshot --db agent.mast --collection user:alice --output backup.jsonl
+</code></pre>
+<h3 id="python"><a class="header" href="#python">Python</a></h3>
+<pre><code class="language-python">result = db.snapshot("user:alice", "backup.jsonl")
+</code></pre>
+<h3 id="nodejs"><a class="header" href="#nodejs">Node.js</a></h3>
+<pre><code class="language-javascript">const result = db.snapshot('user:alice', 'backup.jsonl');
+</code></pre>
+<h2 id="restoring-a-snapshot"><a class="header" href="#restoring-a-snapshot">Restoring a Snapshot</a></h2>
+<h3 id="requirements"><a class="header" href="#requirements">Requirements</a></h3>
+<ul>
+<li>The target collection <strong>must not already exist</strong>. Restore fails if the collection name is already in use.</li>
+<li>The snapshot format version must be “1.0”.</li>
+</ul>
+<h3 id="rust-1"><a class="header" href="#rust-1">Rust</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let file = std::fs::File::open("backup.jsonl")?;
+let mut reader = std::io::BufReader::new(file);
+let result = mast.restore(&amp;mut reader)?;
+
+println!("Restored '{}': {} memories, {} edges",
+    result.collection, result.memory_count, result.edge_count);
+
+if !result.warnings.is_empty() {
+    for w in &amp;result.warnings {
+        eprintln!("  warning: {w}");
+    }
+}
+<span class="boring">}</span></code></pre>
+<h3 id="cli-1"><a class="header" href="#cli-1">CLI</a></h3>
+<pre><code class="language-bash">mast restore --db agent.mast --input backup.jsonl
+</code></pre>
+<h3 id="python-1"><a class="header" href="#python-1">Python</a></h3>
+<pre><code class="language-python">result = db.restore("backup.jsonl")
+</code></pre>
+<h3 id="nodejs-1"><a class="header" href="#nodejs-1">Node.js</a></h3>
+<pre><code class="language-javascript">const result = db.restore('backup.jsonl');
+</code></pre>
+<h2 id="what-gets-exported"><a class="header" href="#what-gets-exported">What Gets Exported</a></h2>
+<ul>
+<li>All memories in the collection (including compacted ones)</li>
+<li>All graph edges in the collection</li>
+<li>Embeddings are included in the export</li>
+</ul>
+<h2 id="what-gets-restored"><a class="header" href="#what-gets-restored">What Gets Restored</a></h2>
+<ul>
+<li>Memories are written to storage and indexed (vector, full-text, metadata)</li>
+<li>Edges are written to storage with forward/reverse indexes</li>
+<li>Vector indexes are flushed after restore</li>
+<li>Invalid lines produce warnings but do not abort the restore</li>
+</ul>
+<h2 id="result-types"><a class="header" href="#result-types">Result Types</a></h2>
+<h3 id="snapshotresult"><a class="header" href="#snapshotresult">SnapshotResult</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct SnapshotResult {
+    pub collection: String,
+    pub memory_count: u64,
+    pub edge_count: u64,
+}
+<span class="boring">}</span></code></pre>
+<h3 id="restoreresult"><a class="header" href="#restoreresult">RestoreResult</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct RestoreResult {
+    pub collection: String,
+    pub memory_count: u64,
+    pub edge_count: u64,
+    pub warnings: Vec&lt;String&gt;,
+}
+<span class="boring">}</span></code></pre>
+<h2 id="use-cases"><a class="header" href="#use-cases">Use Cases</a></h2>
+<ul>
+<li><strong>Backup:</strong> periodic snapshot to durable storage</li>
+<li><strong>Migration:</strong> move a collection between MAST instances</li>
+<li><strong>Testing:</strong> capture a known state for reproducible tests</li>
+<li><strong>Inspection:</strong> use standard JSON tools to examine memory contents</li>
+<li><strong>Sharing:</strong> distribute pre-built knowledge bases as JSONL files</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="performance"><a class="header" href="#performance">Performance</a></h1>
+<p>Guidelines for optimizing MAST performance.</p>
+<h2 id="embedding-dimensions"><a class="header" href="#embedding-dimensions">Embedding Dimensions</a></h2>
+<p>The choice of embedding dimensions directly impacts memory usage, index size, and search speed.</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Dimensions</th><th>Model Example</th><th>Index Memory per Vector</th><th>Use Case</th></tr>
+</thead>
+<tbody>
+<tr><td>256</td><td>Custom</td><td>~1 KB</td><td>Prototyping, small datasets</td></tr>
+<tr><td>768</td><td>many open-source models</td><td>~3 KB</td><td>Balanced quality/performance</td></tr>
+<tr><td>1536</td><td>OpenAI text-embedding-3-small</td><td>~6 KB</td><td>Production, high quality</td></tr>
+<tr><td>3072</td><td>OpenAI text-embedding-3-large</td><td>~12 KB</td><td>Maximum quality</td></tr>
+</tbody>
+</table>
+</div>
+<p>Lower dimensions = faster search + less memory. Use the smallest dimension that meets your quality requirements.</p>
+<h2 id="batch-operations"><a class="header" href="#batch-operations">Batch Operations</a></h2>
+<p>Use <code>store_batch()</code> instead of repeated <code>store()</code> calls:</p>
+<ul>
+<li><code>embed_batch()</code> is called once instead of N individual embed calls</li>
+<li>Reduces round trips to embedding APIs</li>
+<li>Single transaction for all writes</li>
+</ul>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Prefer this:
+mast.store_batch(BatchStoreRequest {
+    collection: "notes".into(),
+    items: items,  // vec of BatchStoreItem
+}, &amp;embedder).await?;
+
+// Over this:
+for item in items {
+    mast.store(StoreRequest { .. }, &amp;embedder).await?;
+}
+<span class="boring">}</span></code></pre>
+<h2 id="search-tuning"><a class="header" href="#search-tuning">Search Tuning</a></h2>
+<h3 id="overfetch-factor"><a class="header" href="#overfetch-factor">Overfetch Factor</a></h3>
+<p>MAST internally fetches <code>limit * 3 + 10</code> candidates from the vector/full-text index, then filters and re-ranks. This means:</p>
+<ul>
+<li>Setting <code>limit: 5</code> actually searches for ~25 candidates</li>
+<li>This handles filtering out compacted/expired memories without missing results</li>
+<li>Higher limits incur proportionally more index search cost</li>
+</ul>
+<h3 id="search-mode-selection"><a class="header" href="#search-mode-selection">Search Mode Selection</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Mode</th><th>Best For</th><th>Cost</th></tr>
+</thead>
+<tbody>
+<tr><td><code>Vector</code></td><td>Semantic similarity</td><td>One embedding + HNSW search</td></tr>
+<tr><td><code>FullText</code></td><td>Exact keyword matching</td><td>No embedding needed, posting list lookups</td></tr>
+<tr><td><code>Hybrid</code></td><td>Best overall relevance</td><td>Both vector + full-text, then merge</td></tr>
+</tbody>
+</table>
+</div>
+<p>Full-text search is faster than vector search because it does not require an embedding call.</p>
+<h3 id="metadata-filters"><a class="header" href="#metadata-filters">Metadata Filters</a></h3>
+<p>Metadata filters run after the initial vector/full-text search. For vector search with metadata filters, MAST uses <code>filtered_search</code> on the HNSW index, which pre-filters candidates. This is efficient for selective filters but may be slower for very broad filters.</p>
+<h2 id="memory-management"><a class="header" href="#memory-management">Memory Management</a></h2>
+<h3 id="vector-index-caching"><a class="header" href="#vector-index-caching">Vector Index Caching</a></h3>
+<p>Vector indexes are held in memory during the lifetime of the <code>Mast</code> instance. The index is persisted to redb on <code>close()</code> or <code>Drop</code>. Keeping the instance open avoids repeated index deserialization.</p>
+<h3 id="index-capacity"><a class="header" href="#index-capacity">Index Capacity</a></h3>
+<p>usearch pre-allocates capacity in blocks of 1024 vectors. After loading from a buffer, it reserves <code>current_size + 1024</code> additional slots. This avoids frequent reallocations for typical workloads.</p>
+<h2 id="storage-1"><a class="header" href="#storage-1">Storage</a></h2>
+<h3 id="redb-characteristics"><a class="header" href="#redb-characteristics">redb Characteristics</a></h3>
+<ul>
+<li>Single-file ACID database</li>
+<li>Copy-on-write B-tree</li>
+<li>No write-ahead log to manage separately</li>
+<li>Good for read-heavy workloads</li>
+<li>Single-writer, multiple-reader</li>
+</ul>
+<h3 id="data-size-estimates"><a class="header" href="#data-size-estimates">Data Size Estimates</a></h3>
+<p>Per memory, storage overhead is approximately:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Component</th><th>Size</th></tr>
+</thead>
+<tbody>
+<tr><td>Memory record (bincode)</td><td>~content_len + dims*4 + metadata + 200 bytes overhead</td></tr>
+<tr><td>Vector index entry</td><td>~dims * 4 bytes + HNSW graph edges</td></tr>
+<tr><td>Full-text posting entries</td><td>~tokens * 30 bytes</td></tr>
+<tr><td>Metadata index entries</td><td>~metadata_pairs * 40 bytes</td></tr>
+<tr><td>ULID/seq mappings</td><td>~64 bytes</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="vacuum-and-compaction"><a class="header" href="#vacuum-and-compaction">Vacuum and Compaction</a></h2>
+<h3 id="vacuum"><a class="header" href="#vacuum">Vacuum</a></h3>
+<p>Run <code>vacuum()</code> periodically on collections with TTL-bearing memories. Vacuuming removes expired memories from storage and indexes, reclaiming space.</p>
+<h3 id="compaction-2"><a class="header" href="#compaction-2">Compaction</a></h3>
+<p>Compaction reduces the number of active memories by synthesizing them into higher-tier summaries. This improves recall speed (fewer candidates to search) and reduces storage size.</p>
+<p><strong>Recommended compaction strategy:</strong></p>
+<ol>
+<li>Start with <code>CompactionStrategy::Age { older_than_secs: 86400 }</code> (1 day)</li>
+<li>Set <code>max_batch_size</code> to 5-20 memories (larger batches produce better synthesis but consume more LLM tokens)</li>
+<li>Run as a periodic background job</li>
+</ol>
+<h2 id="close-and-flush"><a class="header" href="#close-and-flush">Close and Flush</a></h2>
+<p>Always call <code>close()</code> or let <code>Drop</code> run. If the process exits before either happens, vector index updates since the last flush are lost (storage data is safe due to redb’s ACID properties).</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Explicit close with error handling
+mast.close()?;
+
+// Or rely on Drop (logs errors but does not panic)
+drop(mast);
+<span class="boring">}</span></code></pre>
+<h2 id="cli-performance-tips"><a class="header" href="#cli-performance-tips">CLI Performance Tips</a></h2>
+<p>When using the CLI for batch operations, keep the database handle open as long as possible. Each CLI invocation opens and closes the database, which includes index serialization/deserialization.</p>
+<p>For bulk operations, prefer the Rust API or language bindings over repeated CLI calls.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="rust-api-reference"><a class="header" href="#rust-api-reference">Rust API Reference</a></h1>
+<p>Core API surface of the <code>Mast</code> struct in <code>mast-core</code>.</p>
+<h2 id="mast"><a class="header" href="#mast">Mast</a></h2>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct Mast { /* private */ }
+<span class="boring">}</span></code></pre>
+<h3 id="constructor"><a class="header" href="#constructor">Constructor</a></h3>
+<h4 id="mastopenconfig-mastconfig---resultself-masterror"><a class="header" href="#mastopenconfig-mastconfig---resultself-masterror"><code>Mast::open(config: MastConfig) -&gt; Result&lt;Self, MastError&gt;</code></a></h4>
+<p>Opens or creates a MAST database at the configured path. Creates the file and all internal tables if they do not exist.</p>
+<h3 id="storage-operations"><a class="header" href="#storage-operations">Storage Operations</a></h3>
+<h4 id="storemut-self-request-storerequest-embedder-dyn-embedder---resultmemory-masterror"><a class="header" href="#storemut-self-request-storerequest-embedder-dyn-embedder---resultmemory-masterror"><code>store(&amp;mut self, request: StoreRequest, embedder: &amp;dyn Embedder) -&gt; Result&lt;Memory, MastError&gt;</code></a></h4>
+<p>Stores a single memory. Generates an embedding if <code>request.embedding</code> is <code>None</code>. Indexes the memory for vector search, full-text search, and metadata filtering. Returns the created <code>Memory</code>.</p>
+<p><strong>Errors:</strong></p>
+<ul>
+<li><code>InvalidInput</code> if embedding is empty or dimensions mismatch</li>
+<li><code>Embedder</code> if embedding generation fails</li>
+<li><code>Index</code> if vector index insertion fails (storage is rolled back)</li>
+</ul>
+<h4 id="store_batchmut-self-request-batchstorerequest-embedder-dyn-embedder---resultvecmemory-masterror"><a class="header" href="#store_batchmut-self-request-batchstorerequest-embedder-dyn-embedder---resultvecmemory-masterror"><code>store_batch(&amp;mut self, request: BatchStoreRequest, embedder: &amp;dyn Embedder) -&gt; Result&lt;Vec&lt;Memory&gt;, MastError&gt;</code></a></h4>
+<p>Stores multiple memories atomically. Uses <code>embed_batch()</code> for items without pre-computed embeddings. All-or-nothing: if any item fails, all are rolled back.</p>
+<p><strong>Errors:</strong></p>
+<ul>
+<li><code>Embedder</code> if <code>embed_batch</code> returns wrong number of vectors</li>
+<li><code>InvalidInput</code> if any embedding is empty or dimensions mismatch</li>
+<li><code>Index</code> if any vector index insertion fails (all rolled back)</li>
+</ul>
+<h3 id="search-operations"><a class="header" href="#search-operations">Search Operations</a></h3>
+<h4 id="recallself-request-recallrequest-embedder-dyn-embedder---resultvecrecallresult-masterror"><a class="header" href="#recallself-request-recallrequest-embedder-dyn-embedder---resultvecrecallresult-masterror"><code>recall(&amp;self, request: RecallRequest, embedder: &amp;dyn Embedder) -&gt; Result&lt;Vec&lt;RecallResult&gt;, MastError&gt;</code></a></h4>
+<p>Searches for memories matching the query. Supports Vector, FullText, and Hybrid search modes. Updates <code>access_count</code> and <code>last_accessed</code> on all returned memories.</p>
+<p><strong>Behavior:</strong></p>
+<ul>
+<li><code>limit: 0</code> falls back to <code>config.default_limit</code></li>
+<li>Excludes compacted memories (<code>compacted_at.is_some()</code>)</li>
+<li>Excludes expired memories (<code>now - created_at &gt;= ttl</code>)</li>
+<li>Results sorted descending by score</li>
+</ul>
+<h3 id="crud-operations-3"><a class="header" href="#crud-operations-3">CRUD Operations</a></h3>
+<h4 id="getself-collection-str-id-ulid---resultoptionmemory-masterror"><a class="header" href="#getself-collection-str-id-ulid---resultoptionmemory-masterror"><code>get(&amp;self, collection: &amp;str, id: &amp;Ulid) -&gt; Result&lt;Option&lt;Memory&gt;, MastError&gt;</code></a></h4>
+<p>Retrieves a single memory by collection and ID. Returns <code>None</code> if not found.</p>
+<h4 id="deletemut-self-collection-str-id-ulid---result-masterror"><a class="header" href="#deletemut-self-collection-str-id-ulid---result-masterror"><code>delete(&amp;mut self, collection: &amp;str, id: &amp;Ulid) -&gt; Result&lt;(), MastError&gt;</code></a></h4>
+<p>Deletes a memory from storage, vector index, full-text index, and metadata index.</p>
+<h4 id="listself-collection-str---resultvecmemory-masterror"><a class="header" href="#listself-collection-str---resultvecmemory-masterror"><code>list(&amp;self, collection: &amp;str) -&gt; Result&lt;Vec&lt;Memory&gt;, MastError&gt;</code></a></h4>
+<p>Lists all memories in a collection, including compacted ones. Full table scan, no pagination.</p>
+<h4 id="infoself---resultveccollectioninfo-masterror"><a class="header" href="#infoself---resultveccollectioninfo-masterror"><code>info(&amp;self) -&gt; Result&lt;Vec&lt;CollectionInfo&gt;, MastError&gt;</code></a></h4>
+<p>Returns metadata for all collections.</p>
+<h3 id="compaction-3"><a class="header" href="#compaction-3">Compaction</a></h3>
+<h4 id="compactmut-self-request-compactrequest-compactor-dyn-compactor-embedder-dyn-embedder---resultcompactresult-masterror"><a class="header" href="#compactmut-self-request-compactrequest-compactor-dyn-compactor-embedder-dyn-embedder---resultcompactresult-masterror"><code>compact(&amp;mut self, request: CompactRequest, compactor: &amp;dyn Compactor, embedder: &amp;dyn Embedder) -&gt; Result&lt;CompactResult, MastError&gt;</code></a></h4>
+<p>Compacts memories from <code>source_tier</code> to <code>target_tier</code> using the provided strategy and compactor.</p>
+<p><strong>Errors:</strong></p>
+<ul>
+<li><code>InvalidInput</code> if <code>max_batch_size</code> is 0</li>
+<li><code>Compaction</code> if synthesis fails</li>
+<li><code>Index</code> if indexing the synthesized memory fails (storage rolled back)</li>
+</ul>
+<h3 id="ttl-1"><a class="header" href="#ttl-1">TTL</a></h3>
+<h4 id="vacuummut-self-collection-str---resultvacuumresult-masterror"><a class="header" href="#vacuummut-self-collection-str---resultvacuumresult-masterror"><code>vacuum(&amp;mut self, collection: &amp;str) -&gt; Result&lt;VacuumResult, MastError&gt;</code></a></h4>
+<p>Removes all expired memories from a collection. A memory is expired when <code>now - created_at &gt;= ttl</code>.</p>
+<h3 id="graph-2"><a class="header" href="#graph-2">Graph</a></h3>
+<h4 id="relateself-request-relaterequest---resultulid-masterror"><a class="header" href="#relateself-request-relaterequest---resultulid-masterror"><code>relate(&amp;self, request: RelateRequest) -&gt; Result&lt;Ulid, MastError&gt;</code></a></h4>
+<p>Creates or updates an edge. If an edge with the same (source, target, relation) exists, updates weight and memory_ids (upsert). Returns the edge ID.</p>
+<h4 id="unrelateself-collection-str-source-str-target-str-relation-str---result-masterror"><a class="header" href="#unrelateself-collection-str-source-str-target-str-relation-str---result-masterror"><code>unrelate(&amp;self, collection: &amp;str, source: &amp;str, target: &amp;str, relation: &amp;str) -&gt; Result&lt;(), MastError&gt;</code></a></h4>
+<p>Removes an edge. Returns <code>NotFound</code> if no matching edge exists.</p>
+<h4 id="traverseself-request-traverserequest---resultvecedge-masterror"><a class="header" href="#traverseself-request-traverserequest---resultvecedge-masterror"><code>traverse(&amp;self, request: TraverseRequest) -&gt; Result&lt;Vec&lt;Edge&gt;, MastError&gt;</code></a></h4>
+<p>BFS traversal from a starting entity. Returns all edges encountered, respecting <code>max_depth</code>, <code>relation_filter</code>, and <code>min_weight</code>. Cycle-safe (visits each entity at most once).</p>
+<h4 id="subgraphself-collection-str---resultgraph-masterror"><a class="header" href="#subgraphself-collection-str---resultgraph-masterror"><code>subgraph(&amp;self, collection: &amp;str) -&gt; Result&lt;Graph, MastError&gt;</code></a></h4>
+<p>Returns all edges in a collection.</p>
+<h3 id="snapshots-5"><a class="header" href="#snapshots-5">Snapshots</a></h3>
+<h4 id="snapshotself-collection-str-writer-mut-dyn-write---resultsnapshotresult-masterror"><a class="header" href="#snapshotself-collection-str-writer-mut-dyn-write---resultsnapshotresult-masterror"><code>snapshot(&amp;self, collection: &amp;str, writer: &amp;mut dyn Write) -&gt; Result&lt;SnapshotResult, MastError&gt;</code></a></h4>
+<p>Exports a collection to JSONL format. Writes header, then memories, then edges.</p>
+<h4 id="restoremut-self-reader-mut-dyn-bufread---resultrestoreresult-masterror"><a class="header" href="#restoremut-self-reader-mut-dyn-bufread---resultrestoreresult-masterror"><code>restore(&amp;mut self, reader: &amp;mut dyn BufRead) -&gt; Result&lt;RestoreResult, MastError&gt;</code></a></h4>
+<p>Imports a collection from JSONL format. The collection must not already exist. Indexes all imported memories and edges. Invalid lines produce warnings but do not abort.</p>
+<h3 id="lifecycle-2"><a class="header" href="#lifecycle-2">Lifecycle</a></h3>
+<h4 id="closemut-self---result-masterror"><a class="header" href="#closemut-self---result-masterror"><code>close(&amp;mut self) -&gt; Result&lt;(), MastError&gt;</code></a></h4>
+<p>Flushes all vector indexes to storage. Call before dropping for explicit error handling.</p>
+<p>Also implements <code>Drop</code>, which calls flush (errors logged, not propagated).</p>
+<hr>
+<h2 id="mastconfig"><a class="header" href="#mastconfig">MastConfig</a></h2>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct MastConfig {
+    pub db_path: PathBuf,
+    pub default_collection: String,    // default: "default"
+    pub default_limit: usize,          // default: 10
+    pub default_dimensions: usize,     // default: 1536
+    pub default_tier_weights: TierWeights,
+    pub default_time_decay: Option&lt;TimeDecay&gt;,
+}
+<span class="boring">}</span></code></pre>
+<p>Builder methods: <code>with_db_path()</code>, <code>with_default_collection()</code>, <code>with_default_limit()</code>, <code>with_default_dimensions()</code>, <code>with_default_tier_weights()</code>, <code>with_default_time_decay()</code>.</p>
+<hr>
+<h2 id="key-types"><a class="header" href="#key-types">Key Types</a></h2>
+<p>See <a href="#memories">Memories</a> and <a href="#search">Search</a> for detailed type documentation.</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Type</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>Memory</code></td><td>Core data unit</td></tr>
+<tr><td><code>StoreRequest</code></td><td>Input for <code>store()</code></td></tr>
+<tr><td><code>BatchStoreRequest</code></td><td>Input for <code>store_batch()</code></td></tr>
+<tr><td><code>RecallRequest</code></td><td>Input for <code>recall()</code></td></tr>
+<tr><td><code>RecallResult</code></td><td>Output from <code>recall()</code> (memory + score)</td></tr>
+<tr><td><code>CompactRequest</code></td><td>Input for <code>compact()</code></td></tr>
+<tr><td><code>CompactResult</code></td><td>Output from <code>compact()</code></td></tr>
+<tr><td><code>RelateRequest</code></td><td>Input for <code>relate()</code></td></tr>
+<tr><td><code>TraverseRequest</code></td><td>Input for <code>traverse()</code></td></tr>
+<tr><td><code>Edge</code></td><td>Graph edge</td></tr>
+<tr><td><code>Graph</code></td><td>Collection of edges</td></tr>
+<tr><td><code>CollectionInfo</code></td><td>Collection metadata</td></tr>
+<tr><td><code>MetadataFilter</code></td><td>Eq, In, And, Or filter tree</td></tr>
+<tr><td><code>TierWeights</code></td><td>Per-tier scoring weights</td></tr>
+<tr><td><code>TimeDecay</code></td><td>Half-life decay configuration</td></tr>
+<tr><td><code>SearchMode</code></td><td>Vector, FullText, or Hybrid</td></tr>
+<tr><td><code>Tier</code></td><td>Core, Active, Background, Archive</td></tr>
+<tr><td><code>CompactionStrategy</code></td><td>Age, AccessDecay, Hybrid, Manual</td></tr>
+<tr><td><code>VacuumResult</code></td><td>Output from <code>vacuum()</code></td></tr>
+<tr><td><code>SnapshotResult</code></td><td>Output from <code>snapshot()</code></td></tr>
+<tr><td><code>RestoreResult</code></td><td>Output from <code>restore()</code></td></tr>
+</tbody>
+</table>
+</div>
+<hr>
+<h2 id="traits"><a class="header" href="#traits">Traits</a></h2>
+<h3 id="embedder"><a class="header" href="#embedder">Embedder</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[async_trait]
+pub trait Embedder: Send + Sync {
+    async fn embed(&amp;self, text: &amp;str) -&gt; Result&lt;Vec&lt;f32&gt;, MastError&gt;;
+    async fn embed_batch(&amp;self, texts: &amp;[String]) -&gt; Result&lt;Vec&lt;Vec&lt;f32&gt;&gt;, MastError&gt;;
+    fn dimensions(&amp;self) -&gt; usize;
+}
+<span class="boring">}</span></code></pre>
+<h3 id="compactor"><a class="header" href="#compactor">Compactor</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[async_trait]
+pub trait Compactor: Send + Sync {
+    async fn synthesize(&amp;self, memories: &amp;[Memory]) -&gt; Result&lt;CompactedMemory, MastError&gt;;
+}
+<span class="boring">}</span></code></pre>
+<hr>
+<h2 id="masterror"><a class="header" href="#masterror">MastError</a></h2>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub enum MastError {
+    Storage(String),
+    Index(String),
+    Embedder(String),
+    NotFound(String),
+    InvalidInput(String),
+    Serialization(String),
+    Compaction(String),
+    Graph(String),
+    Snapshot(String),
+}
+<span class="boring">}</span></code></pre>
+<p>Implements <code>std::error::Error</code>, <code>Display</code>, <code>Debug</code>, <code>Send</code>, <code>Sync</code>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="python-api-reference"><a class="header" href="#python-api-reference">Python API Reference</a></h1>
+<p>Python class reference for the <code>mast-memory</code> package (PyO3 bindings).</p>
+<h2 id="mast-1"><a class="header" href="#mast-1">Mast</a></h2>
+<pre><code class="language-python">from mast import Mast
+</code></pre>
+<h3 id="constructor-1"><a class="header" href="#constructor-1">Constructor</a></h3>
+<pre><code class="language-python">Mast(path: str)
+</code></pre>
+<p>Opens or creates a MAST database at the given path.</p>
+<hr>
+<h3 id="store"><a class="header" href="#store">store</a></h3>
+<pre><code class="language-python">store(
+    collection: str,
+    content: str,
+    embedder: object,
+    metadata: dict[str, str] | None = None,
+    tier: str | None = None,
+    ttl: int | None = None,
+) -&gt; PyMemory
+</code></pre>
+<p>Stores a memory. The <code>embedder</code> must have an <code>embed(text: str) -&gt; list[float]</code> method.</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>collection</code></td><td><code>str</code></td><td>required</td><td>Collection name</td></tr>
+<tr><td><code>content</code></td><td><code>str</code></td><td>required</td><td>Memory text</td></tr>
+<tr><td><code>embedder</code></td><td><code>object</code></td><td>required</td><td>Embedder with <code>embed()</code> method</td></tr>
+<tr><td><code>metadata</code></td><td><code>dict</code></td><td><code>None</code></td><td>Key-value metadata</td></tr>
+<tr><td><code>tier</code></td><td><code>str</code></td><td><code>"active"</code></td><td>“core”, “active”, “background”, “archive”</td></tr>
+<tr><td><code>ttl</code></td><td><code>int</code></td><td><code>None</code></td><td>Time-to-live in seconds</td></tr>
+</tbody>
+</table>
+</div>
+<hr>
+<h3 id="recall"><a class="header" href="#recall">recall</a></h3>
+<pre><code class="language-python">recall(
+    collection: str,
+    embedder: object,
+    query: str | None = None,
+    text_query: str | None = None,
+    search_mode: str | None = None,
+    limit: int | None = None,
+    filter: dict[str, str] | None = None,
+) -&gt; list[PyRecallResult]
+</code></pre>
+<p>Searches for memories. At least one of <code>query</code> or <code>text_query</code> is required.</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>collection</code></td><td><code>str</code></td><td>required</td><td>Collection to search</td></tr>
+<tr><td><code>embedder</code></td><td><code>object</code></td><td>required</td><td>Embedder with <code>embed()</code> method</td></tr>
+<tr><td><code>query</code></td><td><code>str</code></td><td><code>None</code></td><td>Text query (embedded for vector search)</td></tr>
+<tr><td><code>text_query</code></td><td><code>str</code></td><td><code>None</code></td><td>Keywords for full-text search</td></tr>
+<tr><td><code>search_mode</code></td><td><code>str</code></td><td><code>"vector"</code></td><td>“vector”, “fulltext”, “hybrid”</td></tr>
+<tr><td><code>limit</code></td><td><code>int</code></td><td><code>10</code></td><td>Max results</td></tr>
+<tr><td><code>filter</code></td><td><code>dict</code></td><td><code>None</code></td><td>Metadata key=value filter (AND semantics)</td></tr>
+</tbody>
+</table>
+</div>
+<hr>
+<h3 id="get"><a class="header" href="#get">get</a></h3>
+<pre><code class="language-python">get(collection: str, id: str) -&gt; PyMemory | None
+</code></pre>
+<p>Retrieves a memory by ULID string. Returns <code>None</code> if not found.</p>
+<hr>
+<h3 id="delete"><a class="header" href="#delete">delete</a></h3>
+<pre><code class="language-python">delete(collection: str, id: str) -&gt; None
+</code></pre>
+<p>Deletes a memory by ULID string.</p>
+<hr>
+<h3 id="list"><a class="header" href="#list">list</a></h3>
+<pre><code class="language-python">list(collection: str) -&gt; list[PyMemory]
+</code></pre>
+<p>Returns all memories in a collection.</p>
+<hr>
+<h3 id="info"><a class="header" href="#info">info</a></h3>
+<pre><code class="language-python">info() -&gt; list[PyCollectionInfo]
+</code></pre>
+<p>Returns metadata for all collections.</p>
+<hr>
+<h3 id="vacuum-1"><a class="header" href="#vacuum-1">vacuum</a></h3>
+<pre><code class="language-python">vacuum(collection: str) -&gt; int
+</code></pre>
+<p>Removes expired memories. Returns the count of expired memories removed.</p>
+<hr>
+<h3 id="relate"><a class="header" href="#relate">relate</a></h3>
+<pre><code class="language-python">relate(
+    collection: str,
+    source: str,
+    target: str,
+    relation: str,
+    weight: float | None = None,
+) -&gt; str
+</code></pre>
+<p>Creates or updates a graph edge. Returns the edge ID as a ULID string. Default weight is 1.0.</p>
+<hr>
+<h3 id="unrelate"><a class="header" href="#unrelate">unrelate</a></h3>
+<pre><code class="language-python">unrelate(collection: str, source: str, target: str, relation: str) -&gt; None
+</code></pre>
+<p>Removes a graph edge. Raises <code>RuntimeError</code> if no matching edge exists.</p>
+<hr>
+<h3 id="traverse"><a class="header" href="#traverse">traverse</a></h3>
+<pre><code class="language-python">traverse(
+    collection: str,
+    start: str,
+    max_depth: int | None = None,
+    relation: str | None = None,
+    min_weight: float | None = None,
+) -&gt; list[PyEdge]
+</code></pre>
+<p>BFS traversal from a starting entity. Default <code>max_depth</code> is 3.</p>
+<hr>
+<h3 id="snapshot"><a class="header" href="#snapshot">snapshot</a></h3>
+<pre><code class="language-python">snapshot(collection: str, output: str) -&gt; PySnapshotResult
+</code></pre>
+<p>Exports a collection to a JSONL file.</p>
+<hr>
+<h3 id="restore"><a class="header" href="#restore">restore</a></h3>
+<pre><code class="language-python">restore(input: str) -&gt; PyRestoreResult
+</code></pre>
+<p>Imports a collection from a JSONL file. The collection must not already exist.</p>
+<hr>
+<h3 id="close"><a class="header" href="#close">close</a></h3>
+<pre><code class="language-python">close() -&gt; None
+</code></pre>
+<p>Flushes indexes and closes the database.</p>
+<hr>
+<h2 id="data-classes"><a class="header" href="#data-classes">Data Classes</a></h2>
+<h3 id="pymemory-1"><a class="header" href="#pymemory-1">PyMemory</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Attribute</th><th>Type</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>id</code></td><td><code>str</code></td><td>ULID string</td></tr>
+<tr><td><code>collection</code></td><td><code>str</code></td><td>Collection name</td></tr>
+<tr><td><code>content</code></td><td><code>str</code></td><td>Memory text</td></tr>
+<tr><td><code>metadata</code></td><td><code>dict[str, str]</code></td><td>Key-value pairs</td></tr>
+<tr><td><code>tier</code></td><td><code>str</code></td><td>Tier name</td></tr>
+<tr><td><code>created_at</code></td><td><code>int</code></td><td>Unix timestamp</td></tr>
+<tr><td><code>access_count</code></td><td><code>int</code></td><td>Recall count</td></tr>
+<tr><td><code>last_accessed</code></td><td><code>int</code></td><td>Last recall timestamp</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="pyrecallresult-1"><a class="header" href="#pyrecallresult-1">PyRecallResult</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Attribute</th><th>Type</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>memory</code></td><td><code>PyMemory</code></td><td>The recalled memory</td></tr>
+<tr><td><code>score</code></td><td><code>float</code></td><td>Relevance score</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="pycollectioninfo"><a class="header" href="#pycollectioninfo">PyCollectionInfo</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Attribute</th><th>Type</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>name</code></td><td><code>str</code></td><td>Collection name</td></tr>
+<tr><td><code>dimensions</code></td><td><code>int</code></td><td>Vector dimensionality</td></tr>
+<tr><td><code>memory_count</code></td><td><code>int</code></td><td>Number of memories</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="pyedge"><a class="header" href="#pyedge">PyEdge</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Attribute</th><th>Type</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>id</code></td><td><code>str</code></td><td>Edge ULID</td></tr>
+<tr><td><code>source</code></td><td><code>str</code></td><td>Source entity</td></tr>
+<tr><td><code>target</code></td><td><code>str</code></td><td>Target entity</td></tr>
+<tr><td><code>relation</code></td><td><code>str</code></td><td>Relation type</td></tr>
+<tr><td><code>weight</code></td><td><code>float</code></td><td>Edge weight</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="pysnapshotresult"><a class="header" href="#pysnapshotresult">PySnapshotResult</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Attribute</th><th>Type</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>collection</code></td><td><code>str</code></td><td>Collection name</td></tr>
+<tr><td><code>memory_count</code></td><td><code>int</code></td><td>Memories exported</td></tr>
+<tr><td><code>edge_count</code></td><td><code>int</code></td><td>Edges exported</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="pyrestoreresult"><a class="header" href="#pyrestoreresult">PyRestoreResult</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Attribute</th><th>Type</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>collection</code></td><td><code>str</code></td><td>Collection name</td></tr>
+<tr><td><code>memory_count</code></td><td><code>int</code></td><td>Memories imported</td></tr>
+<tr><td><code>edge_count</code></td><td><code>int</code></td><td>Edges imported</td></tr>
+<tr><td><code>warnings</code></td><td><code>list[str]</code></td><td>Import warnings</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="embedder-protocol-1"><a class="header" href="#embedder-protocol-1">Embedder Protocol</a></h2>
+<p>Any Python object with these methods:</p>
+<pre><code class="language-python">class Embedder:
+    def embed(self, text: str) -&gt; list[float]: ...
+    def embed_batch(self, texts: list[str]) -&gt; list[list[float]]: ...  # optional
+    def dimensions(self) -&gt; int: ...
+</code></pre>
+<p>If <code>embed_batch</code> is not defined, MAST falls back to calling <code>embed</code> sequentially.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="nodejs-api-reference"><a class="header" href="#nodejs-api-reference">Node.js API Reference</a></h1>
+<p>Node.js class reference for the <code>mast-memory</code> package (napi-rs bindings).</p>
+<h2 id="mastdb"><a class="header" href="#mastdb">MastDb</a></h2>
+<pre><code class="language-javascript">const { MastDb } = require('mast-memory');
+</code></pre>
+<h3 id="constructor-2"><a class="header" href="#constructor-2">Constructor</a></h3>
+<pre><code class="language-javascript">new MastDb(path: string)
+</code></pre>
+<p>Opens or creates a MAST database at the given path.</p>
+<hr>
+<h3 id="store-1"><a class="header" href="#store-1">store</a></h3>
+<pre><code class="language-typescript">store(
+  collection: string,
+  content: string,
+  embedFn: (text: string) =&gt; number[],
+  dimensions: number,
+  metadata?: Record&lt;string, string&gt;,
+  tier?: string,
+  ttl?: number,
+): JsMemory
+</code></pre>
+<p>Stores a memory. The <code>embedFn</code> receives text and must return a number array.</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>collection</code></td><td><code>string</code></td><td>required</td><td>Collection name</td></tr>
+<tr><td><code>content</code></td><td><code>string</code></td><td>required</td><td>Memory text</td></tr>
+<tr><td><code>embedFn</code></td><td><code>function</code></td><td>required</td><td>Embedding function</td></tr>
+<tr><td><code>dimensions</code></td><td><code>number</code></td><td>required</td><td>Vector dimensionality</td></tr>
+<tr><td><code>metadata</code></td><td><code>object</code></td><td><code>undefined</code></td><td>Key-value metadata</td></tr>
+<tr><td><code>tier</code></td><td><code>string</code></td><td><code>"active"</code></td><td>“core”, “active”, “background”, “archive”</td></tr>
+<tr><td><code>ttl</code></td><td><code>number</code></td><td><code>undefined</code></td><td>Time-to-live in seconds</td></tr>
+</tbody>
+</table>
+</div>
+<hr>
+<h3 id="recall-1"><a class="header" href="#recall-1">recall</a></h3>
+<pre><code class="language-typescript">recall(
+  collection: string,
+  embedFn: (text: string) =&gt; number[],
+  dimensions: number,
+  query?: string,
+  textQuery?: string,
+  searchMode?: string,
+  limit?: number,
+): JsRecallResult[]
+</code></pre>
+<p>Searches for memories. At least one of <code>query</code> or <code>textQuery</code> is required.</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>collection</code></td><td><code>string</code></td><td>required</td><td>Collection to search</td></tr>
+<tr><td><code>embedFn</code></td><td><code>function</code></td><td>required</td><td>Embedding function</td></tr>
+<tr><td><code>dimensions</code></td><td><code>number</code></td><td>required</td><td>Vector dimensionality</td></tr>
+<tr><td><code>query</code></td><td><code>string</code></td><td><code>undefined</code></td><td>Text query (for vector search)</td></tr>
+<tr><td><code>textQuery</code></td><td><code>string</code></td><td><code>undefined</code></td><td>Keywords (for full-text search)</td></tr>
+<tr><td><code>searchMode</code></td><td><code>string</code></td><td><code>"vector"</code></td><td>“vector”, “fulltext”, “hybrid”</td></tr>
+<tr><td><code>limit</code></td><td><code>number</code></td><td><code>10</code></td><td>Max results</td></tr>
+</tbody>
+</table>
+</div>
+<hr>
+<h3 id="get-1"><a class="header" href="#get-1">get</a></h3>
+<pre><code class="language-typescript">get(collection: string, id: string): JsMemory | null
+</code></pre>
+<p>Retrieves a memory by ULID string.</p>
+<hr>
+<h3 id="delete-1"><a class="header" href="#delete-1">delete</a></h3>
+<pre><code class="language-typescript">delete(collection: string, id: string): void
+</code></pre>
+<p>Deletes a memory by ULID string.</p>
+<hr>
+<h3 id="list-1"><a class="header" href="#list-1">list</a></h3>
+<pre><code class="language-typescript">list(collection: string): JsMemory[]
+</code></pre>
+<p>Returns all memories in a collection.</p>
+<hr>
+<h3 id="info-1"><a class="header" href="#info-1">info</a></h3>
+<pre><code class="language-typescript">info(): JsCollectionInfo[]
+</code></pre>
+<p>Returns metadata for all collections.</p>
+<hr>
+<h3 id="vacuum-2"><a class="header" href="#vacuum-2">vacuum</a></h3>
+<pre><code class="language-typescript">vacuum(collection: string): number
+</code></pre>
+<p>Removes expired memories. Returns the count of expired memories removed.</p>
+<hr>
+<h3 id="relate-1"><a class="header" href="#relate-1">relate</a></h3>
+<pre><code class="language-typescript">relate(
+  collection: string,
+  source: string,
+  target: string,
+  relation: string,
+  weight?: number,
+): string
+</code></pre>
+<p>Creates or updates a graph edge. Returns the edge ID as a ULID string. Default weight is 1.0.</p>
+<hr>
+<h3 id="unrelate-1"><a class="header" href="#unrelate-1">unrelate</a></h3>
+<pre><code class="language-typescript">unrelate(collection: string, source: string, target: string, relation: string): void
+</code></pre>
+<p>Removes a graph edge. Throws if no matching edge exists.</p>
+<hr>
+<h3 id="traverse-1"><a class="header" href="#traverse-1">traverse</a></h3>
+<pre><code class="language-typescript">traverse(
+  collection: string,
+  start: string,
+  maxDepth?: number,
+  relation?: string,
+  minWeight?: number,
+): JsEdge[]
+</code></pre>
+<p>BFS traversal from a starting entity. Default <code>maxDepth</code> is 3.</p>
+<hr>
+<h3 id="snapshot-1"><a class="header" href="#snapshot-1">snapshot</a></h3>
+<pre><code class="language-typescript">snapshot(collection: string, output: string): JsSnapshotResult
+</code></pre>
+<p>Exports a collection to a JSONL file.</p>
+<hr>
+<h3 id="restore-1"><a class="header" href="#restore-1">restore</a></h3>
+<pre><code class="language-typescript">restore(input: string): JsRestoreResult
+</code></pre>
+<p>Imports a collection from a JSONL file. The collection must not already exist.</p>
+<hr>
+<h3 id="close-1"><a class="header" href="#close-1">close</a></h3>
+<pre><code class="language-typescript">close(): void
+</code></pre>
+<p>Flushes indexes and closes the database.</p>
+<hr>
+<h2 id="types"><a class="header" href="#types">Types</a></h2>
+<h3 id="jsmemory-1"><a class="header" href="#jsmemory-1">JsMemory</a></h3>
+<pre><code class="language-typescript">interface JsMemory {
+  id: string;                    // ULID string
+  collection: string;           // Collection name
+  content: string;              // Memory text
+  metadata: Record&lt;string, string&gt;; // Key-value pairs
+  tier: string;                 // Tier name
+  createdAt: number;            // Unix timestamp
+  accessCount: number;          // Recall count
+  lastAccessed: number;         // Last recall timestamp
+}
+</code></pre>
+<h3 id="jsrecallresult-1"><a class="header" href="#jsrecallresult-1">JsRecallResult</a></h3>
+<pre><code class="language-typescript">interface JsRecallResult {
+  memory: JsMemory;
+  score: number;                // Relevance score (f64)
+}
+</code></pre>
+<h3 id="jscollectioninfo-1"><a class="header" href="#jscollectioninfo-1">JsCollectionInfo</a></h3>
+<pre><code class="language-typescript">interface JsCollectionInfo {
+  name: string;
+  dimensions: number;
+  memoryCount: number;
+}
+</code></pre>
+<h3 id="jsedge"><a class="header" href="#jsedge">JsEdge</a></h3>
+<pre><code class="language-typescript">interface JsEdge {
+  id: string;
+  source: string;
+  target: string;
+  relation: string;
+  weight: number;               // f64
+}
+</code></pre>
+<h3 id="jssnapshotresult"><a class="header" href="#jssnapshotresult">JsSnapshotResult</a></h3>
+<pre><code class="language-typescript">interface JsSnapshotResult {
+  collection: string;
+  memoryCount: number;
+  edgeCount: number;
+}
+</code></pre>
+<h3 id="jsrestoreresult"><a class="header" href="#jsrestoreresult">JsRestoreResult</a></h3>
+<pre><code class="language-typescript">interface JsRestoreResult {
+  collection: string;
+  memoryCount: number;
+  edgeCount: number;
+  warnings: string[];
+}
+</code></pre>
+<h2 id="embedding-function"><a class="header" href="#embedding-function">Embedding Function</a></h2>
+<p>The embedding function is passed as a <code>ThreadsafeFunction</code>. It must accept a <code>string</code> and return <code>number[]</code>. It is called synchronously from Rust’s perspective (via <code>call_async</code>).</p>
+<pre><code class="language-javascript">// Simple example
+async function embed(text) {
+  const response = await openai.embeddings.create({
+    input: text,
+    model: 'text-embedding-3-small',
+  });
+  return response.data[0].embedding;
+}
+</code></pre>
+<p>Note: batch embedding is handled by calling <code>embed</code> sequentially in the Node.js bindings (there is no separate <code>embedBatch</code> callback).</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="c-api-reference"><a class="header" href="#c-api-reference">C API Reference</a></h1>
+<p>C function reference for the <code>mast-ffi</code> crate. All functions use C-compatible calling conventions (<code>extern "C"</code>).</p>
+<h2 id="types-1"><a class="header" href="#types-1">Types</a></h2>
+<h3 id="masthandle-1"><a class="header" href="#masthandle-1">MastHandle</a></h3>
+<p>Opaque handle to a MAST instance. Created with <code>mast_open()</code>, freed with <code>mast_close()</code>.</p>
+<h3 id="mastffierror"><a class="header" href="#mastffierror">MastFfiError</a></h3>
+<pre><code class="language-c">typedef struct {
+    int code;           // Error category code
+    char* message;      // Heap-allocated error message
+} MastFfiError;
+</code></pre>
+<p>Error codes:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Code</th><th>Category</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>Storage</td></tr>
+<tr><td>2</td><td>Index</td></tr>
+<tr><td>3</td><td>Embedder</td></tr>
+<tr><td>4</td><td>NotFound</td></tr>
+<tr><td>5</td><td>InvalidInput</td></tr>
+<tr><td>6</td><td>Serialization</td></tr>
+<tr><td>7</td><td>Compaction</td></tr>
+<tr><td>8</td><td>Graph</td></tr>
+<tr><td>9</td><td>Snapshot</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="mastembeddervtable"><a class="header" href="#mastembeddervtable">MastEmbedderVtable</a></h3>
+<pre><code class="language-c">typedef struct {
+    float* (*embed)(void* user_data, const char* text,
+                    size_t* out_len, MastFfiError** err);
+    float** (*embed_batch)(void* user_data, const char** texts,
+                           size_t count, size_t* out_lens, MastFfiError** err);
+    size_t (*dimensions)(void* user_data);
+    void* user_data;
+} MastEmbedderVtable;
+</code></pre>
+<ul>
+<li><code>embed</code> is required. Must return a heap-allocated <code>float*</code> of length <code>*out_len</code>. MAST takes ownership.</li>
+<li><code>embed_batch</code> is optional. If <code>NULL</code>, MAST calls <code>embed</code> sequentially.</li>
+<li><code>dimensions</code> is optional. Returns 0 if <code>NULL</code>.</li>
+</ul>
+<h3 id="mastmetadata"><a class="header" href="#mastmetadata">MastMetadata</a></h3>
+<pre><code class="language-c">typedef struct {
+    const char** keys;
+    const char** values;
+    size_t count;
+} MastMetadata;
+</code></pre>
+<h3 id="maststoreresult"><a class="header" href="#maststoreresult">MastStoreResult</a></h3>
+<pre><code class="language-c">typedef struct {
+    char* id;           // ULID string (heap-allocated)
+} MastStoreResult;
+</code></pre>
+<h3 id="mastrecallentry"><a class="header" href="#mastrecallentry">MastRecallEntry</a></h3>
+<pre><code class="language-c">typedef struct {
+    char* id;           // ULID string
+    char* content;      // Memory content
+    float score;        // Relevance score
+} MastRecallEntry;
+</code></pre>
+<h3 id="mastrecallresult"><a class="header" href="#mastrecallresult">MastRecallResult</a></h3>
+<pre><code class="language-c">typedef struct {
+    MastRecallEntry* entries;
+    size_t count;
+} MastRecallResult;
+</code></pre>
+<h3 id="mastcollectioninfoentry"><a class="header" href="#mastcollectioninfoentry">MastCollectionInfoEntry</a></h3>
+<pre><code class="language-c">typedef struct {
+    char* name;
+    size_t dimensions;
+    uint64_t memory_count;
+} MastCollectionInfoEntry;
+</code></pre>
+<h3 id="mastinforesult"><a class="header" href="#mastinforesult">MastInfoResult</a></h3>
+<pre><code class="language-c">typedef struct {
+    MastCollectionInfoEntry* collections;
+    size_t count;
+} MastInfoResult;
+</code></pre>
+<h3 id="mastsnapshotresult"><a class="header" href="#mastsnapshotresult">MastSnapshotResult</a></h3>
+<pre><code class="language-c">typedef struct {
+    uint64_t memory_count;
+    uint64_t edge_count;
+} MastSnapshotResult;
+</code></pre>
+<h3 id="mastrestoreresult"><a class="header" href="#mastrestoreresult">MastRestoreResult</a></h3>
+<pre><code class="language-c">typedef struct {
+    uint64_t memory_count;
+    uint64_t edge_count;
+} MastRestoreResult;
+</code></pre>
+<hr>
+<h2 id="functions"><a class="header" href="#functions">Functions</a></h2>
+<h3 id="lifecycle-3"><a class="header" href="#lifecycle-3">Lifecycle</a></h3>
+<h4 id="mast_open"><a class="header" href="#mast_open">mast_open</a></h4>
+<pre><code class="language-c">MastHandle* mast_open(const char* path, MastFfiError** err);
+</code></pre>
+<p>Opens or creates a database. Returns <code>NULL</code> on error.</p>
+<h4 id="mast_close"><a class="header" href="#mast_close">mast_close</a></h4>
+<pre><code class="language-c">void mast_close(MastHandle* handle);
+</code></pre>
+<p>Flushes indexes and frees the handle. Safe to call with <code>NULL</code>.</p>
+<hr>
+<h3 id="store-and-recall-1"><a class="header" href="#store-and-recall-1">Store and Recall</a></h3>
+<h4 id="mast_store"><a class="header" href="#mast_store">mast_store</a></h4>
+<pre><code class="language-c">MastStoreResult* mast_store(
+    MastHandle* handle,
+    const char* collection,
+    const char* content,
+    const MastEmbedderVtable* embedder,
+    const MastMetadata* metadata,   // NULL for no metadata
+    const char* tier,               // NULL defaults to "active"
+    int64_t ttl,
+    bool has_ttl,                   // false to ignore ttl
+    MastFfiError** err
+);
+</code></pre>
+<p>Returns <code>NULL</code> on error. Free with <code>mast_free_store_result()</code>.</p>
+<h4 id="mast_recall"><a class="header" href="#mast_recall">mast_recall</a></h4>
+<pre><code class="language-c">MastRecallResult* mast_recall(
+    MastHandle* handle,
+    const char* collection,
+    const char* query,              // NULL for no query
+    const MastEmbedderVtable* embedder,
+    size_t limit,
+    MastFfiError** err
+);
+</code></pre>
+<p>Vector search only. Returns <code>NULL</code> on error. Free with <code>mast_free_recall_result()</code>.</p>
+<hr>
+<h3 id="crud-1"><a class="header" href="#crud-1">CRUD</a></h3>
+<h4 id="mast_get"><a class="header" href="#mast_get">mast_get</a></h4>
+<pre><code class="language-c">bool mast_get(
+    MastHandle* handle,
+    const char* collection,
+    const char* id,                 // ULID string
+    char** out_content,             // receives content string (free with mast_free_string)
+    MastFfiError** err
+);
+</code></pre>
+<p>Returns <code>true</code> if found. Content written to <code>*out_content</code>.</p>
+<h4 id="mast_delete"><a class="header" href="#mast_delete">mast_delete</a></h4>
+<pre><code class="language-c">bool mast_delete(
+    MastHandle* handle,
+    const char* collection,
+    const char* id,
+    MastFfiError** err
+);
+</code></pre>
+<p>Returns <code>true</code> on success.</p>
+<h4 id="mast_info"><a class="header" href="#mast_info">mast_info</a></h4>
+<pre><code class="language-c">MastInfoResult* mast_info(MastHandle* handle, MastFfiError** err);
+</code></pre>
+<p>Returns all collections. Free with <code>mast_free_info_result()</code>.</p>
+<h4 id="mast_vacuum"><a class="header" href="#mast_vacuum">mast_vacuum</a></h4>
+<pre><code class="language-c">bool mast_vacuum(
+    MastHandle* handle,
+    const char* collection,
+    size_t* out_expired,
+    MastFfiError** err
+);
+</code></pre>
+<p>Removes expired memories. Count written to <code>*out_expired</code>.</p>
+<hr>
+<h3 id="graph-3"><a class="header" href="#graph-3">Graph</a></h3>
+<h4 id="mast_relate"><a class="header" href="#mast_relate">mast_relate</a></h4>
+<pre><code class="language-c">bool mast_relate(
+    MastHandle* handle,
+    const char* collection,
+    const char* source,
+    const char* target,
+    const char* relation,
+    float weight,
+    char** out_id,                  // receives edge ID (free with mast_free_string)
+    MastFfiError** err
+);
+</code></pre>
+<h4 id="mast_unrelate"><a class="header" href="#mast_unrelate">mast_unrelate</a></h4>
+<pre><code class="language-c">bool mast_unrelate(
+    MastHandle* handle,
+    const char* collection,
+    const char* source,
+    const char* target,
+    const char* relation,
+    MastFfiError** err
+);
+</code></pre>
+<hr>
+<h3 id="snapshots-6"><a class="header" href="#snapshots-6">Snapshots</a></h3>
+<h4 id="mast_snapshot"><a class="header" href="#mast_snapshot">mast_snapshot</a></h4>
+<pre><code class="language-c">MastSnapshotResult* mast_snapshot(
+    MastHandle* handle,
+    const char* collection,
+    const char* output_path,
+    MastFfiError** err
+);
+</code></pre>
+<p>Free with <code>mast_free_snapshot_result()</code>.</p>
+<h4 id="mast_restore"><a class="header" href="#mast_restore">mast_restore</a></h4>
+<pre><code class="language-c">MastRestoreResult* mast_restore(
+    MastHandle* handle,
+    const char* input_path,
+    MastFfiError** err
+);
+</code></pre>
+<p>Free with <code>mast_free_restore_result()</code>.</p>
+<hr>
+<h3 id="free-functions-1"><a class="header" href="#free-functions-1">Free Functions</a></h3>
+<pre><code class="language-c">void mast_free_error(MastFfiError* err);
+void mast_free_string(char* s);
+void mast_free_store_result(MastStoreResult* result);
+void mast_free_recall_result(MastRecallResult* result);
+void mast_free_info_result(MastInfoResult* result);
+void mast_free_snapshot_result(MastSnapshotResult* result);
+void mast_free_restore_result(MastRestoreResult* result);
+</code></pre>
+<p>All free functions are safe to call with <code>NULL</code>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="architecture"><a class="header" href="#architecture">Architecture</a></h1>
+<p>MAST’s internal architecture consists of three layers: storage, indexing, and serialization.</p>
+<h2 id="workspace-layout"><a class="header" href="#workspace-layout">Workspace Layout</a></h2>
+<pre><code>crates/
++-- mast-core/         Core engine (storage, index, types, config, graph, compaction, snapshot)
++-- mast-embed-openai/ OpenAI embedder implementation
++-- mast-cli/          Command-line interface
++-- mast-ffi/          C FFI bindings
++-- mast-py/           Python bindings (PyO3)
++-- mast-node/         Node.js bindings (napi-rs)
+</code></pre>
+<p><code>mast-core</code> has zero vendor dependencies for embeddings. The <code>Embedder</code> trait is the boundary – all embedding logic lives outside the core.</p>
+<h2 id="storage-layer-redb"><a class="header" href="#storage-layer-redb">Storage Layer (redb)</a></h2>
+<p>All persistent data lives in a single redb database file. redb is an embedded key-value store with ACID transactions, copy-on-write B-trees, and a single-writer/multiple-reader concurrency model.</p>
+<h3 id="tables"><a class="header" href="#tables">Tables</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Table</th><th>Key</th><th>Value</th><th>Purpose</th></tr>
+</thead>
+<tbody>
+<tr><td><code>memories</code></td><td><code>(collection, ulid_bytes)</code></td><td>Versioned-serialized Memory</td><td>Primary data store</td></tr>
+<tr><td><code>collections</code></td><td><code>collection_name</code></td><td>Serialized CollectionInfo</td><td>Collection metadata</td></tr>
+<tr><td><code>seq</code></td><td><code>collection_name</code></td><td><code>u64</code></td><td>Next sequential key for usearch</td></tr>
+<tr><td><code>ulid_to_seq</code></td><td><code>(collection, ulid_bytes)</code></td><td><code>u64</code></td><td>ULID to sequential key mapping</td></tr>
+<tr><td><code>seq_to_ulid</code></td><td><code>(collection, u64_be_bytes)</code></td><td><code>ulid_bytes</code></td><td>Sequential key to ULID mapping</td></tr>
+<tr><td><code>meta_index</code></td><td><code>(collection, key, value)</code></td><td>Serialized <code>Vec&lt;[u8; 16]&gt;</code></td><td>Metadata inverted index</td></tr>
+<tr><td><code>vector_index</code></td><td><code>collection_name</code></td><td>Serialized usearch buffer</td><td>Persisted vector index</td></tr>
+<tr><td><code>edges</code></td><td><code>(collection, edge_id)</code></td><td>Serialized Edge</td><td>Graph edge store</td></tr>
+<tr><td><code>edge_index_fwd</code></td><td><code>(collection, source, relation)</code></td><td>Serialized <code>Vec&lt;[u8; 16]&gt;</code></td><td>Forward edge index</td></tr>
+<tr><td><code>edge_index_rev</code></td><td><code>(collection, target, relation)</code></td><td>Serialized <code>Vec&lt;[u8; 16]&gt;</code></td><td>Reverse edge index</td></tr>
+<tr><td><code>ft_posting</code></td><td><code>(collection, term)</code></td><td>Serialized PostingList</td><td>Full-text posting lists</td></tr>
+<tr><td><code>ft_stats</code></td><td><code>collection_name</code></td><td>Serialized <code>(doc_count, total_tokens)</code></td><td>Full-text corpus stats</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="ulid-to-seq-mapping"><a class="header" href="#ulid-to-seq-mapping">ULID-to-Seq Mapping</a></h3>
+<p>usearch requires <code>u64</code> keys, but MAST uses ULIDs (128-bit). The <code>ulid_to_seq</code> and <code>seq_to_ulid</code> tables provide bidirectional mapping. Each collection maintains an auto-incrementing <code>seq</code> counter.</p>
+<h2 id="index-layer"><a class="header" href="#index-layer">Index Layer</a></h2>
+<h3 id="vector-index-usearch"><a class="header" href="#vector-index-usearch">Vector Index (usearch)</a></h3>
+<p>Per-collection HNSW indexes using cosine distance. Indexes are:</p>
+<ul>
+<li>Held in memory during runtime for fast search</li>
+<li>Serialized to redb’s <code>vector_index</code> table on <code>close()</code> or <code>Drop</code></li>
+<li>Deserialized from redb on <code>open()</code> (via <code>load_from_buffer</code>)</li>
+<li>After loading, capacity is reserved as <code>current_size + 1024</code> to allow inserts</li>
+</ul>
+<p>Configuration:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>IndexOptions {
+    dimensions: N,
+    metric: MetricKind::Cos,
+    quantization: ScalarKind::F32,
+    ..Default::default()
+}
+<span class="boring">}</span></code></pre>
+<p>The <code>IndexManager</code> manages per-collection vector indexes, creating them on first write and loading existing ones from storage.</p>
+<h3 id="full-text-index-bm25"><a class="header" href="#full-text-index-bm25">Full-Text Index (BM25)</a></h3>
+<p>Built-in BM25 implementation stored in redb. No external full-text library.</p>
+<p><strong>Tokenizer:</strong></p>
+<ol>
+<li>Lowercase the text</li>
+<li>Split on non-alphanumeric characters</li>
+<li>Remove tokens shorter than 2 characters</li>
+<li>Remove stop words (common English words)</li>
+</ol>
+<p><strong>Posting lists</strong> are stored per-term in the <code>ft_posting</code> table. Each entry contains:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct PostingEntry {
+    pub ulid_bytes: [u8; 16],   // Document ID
+    pub term_freq: u32,          // Term frequency in this document
+    pub field_length: u32,       // Total tokens in this document
+}
+<span class="boring">}</span></code></pre>
+<p><strong>BM25 scoring</strong> (parameters: <code>k1=1.2</code>, <code>b=0.75</code>):</p>
+<pre><code>IDF = ln((N - df + 0.5) / (df + 0.5) + 1.0)
+TF  = (tf * (k1 + 1)) / (tf + k1 * (1 - b + b * dl / avgdl))
+score = sum(IDF * TF for each query term)
+</code></pre>
+<h3 id="metadata-index"><a class="header" href="#metadata-index">Metadata Index</a></h3>
+<p>Inverted index mapping <code>(collection, key, value)</code> to lists of ULID bytes. Supports Eq, In, And, and Or filters with arbitrary nesting.</p>
+<h2 id="serialization"><a class="header" href="#serialization">Serialization</a></h2>
+<h3 id="memory-serialization-versioned-envelope"><a class="header" href="#memory-serialization-versioned-envelope">Memory Serialization (Versioned Envelope)</a></h3>
+<p>Memories use a versioned serialization format for forward compatibility:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Byte 0</th><th>Format</th></tr>
+</thead>
+<tbody>
+<tr><td><code>0x01</code></td><td>V1: bincode-serialized full Memory struct</td></tr>
+<tr><td>Other</td><td>V0: raw bincode of legacy struct (no ttl, compacted_at, parent_ids)</td></tr>
+</tbody>
+</table>
+</div>
+<p>V0 data is auto-migrated on read: <code>ttl=None</code>, <code>compacted_at=None</code>, <code>parent_ids=[]</code>. No scan-and-rewrite migration is needed.</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn serialize_memory(m: &amp;Memory) -&gt; Result&lt;Vec&lt;u8&gt;, MastError&gt; {
+    let payload = bincode::serialize(m)?;
+    let mut buf = Vec::with_capacity(1 + payload.len());
+    buf.push(0x01);  // VERSION_V1
+    buf.extend_from_slice(&amp;payload);
+    Ok(buf)
+}
+<span class="boring">}</span></code></pre>
+<h3 id="edge-serialization"><a class="header" href="#edge-serialization">Edge Serialization</a></h3>
+<p>Edges use raw bincode (no versioned envelope).</p>
+<h3 id="snapshot-format"><a class="header" href="#snapshot-format">Snapshot Format</a></h3>
+<p>JSONL (JSON Lines) with <code>serde_json</code>. Each line is either a <code>{"type":"memory","data":{...}}</code> or <code>{"type":"edge","data":{...}}</code> object, preceded by a header line.</p>
+<h2 id="write-path"><a class="header" href="#write-path">Write Path</a></h2>
+<ol>
+<li>Generate ULID</li>
+<li>Compute embedding (if not provided)</li>
+<li>Write memory to <code>memories</code> table (redb transaction)</li>
+<li>Allocate seq key, write ULID-to-seq and seq-to-ULID mappings</li>
+<li>Add vector to usearch index (in-memory)</li>
+<li>Update metadata index (redb)</li>
+<li>Update full-text index (redb)</li>
+<li>On failure at step 5: compensating rollback (delete from storage)</li>
+</ol>
+<h2 id="read-path-recall"><a class="header" href="#read-path-recall">Read Path (Recall)</a></h2>
+<ol>
+<li>Embed query text (if not pre-computed)</li>
+<li>Search vector index (or full-text index, or both for hybrid)</li>
+<li>For vector: apply metadata filter via <code>filtered_search</code></li>
+<li>Map seq keys back to ULIDs</li>
+<li>Load memories from storage</li>
+<li>Filter out compacted and expired memories</li>
+<li>Compute score: <code>similarity * tier_weight * time_decay</code></li>
+<li>Sort by score descending, truncate to limit</li>
+<li>Update access stats on returned memories</li>
+</ol>
+<h2 id="drop-and-flush"><a class="header" href="#drop-and-flush">Drop and Flush</a></h2>
+<p><code>Mast</code> implements <code>Drop</code> to flush all in-memory vector indexes to redb. The <code>close()</code> method does the same with error propagation. If neither runs (process crash), vector index updates since the last flush are lost, but all storage data (memories, edges, metadata, full-text) is safe due to redb’s ACID guarantees.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="changelog"><a class="header" href="#changelog">Changelog</a></h1>
+<h2 id="phase-1-core-storage"><a class="header" href="#phase-1-core-storage">Phase 1: Core Storage</a></h2>
+<p>The foundation: single-file storage, vector search, and basic operations.</p>
+<ul>
+<li>Single-file database using redb (ACID, copy-on-write B-tree)</li>
+<li><code>Memory</code> struct with ULID, collection, content, embedding, metadata, tier</li>
+<li><code>store()</code> operation: write + embed + index atomically</li>
+<li><code>recall()</code> operation: vector search (cosine similarity via usearch HNSW)</li>
+<li>Metadata inverted index with <code>Eq</code>, <code>In</code>, <code>And</code>, <code>Or</code> filters</li>
+<li>Collection namespacing with per-collection vector indexes</li>
+<li><code>Embedder</code> trait for pluggable embedding providers</li>
+<li><code>OpenAIEmbedder</code> implementation (text-embedding-3-small)</li>
+<li><code>MastConfig</code> with builder pattern</li>
+<li><code>MastError</code> typed error enum</li>
+<li><code>get()</code>, <code>delete()</code> CRUD operations</li>
+<li><code>info()</code> for collection listing</li>
+<li>CLI: <code>store</code>, <code>recall</code>, <code>info</code> commands</li>
+<li><code>MockEmbedder</code> for deterministic testing</li>
+</ul>
+<h2 id="phase-2-compaction-graph-ttl"><a class="header" href="#phase-2-compaction-graph-ttl">Phase 2: Compaction, Graph, TTL</a></h2>
+<p>Tier-based memory evolution, entity relationships, and lifecycle management.</p>
+<h3 id="compaction-4"><a class="header" href="#compaction-4">Compaction</a></h3>
+<ul>
+<li><code>Compactor</code> trait with <code>synthesize()</code> method</li>
+<li><code>CompactRequest</code> with strategies: Age, AccessDecay, Hybrid, Manual</li>
+<li><code>CompactResult</code> with source/compacted counts and provenance tracking</li>
+<li><code>parent_ids</code> field on Memory for compaction provenance</li>
+<li><code>compacted_at</code> field: compacted memories excluded from recall</li>
+<li>Dry run mode for previewing candidates</li>
+<li><code>max_batch_size</code> validation (must be &gt; 0)</li>
+<li><code>MockCompactor</code> for testing (concatenates content)</li>
+</ul>
+<h3 id="graph-layer"><a class="header" href="#graph-layer">Graph Layer</a></h3>
+<ul>
+<li><code>Edge</code> struct: source, target, relation, weight, memory_ids</li>
+<li><code>relate()</code>: create or upsert edges</li>
+<li><code>unrelate()</code>: remove edges by (source, target, relation)</li>
+<li><code>traverse()</code>: BFS traversal with depth, relation, and weight filters</li>
+<li><code>subgraph()</code>: return all edges in a collection</li>
+<li>Forward and reverse edge index tables for O(1) lookups</li>
+</ul>
+<h3 id="ttl-and-lifecycle"><a class="header" href="#ttl-and-lifecycle">TTL and Lifecycle</a></h3>
+<ul>
+<li><code>ttl</code> field on Memory (optional seconds-based expiry)</li>
+<li>Expired memories excluded from recall (<code>now - created_at &gt;= ttl</code>)</li>
+<li><code>vacuum()</code>: hard-delete expired memories from storage and indexes</li>
+<li><code>list()</code>: return all memories including compacted ones</li>
+</ul>
+<h3 id="scoring"><a class="header" href="#scoring">Scoring</a></h3>
+<ul>
+<li>Recall score: <code>similarity * tier_weight * time_decay_factor</code></li>
+<li>Configurable <code>TierWeights</code> (Core=1.0, Active=0.9, Background=0.7, Archive=0.5)</li>
+<li>Configurable <code>TimeDecay</code> with half-life</li>
+<li>Access stats: <code>access_count</code> and <code>last_accessed</code> updated on recall</li>
+</ul>
+<h3 id="storage-2"><a class="header" href="#storage-2">Storage</a></h3>
+<ul>
+<li>Versioned serialization envelope (v0 compat + v1 with version byte prefix)</li>
+<li>V0 auto-migration on read (ttl=None, compacted_at=None, parent_ids=[])</li>
+<li><code>store_batch()</code> with atomic rollback</li>
+<li>Compensating rollback on index insertion failures (store, store_batch, compact)</li>
+</ul>
+<h3 id="infrastructure"><a class="header" href="#infrastructure">Infrastructure</a></h3>
+<ul>
+<li><code>Drop</code> impl: flush vector indexes on drop</li>
+<li><code>close()</code> for explicit flush with error propagation</li>
+<li>CLI: <code>delete</code>, <code>list</code>, <code>vacuum</code>, <code>compact</code>, <code>relate</code>, <code>traverse</code> commands</li>
+</ul>
+<h2 id="phase-3-full-text-snapshots-bindings-ffi"><a class="header" href="#phase-3-full-text-snapshots-bindings-ffi">Phase 3: Full-Text, Snapshots, Bindings, FFI</a></h2>
+<p>Keyword search, data portability, and multi-language support.</p>
+<h3 id="full-text-search-bm25"><a class="header" href="#full-text-search-bm25">Full-Text Search (BM25)</a></h3>
+<ul>
+<li>Built-in BM25 implementation with redb-backed posting lists</li>
+<li>Tokenizer: lowercase, split on non-alphanumeric, remove short tokens, stop words</li>
+<li><code>SearchMode::FullText</code> for keyword search</li>
+<li><code>SearchMode::Hybrid</code> with min-max normalized score blending</li>
+<li><code>RecallRequest.text_query</code> field for full-text query</li>
+<li>Per-collection full-text stats (doc count, total tokens)</li>
+</ul>
+<h3 id="snapshots-7"><a class="header" href="#snapshots-7">Snapshots</a></h3>
+<ul>
+<li>JSONL format: header + memory lines + edge lines</li>
+<li><code>snapshot()</code>: export a collection to any <code>Write</code> stream</li>
+<li><code>restore()</code>: import from any <code>BufRead</code> stream</li>
+<li>Version validation (“1.0”)</li>
+<li>Collection existence check on restore</li>
+<li>Warning-tolerant: invalid lines produce warnings, do not abort</li>
+<li>Vector index flush after restore</li>
+</ul>
+<h3 id="c-ffi-mast-ffi"><a class="header" href="#c-ffi-mast-ffi">C FFI (<code>mast-ffi</code>)</a></h3>
+<ul>
+<li><code>MastHandle</code> opaque type</li>
+<li><code>MastEmbedderVtable</code> callback struct (embed, embed_batch, dimensions)</li>
+<li><code>MastFfiError</code> with error codes</li>
+<li>Functions: open, close, store, recall, get, delete, info, vacuum</li>
+<li>Functions: relate, unrelate, snapshot, restore</li>
+<li>Memory-safe free functions for all result types</li>
+<li><code>MastMetadata</code> struct for key-value pair passing</li>
+</ul>
+<h3 id="python-bindings-mast-py"><a class="header" href="#python-bindings-mast-py">Python Bindings (<code>mast-py</code>)</a></h3>
+<ul>
+<li>PyO3 bindings via maturin</li>
+<li><code>Mast</code> class with all operations</li>
+<li>Python embedder protocol (duck-typed <code>embed()</code> method)</li>
+<li><code>PyMemory</code>, <code>PyRecallResult</code>, <code>PyCollectionInfo</code>, <code>PyEdge</code> classes</li>
+<li><code>PySnapshotResult</code>, <code>PyRestoreResult</code> classes</li>
+<li>Optional <code>embed_batch</code> with sequential fallback</li>
+<li>Metadata filter as <code>dict[str, str]</code> with AND semantics</li>
+</ul>
+<h3 id="nodejs-bindings-mast-node"><a class="header" href="#nodejs-bindings-mast-node">Node.js Bindings (<code>mast-node</code>)</a></h3>
+<ul>
+<li>napi-rs bindings</li>
+<li><code>MastDb</code> class with all operations</li>
+<li>Embedding via <code>ThreadsafeFunction&lt;String&gt;</code></li>
+<li><code>JsMemory</code>, <code>JsRecallResult</code>, <code>JsCollectionInfo</code>, <code>JsEdge</code> types</li>
+<li><code>JsSnapshotResult</code>, <code>JsRestoreResult</code> types</li>
+</ul>
+<h3 id="cli-enhancements"><a class="header" href="#cli-enhancements">CLI Enhancements</a></h3>
+<ul>
+<li><code>snapshot</code> and <code>restore</code> commands</li>
+<li>Full-text and hybrid search modes in <code>recall</code></li>
+<li><code>--text-query</code> and <code>--search-mode</code> flags</li>
+</ul>
+<h3 id="test-infrastructure"><a class="header" href="#test-infrastructure">Test Infrastructure</a></h3>
+<ul>
+<li>183 tests: 82 core unit + 61 integration + 16 embedder + 24 CLI</li>
+<li><code>MockEmbedder</code>: deterministic hash-based vectors</li>
+<li><code>MockCompactor</code>: concatenation-based synthesis</li>
+<li><code>tempfile::tempdir()</code> for isolated test databases</li>
+<li>wiremock-based HTTP tests for OpenAI embedder</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+        <template id=fa-eye><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM432 256c0 79.5-64.5 144-144 144s-144-64.5-144-144s64.5-144 144-144s144 64.5 144 144zM288 192c0 35.3-28.7 64-64 64c-11.5 0-22.3-3-31.6-8.4c-.2 2.8-.4 5.5-.4 8.4c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6z"/></svg></span></template>
+        <template id=fa-eye-slash><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C465.5 68.8 400.8 32 320 32c-68.2 0-125 26.3-169.3 60.8L38.8 5.1zM223.1 149.5C248.6 126.2 282.7 112 320 112c79.5 0 144 64.5 144 144c0 24.9-6.3 48.3-17.4 68.7L408 294.5c5.2-11.8 8-24.8 8-38.5c0-53-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6c0 10.2-2.4 19.8-6.6 28.3l-90.3-70.8zm223.1 298L373 389.9c-16.4 6.5-34.3 10.1-53 10.1c-79.5 0-144-64.5-144-144c0-6.9 .5-13.6 1.4-20.2L83.1 161.5C60.3 191.2 44 220.8 34.5 243.7c-3.3 7.9-3.3 16.7 0 24.6c14.9 35.7 46.2 87.7 93 131.1C174.5 443.2 239.2 480 320 480c47.8 0 89.9-12.9 126.2-32.5z"/></svg></span></template>
+        <template id=fa-copy><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg></span></template>
+        <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
+        <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr-ef4e11c1.min.js"></script>
+        <script src="mark-09e88c2c.min.js"></script>
+        <script src="searcher-c2a407aa.js"></script>
+
+        <script src="clipboard-1626706a.min.js"></script>
+        <script src="highlight-abc7f01d.js"></script>
+        <script src="book-a0b12cfe.js"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+
+    </div>
+    </body>
+</html>

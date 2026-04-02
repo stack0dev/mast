@@ -1,0 +1,18 @@
+{
+  "name": "mast-memory-linux-x64-musl",
+  "version": "0.1.0",
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "main": "mast.linux-x64-musl.node",
+  "files": [
+    "mast.linux-x64-musl.node"
+  ],
+  "description": "Node.js bindings for MAST memory engine",
+  "libc": [
+    "musl"
+  ]
+}

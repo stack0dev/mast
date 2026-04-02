@@ -1,0 +1,5 @@
+.cache/
+.bench-data/
+node_modules/
+dist/
+results.json

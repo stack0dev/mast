@@ -1,0 +1,15 @@
+{
+  "name": "mast-memory-win32-x64-msvc",
+  "version": "0.1.0",
+  "os": [
+    "win32"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "main": "mast.win32-x64-msvc.node",
+  "files": [
+    "mast.win32-x64-msvc.node"
+  ],
+  "description": "Node.js bindings for MAST memory engine"
+}

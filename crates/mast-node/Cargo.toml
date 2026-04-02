@@ -1,0 +1,23 @@
+[package]
+name = "mast-node"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+async-trait = "0.1"
+mast-core = { path = "../mast-core" }
+mast-embed-local = { path = "../mast-embed-local", optional = true }
+napi = { version = "2", features = ["async", "serde-json", "napi8"] }
+napi-derive = "2"
+serde_json = "1"
+tokio = { version = "1", features = ["rt-multi-thread"] }
+ulid = "1"
+
+[features]
+local-embedder = ["mast-embed-local"]
+
+[build-dependencies]
+napi-build = "2"

@@ -1,0 +1,122 @@
+name: Build & Publish mast-memory
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: aarch64-apple-darwin
+            os: macos-14
+          - target: x86_64-apple-darwin
+            os: macos-14
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-latest
+            use-zig: true
+          - target: x86_64-unknown-linux-musl
+            os: ubuntu-latest
+            use-zig: true
+
+    runs-on: ${{ matrix.os }}
+    name: Build - ${{ matrix.target }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install Zig
+        if: matrix.use-zig
+        uses: mlugg/setup-zig@v2
+        with:
+          version: 0.13.0
+
+      - name: Install dependencies
+        working-directory: crates/mast-node
+        run: npm install --ignore-scripts
+
+      - name: Build native module
+        working-directory: crates/mast-node
+        run: |
+          if [ "${{ matrix.use-zig }}" = "true" ]; then
+            npx napi build --release --features local-embedder --target ${{ matrix.target }} --zig
+          else
+            npx napi build --release --features local-embedder --target ${{ matrix.target }}
+          fi
+        shell: bash
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bindings-${{ matrix.target }}
+          path: crates/mast-node/mast.node
+          if-no-files-found: error
+
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        working-directory: crates/mast-node
+        run: npm install --ignore-scripts
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: crates/mast-node/artifacts
+
+      - name: Move artifacts
+        working-directory: crates/mast-node
+        run: npx napi artifacts --dir artifacts
+
+      - name: List npm packages
+        working-directory: crates/mast-node
+        run: ls -R npm/
+
+      - name: Publish platform packages
+        working-directory: crates/mast-node
+        run: |
+          for dir in npm/*/; do
+            if [ -f "$dir/package.json" ]; then
+              echo "Publishing $dir..."
+              npm publish "$dir" --provenance --access public
+            fi
+          done
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish main package
+        working-directory: crates/mast-node
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

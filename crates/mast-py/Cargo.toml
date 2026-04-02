@@ -1,0 +1,16 @@
+[package]
+name = "mast-py"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "mast"
+crate-type = ["cdylib"]
+
+[dependencies]
+async-trait = "0.1"
+mast-core = { path = "../mast-core" }
+pyo3 = { version = "0.22", features = ["extension-module"] }
+pyo3-async-runtimes = { version = "0.22", features = ["tokio-runtime"] }
+ulid = "1"
+tokio = { version = "1", features = ["rt-multi-thread"] }

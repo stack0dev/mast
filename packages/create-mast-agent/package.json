@@ -1,0 +1,23 @@
+{
+  "name": "create-mast-agent",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Zero-config scaffold for MAST agents",
+  "main": "dist/index.js",
+  "bin": {
+    "create-mast-agent": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "inquirer": "^12.3.0",
+    "chalk": "^5.4.1",
+    "ora": "^8.1.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/node": "^22.0.0"
+  }
+}

@@ -1,0 +1,13 @@
+[package]
+name = "mast-cli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+mast-core = { path = "../mast-core" }
+mast-embed-openai = { path = "../mast-embed-openai" }
+mast-embed-local = { path = "../mast-embed-local" }
+tokio = { version = "1", features = ["full"] }
+ulid = "1"
+tracing-subscriber = "0.3"

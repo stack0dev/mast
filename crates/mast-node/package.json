@@ -1,0 +1,42 @@
+{
+  "name": "mast-memory",
+  "version": "0.1.0",
+  "description": "Node.js bindings for MAST memory engine",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "napi": {
+    "name": "mast",
+    "triples": {
+      "defaults": false,
+      "additional": [
+        "aarch64-apple-darwin",
+        "x86_64-apple-darwin",
+        "x86_64-unknown-linux-gnu",
+        "aarch64-unknown-linux-gnu",
+        "x86_64-unknown-linux-musl"
+      ]
+    }
+  },
+  "scripts": {
+    "artifacts": "napi artifacts",
+    "build": "napi build --release --features local-embedder",
+    "build:slim": "napi build --release",
+    "prepublishOnly": "napi prepublish -t npm",
+    "test": "jest",
+    "version": "napi version"
+  },
+  "optionalDependencies": {
+    "mast-memory-darwin-arm64": "0.1.0",
+    "mast-memory-darwin-x64": "0.1.0",
+    "mast-memory-linux-x64-gnu": "0.1.0",
+    "mast-memory-linux-arm64-gnu": "0.1.0",
+    "mast-memory-linux-x64-musl": "0.1.0"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^2",
+    "jest": "^29",
+    "@types/jest": "^29",
+    "ts-jest": "^29",
+    "typescript": "^5"
+  }
+}

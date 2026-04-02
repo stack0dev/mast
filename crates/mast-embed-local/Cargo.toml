@@ -1,0 +1,13 @@
+[package]
+name = "mast-embed-local"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-trait = "0.1"
+mast-core = { path = "../mast-core" }
+fastembed = "4"
+tokio = { version = "1", features = ["rt"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full"] }

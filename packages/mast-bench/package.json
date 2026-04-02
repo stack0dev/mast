@@ -1,0 +1,20 @@
+{
+  "name": "mast-bench",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "description": "LOCOMO benchmark harness for MAST",
+  "scripts": {
+    "bench": "tsx src/run.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "mast-memory": "file:../../crates/mast-node",
+    "openai": "^4.77.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0"
+  }
+}

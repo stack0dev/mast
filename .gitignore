@@ -1,0 +1,33 @@
+# Rust build artifacts
+/target/
+
+# Local database/test artifacts
+*.mast
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment files
+.env
+.env.*
+
+# Editor/OS files
+.DS_Store
+.idea/
+.vscode/
+
+# Node.js
+node_modules/
+dist/
+*.node
+crates/mast-node/npm/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+benchmarks/.fastembed_cache/
+
+.fastembed_cache
+bench-results

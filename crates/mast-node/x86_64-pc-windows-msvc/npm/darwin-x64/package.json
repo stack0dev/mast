@@ -1,0 +1,15 @@
+{
+  "name": "mast-memory-darwin-x64",
+  "version": "0.1.0",
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "main": "mast.darwin-x64.node",
+  "files": [
+    "mast.darwin-x64.node"
+  ],
+  "description": "Node.js bindings for MAST memory engine"
+}

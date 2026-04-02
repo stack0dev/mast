@@ -1,0 +1,198 @@
+{
+  "name": "mast-memory",
+  "displayName": "MAST Memory",
+  "version": "0.1.0",
+  "description": "Long-term memory for OpenClaw powered by MAST — vector + full-text hybrid search with knowledge graphs.",
+  "entry": "dist/index.js",
+  "configSchema": {
+    "type": "object",
+    "properties": {
+      "dbPath": {
+        "type": "string",
+        "default": "~/.mast/memory.db",
+        "description": "Path to the MAST database file"
+      },
+      "collection": {
+        "type": "string",
+        "default": "openclaw",
+        "description": "Default collection name for storing memories"
+      },
+      "embeddingProvider": {
+        "type": "string",
+        "enum": ["voyage", "openai"],
+        "default": "voyage",
+        "description": "Embedding API provider"
+      },
+      "apiKey": {
+        "type": "string",
+        "sensitive": true,
+        "description": "Embedding API key (falls back to MAST_EMBEDDING_API_KEY env var)"
+      },
+      "embeddingModel": {
+        "type": "string",
+        "description": "Embedding model name (defaults: voyage-3.5 for Voyage, text-embedding-3-small for OpenAI)"
+      },
+      "dimensions": {
+        "type": "number",
+        "default": 1024,
+        "description": "Embedding vector dimensions"
+      },
+      "autoRecall": {
+        "type": "boolean",
+        "default": true,
+        "description": "Automatically inject relevant memories before each agent turn"
+      },
+      "autoCapture": {
+        "type": "boolean",
+        "default": true,
+        "description": "Automatically store conversation content after each agent turn"
+      },
+      "maxResults": {
+        "type": "number",
+        "default": 10,
+        "minimum": 1,
+        "maximum": 50,
+        "description": "Maximum number of results for auto-recall"
+      },
+      "searchMode": {
+        "type": "string",
+        "enum": ["vector", "fulltext", "hybrid"],
+        "default": "hybrid",
+        "description": "Default search mode for recall"
+      }
+    },
+    "required": []
+  },
+  "tools": [
+    {
+      "name": "mast_store",
+      "description": "Store a memory in MAST. Use this to save important information, decisions, user preferences, or any content that should be remembered across conversations.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "The content to store as a memory"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": { "type": "string" },
+            "description": "Optional key-value metadata to attach to the memory"
+          },
+          "tier": {
+            "type": "string",
+            "enum": ["core", "active", "background", "archive"],
+            "description": "Memory importance tier (default: active)"
+          },
+          "ttl": {
+            "type": "number",
+            "description": "Time-to-live in seconds (memory expires after this duration)"
+          }
+        },
+        "required": ["content"]
+      }
+    },
+    {
+      "name": "mast_search",
+      "description": "Search stored memories using vector similarity, full-text, or hybrid search. Returns scored results ranked by relevance.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "The search query"
+          },
+          "limit": {
+            "type": "number",
+            "description": "Maximum number of results (default: 10)"
+          },
+          "mode": {
+            "type": "string",
+            "enum": ["vector", "fulltext", "hybrid"],
+            "description": "Search mode (default: from plugin config)"
+          }
+        },
+        "required": ["query"]
+      }
+    },
+    {
+      "name": "mast_forget",
+      "description": "Delete a specific memory by its ID.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The ULID of the memory to delete"
+          }
+        },
+        "required": ["id"]
+      }
+    },
+    {
+      "name": "mast_relate",
+      "description": "Create a named, weighted edge between two memories in the knowledge graph.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "description": "Source node identifier (memory ID or concept name)"
+          },
+          "target": {
+            "type": "string",
+            "description": "Target node identifier (memory ID or concept name)"
+          },
+          "relation": {
+            "type": "string",
+            "description": "The type of relationship (e.g., 'related_to', 'causes', 'part_of')"
+          },
+          "weight": {
+            "type": "number",
+            "description": "Edge weight from 0.0 to 1.0 (default: 1.0)"
+          }
+        },
+        "required": ["source", "target", "relation"]
+      }
+    },
+    {
+      "name": "mast_traverse",
+      "description": "Traverse the knowledge graph from a starting node using BFS. Returns connected edges up to a configurable depth.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "start": {
+            "type": "string",
+            "description": "Starting node identifier"
+          },
+          "maxDepth": {
+            "type": "number",
+            "description": "Maximum traversal depth (default: 3)"
+          },
+          "relation": {
+            "type": "string",
+            "description": "Filter edges to this relation type only"
+          },
+          "minWeight": {
+            "type": "number",
+            "description": "Minimum edge weight threshold"
+          }
+        },
+        "required": ["start"]
+      }
+    },
+    {
+      "name": "mast_graph",
+      "description": "List all edges in the collection's knowledge graph. Useful for understanding the full structure of stored relationships.",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    }
+  ],
+  "hooks": {
+    "before_agent_start": "dist/hooks/recall.js",
+    "agent_end": "dist/hooks/capture.js"
+  }
+}

@@ -1,0 +1,5 @@
+module CMast {
+    header "include/mast.h"
+    link "mast_ffi"
+    export *
+}

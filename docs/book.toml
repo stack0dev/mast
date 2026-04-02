@@ -1,0 +1,13 @@
+[book]
+authors = ["MAST Contributors"]
+language = "en"
+src = "src"
+title = "MAST - Memory-Augmented Storage"
+
+[build]
+build-dir = "book"
+
+[output.html]
+default-theme = "light"
+preferred-dark-theme = "ayu"
+git-repository-url = "https://github.com/mast-memory/mast"
