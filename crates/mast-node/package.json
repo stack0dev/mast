@@ -11,9 +11,7 @@
       "additional": [
         "aarch64-apple-darwin",
         "x86_64-apple-darwin",
-        "x86_64-unknown-linux-gnu",
-        "aarch64-unknown-linux-gnu",
-        "x86_64-unknown-linux-musl"
+        "x86_64-unknown-linux-gnu"
       ]
     }
   },
@@ -28,9 +26,7 @@
   "optionalDependencies": {
     "mast-memory-darwin-arm64": "0.1.0",
     "mast-memory-darwin-x64": "0.1.0",
-    "mast-memory-linux-x64-gnu": "0.1.0",
-    "mast-memory-linux-arm64-gnu": "0.1.0",
-    "mast-memory-linux-x64-musl": "0.1.0"
+    "mast-memory-linux-x64-gnu": "0.1.0"
   },
   "devDependencies": {
     "@napi-rs/cli": "^2",
