@@ -137,7 +137,7 @@ mast/
     mast-node/           Node.js bindings (napi-rs)
   packages/
     mast-agent/          Agent loop + memory-first context engine
-    mast-channels/       Channel adapters (CLI, HTTP/WS, Telegram, Slack)
+    mast-channels/       Channel adapters (CLI, HTTP/WS, Telegram, Slack, Discord, WhatsApp)
     mast-tools/          MCP client + built-in tools
     mast-bench/          LOCOMO benchmark harness
     create-mast-agent/   npx scaffold + wizard

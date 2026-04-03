@@ -3,6 +3,8 @@ import { CliChannel } from "./cli.js";
 import { HttpChannel } from "./http.js";
 import { TelegramChannel } from "./telegram.js";
 import { SlackChannel } from "./slack.js";
+import { DiscordChannel } from "./discord.js";
+import { WhatsAppChannel } from "./whatsapp.js";
 
 export type { Channel, AgentHandler } from "./types.js";
 export { CliChannel } from "./cli.js";
@@ -12,12 +14,24 @@ export { TelegramChannel } from "./telegram.js";
 export type { TelegramChannelConfig } from "./telegram.js";
 export { SlackChannel } from "./slack.js";
 export type { SlackChannelConfig } from "./slack.js";
+export { DiscordChannel } from "./discord.js";
+export type { DiscordChannelConfig } from "./discord.js";
+export { WhatsAppChannel } from "./whatsapp.js";
+export type { WhatsAppChannelConfig } from "./whatsapp.js";
 
 export interface ChannelsConfig {
   cli?: boolean;
   http?: { port: number; host?: string };
   telegram?: { token: string };
   slack?: { token: string; appToken: string; signingSecret: string };
+  discord?: { token: string; requireMention?: boolean };
+  whatsapp?: {
+    accessToken: string;
+    phoneNumberId: string;
+    verifyToken: string;
+    port: number;
+    host?: string;
+  };
 }
 
 export function createChannels(config: ChannelsConfig, agentName?: string): Channel[] {
@@ -26,5 +40,7 @@ export function createChannels(config: ChannelsConfig, agentName?: string): Chan
   if (config.http) channels.push(new HttpChannel(config.http, agentName));
   if (config.telegram) channels.push(new TelegramChannel(config.telegram));
   if (config.slack) channels.push(new SlackChannel(config.slack));
+  if (config.discord) channels.push(new DiscordChannel(config.discord));
+  if (config.whatsapp) channels.push(new WhatsAppChannel(config.whatsapp));
   return channels;
 }
