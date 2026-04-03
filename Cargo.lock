@@ -1777,6 +1777,7 @@ dependencies = [
  "async-trait",
  "bincode",
  "criterion",
+ "libc",
  "redb",
  "rust-stemmers",
  "serde",

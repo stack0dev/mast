@@ -1,3 +1,4 @@
+pub mod file_lock;
 pub mod serde;
 pub mod tables;
 
@@ -5,6 +6,7 @@ use crate::config::Durability;
 use crate::error::MastError;
 use crate::index::fulltext::{tokenize, PostingEntry, PostingList};
 use crate::types::{CollectionInfo, Edge, Memory};
+use file_lock::FileLock;
 use redb::{Database, ReadableTable, WriteTransaction};
 use std::collections::HashMap;
 use std::path::Path;
@@ -14,6 +16,7 @@ use ulid::Ulid;
 pub struct Storage {
     pub(crate) db: Database,
     durability: Durability,
+    _file_lock: FileLock,
 }
 
 impl Storage {
@@ -25,6 +28,10 @@ impl Storage {
         path: &Path,
         durability: Durability,
     ) -> Result<Self, MastError> {
+        // Acquire our own advisory lock first — this handles stale lock detection
+        // and PID-based recovery that redb's built-in flock can't do on its own.
+        let file_lock = FileLock::acquire(path)?;
+
         let db = Database::create(path)?;
 
         let txn = db.begin_write()?;
@@ -44,7 +51,11 @@ impl Storage {
         }
         txn.commit()?;
 
-        Ok(Self { db, durability })
+        Ok(Self {
+            db,
+            durability,
+            _file_lock: file_lock,
+        })
     }
 
     pub fn begin_write_txn(&self) -> Result<WriteTransaction, MastError> {
