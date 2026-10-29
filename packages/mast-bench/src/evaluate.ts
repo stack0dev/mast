@@ -31,6 +31,14 @@ function formatContext(
     .join("\n");
 }
 
+/** Turns fetched to rank sessions. LOCOMO conversations have at most 32 sessions. */
+const SESSION_POOL = 200;
+
+/** "D12:4" → "12". */
+function sessionOf(diaId: string): string {
+  return diaId.slice(1, diaId.indexOf(":"));
+}
+
 function searchModeString(config: SearchModeConfig): string {
   return config.mode;
 }
@@ -59,6 +67,21 @@ export async function evaluateQuestion(
   const sessions = sample.conversation.sessions;
   const referenceTime = sessions[sessions.length - 1].timestamp;
   const recalled = db.recallLocal(collection, query, textQuery, mode, topK, referenceTime);
+
+  // A separate, deeper query so the session ranking can fill K distinct sessions.
+  // Hybrid ranking depends on the limit, so the turn score keeps its own top-K call.
+  const pool = db.recallLocal(collection, query, textQuery, mode, SESSION_POOL, referenceTime);
+
+  // Session ranking: each session ranks at its best turn, as in session-level
+  // LOCOMO / LongMemEval scores.
+  const recalledSessions: string[] = [];
+  for (const r of pool) {
+    const session = r.memory.metadata.session;
+    if (session && !recalledSessions.includes(session)) recalledSessions.push(session);
+    if (recalledSessions.length === topK) break;
+  }
+  const evidenceSessions = new Set(qa.evidence.map(sessionOf));
+  const sessionHit = recalledSessions.some((s) => evidenceSessions.has(s));
 
   // Check recall hit — any evidence dia_id found in recalled memories
   const recalledIds: string[] = [];
@@ -117,6 +140,8 @@ export async function evaluateQuestion(
     evidence: qa.evidence,
     recalledIds,
     recallHit,
+    recalledSessions,
+    sessionHit,
     f1,
     bleu1,
     judgeScore,

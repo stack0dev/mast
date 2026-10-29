@@ -30,6 +30,7 @@ export function computeCategories(results: QAResult[]): CategoryBreakdown[] {
       meanF1: mean(items.map((r) => r.f1)),
       meanBleu1: mean(items.map((r) => r.bleu1)),
       recallHitRate: mean(items.map((r) => (r.recallHit ? 1 : 0))),
+      sessionHitRate: mean(items.map((r) => (r.sessionHit ? 1 : 0))),
     };
     const judgeScores = items.filter((r) => r.judgeScore != null).map((r) => r.judgeScore!);
     if (judgeScores.length > 0) breakdown.meanJudge = mean(judgeScores);
@@ -55,6 +56,7 @@ export function buildExperimentResult(
     overallBleu1: mean(results.map((r) => r.bleu1)),
     ...(hasJudge ? { overallJudge: mean(results.map((r) => r.judgeScore ?? 0)) } : {}),
     overallRecallHit: mean(results.map((r) => (r.recallHit ? 1 : 0))),
+    overallSessionHit: mean(results.map((r) => (r.sessionHit ? 1 : 0))),
     durationMs,
   };
 }
@@ -117,12 +119,22 @@ export function formatSummary(report: BenchmarkReport): string {
   lines.push(`Total time: ${(report.totalDurationMs / 1000).toFixed(1)}s`);
   lines.push("");
 
-  lines.push("Retrieval recall (an evidence turn is in the top K)");
+  lines.push("Turn recall (an evidence turn is in the top K turns)");
   lines.push(
     ...table(
       report,
       (cat) => fmtPct(cat.recallHitRate),
       (exp) => fmtPct(exp.overallRecallHit),
+    ),
+  );
+
+  lines.push("");
+  lines.push("Session recall (an evidence session is in the top K sessions)");
+  lines.push(
+    ...table(
+      report,
+      (cat) => fmtPct(cat.sessionHitRate),
+      (exp) => fmtPct(exp.overallSessionHit),
     ),
   );
 
@@ -172,6 +184,7 @@ export function writeResults(
       overallBleu1: e.overallBleu1,
       overallJudge: e.overallJudge,
       overallRecallHit: e.overallRecallHit,
+      overallSessionHit: e.overallSessionHit,
       durationMs: e.durationMs,
       questionCount: e.results.length,
     })),

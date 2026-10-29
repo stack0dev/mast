@@ -81,6 +81,9 @@ export interface QAResult {
   evidence: string[];
   recalledIds: string[];
   recallHit: boolean;
+  /** Distinct sessions of the recalled turns, best first, up to top K. */
+  recalledSessions: string[];
+  sessionHit: boolean;
   f1: number;
   bleu1: number;
   judgeScore?: number;
@@ -93,6 +96,7 @@ export interface CategoryBreakdown {
   meanBleu1: number;
   meanJudge?: number;
   recallHitRate: number;
+  sessionHitRate: number;
 }
 
 export interface ExperimentResult {
@@ -103,6 +107,7 @@ export interface ExperimentResult {
   overallBleu1: number;
   overallJudge?: number;
   overallRecallHit: number;
+  overallSessionHit: number;
   durationMs: number;
 }
 

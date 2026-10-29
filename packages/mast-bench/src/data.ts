@@ -60,6 +60,15 @@ export function parseSessionDate(text: string): number | undefined {
   return Date.UTC(parseInt(year, 10), month, parseInt(day, 10), hour, parseInt(min, 10)) / 1000;
 }
 
+/**
+ * Turn IDs like "D1:3". A few dataset entries hold several IDs in one string
+ * ("D8:6; D9:17"), so every ID is pulled out of every entry.
+ */
+function parseEvidence(raw: unknown): string[] {
+  const entries = Array.isArray(raw) ? raw : raw == null ? [] : [raw];
+  return entries.flatMap((e) => String(e).match(/D\d+:\d+/g) ?? []);
+}
+
 function parseSample(raw: Record<string, unknown>, index: number): LocomoSample {
   const conv = raw.conversation as Record<string, unknown> | undefined;
   if (!conv) {
@@ -110,11 +119,7 @@ function parseSample(raw: Record<string, unknown>, index: number): LocomoSample 
   const qa: LocomoQA[] = qaRaw.map((q) => ({
     question: String(q.question ?? ""),
     answer: String(q.answer ?? ""),
-    evidence: Array.isArray(q.evidence)
-      ? q.evidence.map(String)
-      : typeof q.evidence === "string"
-        ? [q.evidence]
-        : [],
+    evidence: parseEvidence(q.evidence),
     category: Number(q.category ?? 0),
     ...(q.adversarial_answer != null
       ? { adversarial_answer: String(q.adversarial_answer) }
