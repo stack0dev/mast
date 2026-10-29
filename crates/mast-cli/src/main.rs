@@ -48,6 +48,10 @@ enum Commands {
         #[arg(long)]
         ttl: Option<i64>,
 
+        /// When the memory happened, in unix seconds (default: now)
+        #[arg(long)]
+        created_at: Option<i64>,
+
         /// Use local on-device embedder (no API key needed)
         #[arg(long)]
         local: bool,
@@ -86,6 +90,11 @@ enum Commands {
         /// Metadata filter key=value pairs (AND semantics)
         #[arg(long, value_parser = parse_metadata)]
         filter: Vec<(String, String)>,
+
+        /// When the question is asked, in unix seconds (default: now).
+        /// Phrases like "two weeks ago" in the query count back from it.
+        #[arg(long)]
+        reference_time: Option<i64>,
 
         /// Use local on-device embedder (no API key needed)
         #[arg(long)]
@@ -226,6 +235,41 @@ enum Commands {
         /// Edge weight
         #[arg(long, default_value = "1.0")]
         weight: f32,
+
+        /// When the fact started being true, in unix seconds
+        #[arg(long)]
+        valid_from: Option<i64>,
+
+        /// When the fact stopped being true, in unix seconds (exclusive)
+        #[arg(long)]
+        valid_to: Option<i64>,
+    },
+
+    /// Mark a graph edge as no longer true
+    Invalidate {
+        /// Path to database file
+        #[arg(long)]
+        db: PathBuf,
+
+        /// Collection name
+        #[arg(long)]
+        collection: String,
+
+        /// Source entity
+        #[arg(long)]
+        source: String,
+
+        /// Target entity
+        #[arg(long)]
+        target: String,
+
+        /// Relation type
+        #[arg(long)]
+        relation: String,
+
+        /// When the fact stopped being true, in unix seconds (default: now)
+        #[arg(long)]
+        ended_at: Option<i64>,
     },
 
     /// Traverse the graph from a starting entity
@@ -253,6 +297,10 @@ enum Commands {
         /// Minimum edge weight
         #[arg(long)]
         min_weight: Option<f32>,
+
+        /// Follow only edges valid at this time, in unix seconds
+        #[arg(long)]
+        as_of: Option<i64>,
     },
 }
 
@@ -261,6 +309,16 @@ fn parse_metadata(s: &str) -> Result<(String, String), String> {
         .find('=')
         .ok_or_else(|| format!("invalid KEY=VALUE: no '=' found in '{s}'"))?;
     Ok((s[..pos].to_string(), s[pos + 1..].to_string()))
+}
+
+/// " [from 100 to 200)" style suffix for an edge's validity interval, or "" when it has none.
+fn format_validity(valid_from: Option<i64>, valid_to: Option<i64>) -> String {
+    match (valid_from, valid_to) {
+        (None, None) => String::new(),
+        (Some(from), None) => format!(" [from {from}]"),
+        (None, Some(to)) => format!(" [until {to})"),
+        (Some(from), Some(to)) => format!(" [from {from} until {to})"),
+    }
 }
 
 fn parse_embedding(s: &str) -> Result<Vec<f32>, String> {
@@ -288,6 +346,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             metadata,
             tier,
             ttl,
+            created_at,
             local,
         } => {
             let config = MastConfig::default().with_db_path(&db);
@@ -316,6 +375,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 metadata: metadata_map,
                 tier,
                 ttl,
+                created_at,
             };
 
             let memory = mast.store(request, embedder.as_ref()).await?;
@@ -333,6 +393,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             search_mode,
             limit,
             filter,
+            reference_time,
             local,
         } => {
             let config = MastConfig::default().with_db_path(&db);
@@ -397,6 +458,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 filter: metadata_filter,
                 tier_weights: None,
                 time_decay: None,
+                reference_time,
+                time_anchor: None,
             };
 
             let results = mast.recall(request, embedder.as_ref()).await?;
@@ -612,6 +675,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             target,
             relation,
             weight,
+            valid_from,
+            valid_to,
         } => {
             let config = MastConfig::default().with_db_path(&db);
             let mast = Mast::open(config)?;
@@ -623,12 +688,36 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 relation: relation.clone(),
                 weight,
                 memory_ids: vec![],
+                valid_from,
+                valid_to,
             };
 
             let edge_id = mast.relate(request)?;
             println!(
-                "Edge {edge_id}: {source} --[{relation}]--> {target} (weight={weight})"
+                "Edge {edge_id}: {source} --[{relation}]--> {target} (weight={weight}){}",
+                format_validity(valid_from, valid_to)
             );
+        }
+
+        Commands::Invalidate {
+            db,
+            collection,
+            source,
+            target,
+            relation,
+            ended_at,
+        } => {
+            let config = MastConfig::default().with_db_path(&db);
+            let mast = Mast::open(config)?;
+
+            let closed = mast.invalidate(InvalidateRequest {
+                collection,
+                source: source.clone(),
+                target: target.clone(),
+                relation: relation.clone(),
+                ended_at,
+            })?;
+            println!("Closed {closed} edge(s): {source} --[{relation}]--> {target}");
         }
 
         Commands::Traverse {
@@ -638,6 +727,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             max_depth,
             relation,
             min_weight,
+            as_of,
         } => {
             let config = MastConfig::default().with_db_path(&db);
             let mast = Mast::open(config)?;
@@ -648,6 +738,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 max_depth,
                 relation_filter: relation,
                 min_weight,
+                as_of,
             };
 
             let edges = mast.traverse(request)?;
@@ -657,8 +748,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             } else {
                 for edge in &edges {
                     println!(
-                        "{} --[{}]--> {} (weight={:.2})",
-                        edge.source, edge.relation, edge.target, edge.weight
+                        "{} --[{}]--> {} (weight={:.2}){}",
+                        edge.source,
+                        edge.relation,
+                        edge.target,
+                        edge.weight,
+                        format_validity(edge.valid_from, edge.valid_to)
                     );
                 }
                 println!("\nTotal edges: {}", edges.len());
@@ -792,6 +887,48 @@ mod tests {
             "0.1,0.2",
         ]);
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn cli_time_options() {
+        let cli = Cli::try_parse_from([
+            "mast", "relate", "--db", "t.mast", "--collection", "c", "--source", "a",
+            "--target", "b", "--relation", "r", "--valid-from", "100", "--valid-to", "200",
+        ])
+        .unwrap();
+        match cli.command {
+            Commands::Relate { valid_from, valid_to, .. } => {
+                assert_eq!((valid_from, valid_to), (Some(100), Some(200)))
+            }
+            _ => panic!("expected Relate"),
+        }
+
+        let cli = Cli::try_parse_from([
+            "mast", "invalidate", "--db", "t.mast", "--collection", "c", "--source", "a",
+            "--target", "b", "--relation", "r",
+        ])
+        .unwrap();
+        match cli.command {
+            Commands::Invalidate { ended_at, .. } => assert_eq!(ended_at, None),
+            _ => panic!("expected Invalidate"),
+        }
+
+        let cli = Cli::try_parse_from([
+            "mast", "traverse", "--db", "t.mast", "--collection", "c", "--start", "a",
+            "--as-of", "150",
+        ])
+        .unwrap();
+        match cli.command {
+            Commands::Traverse { as_of, .. } => assert_eq!(as_of, Some(150)),
+            _ => panic!("expected Traverse"),
+        }
+    }
+
+    #[test]
+    fn format_validity_suffix() {
+        assert_eq!(format_validity(None, None), "");
+        assert_eq!(format_validity(Some(1), None), " [from 1]");
+        assert_eq!(format_validity(Some(1), Some(2)), " [from 1 until 2)");
     }
 
     #[test]

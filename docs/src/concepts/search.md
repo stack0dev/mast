@@ -28,6 +28,8 @@ let results = mast.recall(
         filter: None,
         tier_weights: None,
         time_decay: None,
+        reference_time: None,
+        time_anchor: None,
     },
     &embedder,
 ).await?;
@@ -56,6 +58,8 @@ let results = mast.recall(
         filter: None,
         tier_weights: None,
         time_decay: None,
+        reference_time: None,
+        time_anchor: None,
     },
     &embedder,
 ).await?;
@@ -69,7 +73,7 @@ Full-text search does not require an embedder. The `text_query` field is used; i
 
 ## Hybrid Search
 
-Runs both vector and full-text search, normalizes scores with min-max normalization, and blends them using configurable weights.
+Runs both vector and full-text search and adds the scores with configurable weights.
 
 ```rust
 let results = mast.recall(
@@ -86,14 +90,48 @@ let results = mast.recall(
         filter: None,
         tier_weights: None,
         time_decay: None,
+        reference_time: None,
+        time_anchor: None,
     },
     &embedder,
 ).await?;
 ```
 
-**Score formula:** `score = vector_weight * norm(vec_score) + text_weight * norm(ft_score)`
+**Score formula:** `score = vector_weight * vec_score + text_weight * (ft_score / best_ft_score)`
 
-Where `norm()` is min-max normalization to [0, 1] across the result set.
+Vector similarity is already on a 0..1 scale and is used as is. BM25 has no fixed scale, so it is divided by the best BM25 score among the candidates. On the LOCOMO benchmark this beat min-max normalization of both lists and reciprocal rank fusion (see `packages/mast-bench/README.md`).
+
+## Time in Recall
+
+Each memory has a `created_at` time. Set `StoreRequest::created_at` when you import history, so the memory carries the time it happened instead of the time it was stored.
+
+`RecallRequest::reference_time` is when the question is asked (default: now). Time decay measures age from it.
+
+When the query contains a relative time phrase, recall boosts memories created near that time:
+
+| Phrase | Target | Window |
+|--------|--------|--------|
+| "yesterday" | 1 day before | 1 day |
+| "today" | reference time | 1 day |
+| "recently", "lately" | reference time | 14 days |
+| "N days ago" | N days before | 2 days |
+| "N weeks ago", "last week" | N weeks before | 7 days |
+| "N months ago", "last month" | N × 30 days before | 15 days |
+| "N years ago", "last year" | N × 365 days before | 120 days |
+
+`N` can be a digit, a number word up to twelve, "a", "an", "a couple of" or "a few". The boost is `1 + 0.4 * (1 - distance / window)` for memories inside the window and 1.0 outside. To choose the target yourself, set `RecallRequest::time_anchor`.
+
+```rust
+let results = mast.recall(
+    RecallRequest {
+        collection: "chat".into(),
+        query: Some("what did we decide two weeks ago".into()),
+        reference_time: Some(question_time),
+        ..request
+    },
+    &embedder,
+).await?;
+```
 
 ## Metadata Filtering
 

@@ -9,13 +9,15 @@ import type {
   ExperimentResult,
   BenchmarkReport,
   Checkpoint,
+  SplitName,
 } from "./types.js";
 import { loadData } from "./data.js";
 import { ingestAll } from "./ingest.js";
 import { extractAll } from "./extract.js";
 import { evaluateSample } from "./evaluate.js";
 import { createLLMClient } from "./llm.js";
-import { buildExperimentResult, writeResults } from "./report.js";
+import { buildExperimentResult, writeResults, recordResults } from "./report.js";
+import { loadDevKeys, selectQuestions } from "./split.js";
 
 // ── CLI parsing ──
 
@@ -27,6 +29,11 @@ function parseSearchModes(csv: string): SearchModeConfig[] {
     }
     throw new Error(`Unknown search mode: ${s}`);
   });
+}
+
+function parseSplit(value: string): SplitName {
+  if (value === "dev" || value === "held-out" || value === "all") return value;
+  throw new Error(`Unknown split: ${value} (use dev, held-out or all)`);
 }
 
 function parseArgs(argv: string[]): RunConfig {
@@ -59,6 +66,8 @@ function parseArgs(argv: string[]): RunConfig {
     resume: has("--resume"),
     extract: has("--extract"),
     extractModel: get("--extract-model") ?? get("--model") ?? "gpt-4o-mini",
+    split: parseSplit(get("--split") ?? "dev"),
+    record: get("--record"),
   };
 }
 
@@ -68,8 +77,8 @@ function checkpointPath(outputDir: string): string {
   return path.join(outputDir, "checkpoint.json");
 }
 
-function experimentKey(config: ExperimentConfig): string {
-  return `${config.searchMode.mode}:${config.topK}`;
+function experimentKey(config: ExperimentConfig, split: SplitName): string {
+  return `${split}:${config.searchMode.mode}:${config.topK}`;
 }
 
 function loadCheckpoint(outputDir: string): Checkpoint {
@@ -101,6 +110,7 @@ async function main() {
   } else {
     console.log(`Model: ${config.model}`);
   }
+  console.log(`Split: ${config.split}`);
   console.log(`Search modes: ${config.searchModes.map((s) => s.mode).join(", ")}`);
   console.log(`Top-K values: ${config.topKs.join(", ")}`);
   if (config.extract) {
@@ -116,7 +126,14 @@ async function main() {
   const samples = config.samples
     ? allSamples.filter((s) => config.samples!.includes(s.id))
     : allSamples;
-  console.log(`\nLoaded ${allSamples.length} samples, using ${samples.length}`);
+  const devKeys = loadDevKeys();
+  const questionsBySample = new Map(
+    samples.map((s) => [s.id, selectQuestions(s, config.split, devKeys)]),
+  );
+  const questionCount = [...questionsBySample.values()].reduce((n, q) => n + q.length, 0);
+  console.log(
+    `\nLoaded ${allSamples.length} samples, using ${samples.length} (${questionCount} ${config.split} questions)`,
+  );
 
   // Create MAST db
   const dbPath = path.join(config.outputDir, "mast.db");
@@ -173,7 +190,7 @@ async function main() {
   const totalStart = Date.now();
 
   for (const expConfig of experiments) {
-    const key = experimentKey(expConfig);
+    const key = experimentKey(expConfig, config.split);
     const modeName = expConfig.searchMode.mode;
 
     if (checkpoint.completedExperiments.includes(key)) {
@@ -188,7 +205,9 @@ async function main() {
 
     const allResults: QAResult[] = [];
     for (const sample of samples) {
-      const totalQA = sample.qa.length;
+      const qaIndices = questionsBySample.get(sample.id)!;
+      const totalQA = qaIndices.length;
+      if (totalQA === 0) continue;
       process.stdout.write(`  Sample ${sample.id} (${totalQA} questions)...`);
 
       const results = await evaluateSample(
@@ -198,6 +217,7 @@ async function main() {
         expConfig.searchMode,
         expConfig.topK,
         config.concurrency,
+        qaIndices,
         judgeLlm,
         config.extract,
       );
@@ -232,12 +252,14 @@ async function main() {
   // Report
   const report: BenchmarkReport = {
     model: config.recallOnly ? "(recall-only)" : config.model,
+    split: config.split,
     sampleCount: samples.length,
     experiments: experimentResults,
     totalDurationMs: Date.now() - totalStart,
   };
 
   writeResults(report, config.outputDir);
+  if (config.record) recordResults(config.outputDir, config.record);
   clearCheckpoint(config.outputDir);
 
   db.close();

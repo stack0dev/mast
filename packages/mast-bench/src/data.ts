@@ -44,6 +44,22 @@ export async function loadData(dataPath: string): Promise<LocomoSample[]> {
   return data.map((item, idx) => parseSample(item, idx));
 }
 
+const MONTHS = [
+  "january", "february", "march", "april", "may", "june",
+  "july", "august", "september", "october", "november", "december",
+];
+
+/** "1:56 pm on 8 May, 2023" → unix seconds, read as UTC. */
+export function parseSessionDate(text: string): number | undefined {
+  const m = /^(\d{1,2}):(\d{2})\s*(am|pm) on (\d{1,2}) ([A-Za-z]+),? (\d{4})$/i.exec(text.trim());
+  if (!m) return undefined;
+  const [, h, min, ampm, day, monthName, year] = m;
+  const month = MONTHS.indexOf(monthName.toLowerCase());
+  if (month < 0) return undefined;
+  const hour = (parseInt(h, 10) % 12) + (ampm.toLowerCase() === "pm" ? 12 : 0);
+  return Date.UTC(parseInt(year, 10), month, parseInt(day, 10), hour, parseInt(min, 10)) / 1000;
+}
+
 function parseSample(raw: Record<string, unknown>, index: number): LocomoSample {
   const conv = raw.conversation as Record<string, unknown> | undefined;
   if (!conv) {
@@ -69,6 +85,11 @@ function parseSample(raw: Record<string, unknown>, index: number): LocomoSample 
   const sessions: LocomoSession[] = [];
   for (const key of sessionKeys) {
     const sessionData = conv[key] as Record<string, unknown>[];
+    const dateTime = String(conv[`${key}_date_time`] ?? "");
+    const timestamp = parseSessionDate(dateTime);
+    if (timestamp === undefined) {
+      throw new Error(`Sample ${index}: ${key} has no readable date ("${dateTime}")`);
+    }
     const turns: LocomoTurn[] = [];
 
     for (const turn of sessionData) {
@@ -81,7 +102,7 @@ function parseSample(raw: Record<string, unknown>, index: number): LocomoSample 
       turns.push(t);
     }
 
-    sessions.push({ turns });
+    sessions.push({ dateTime, timestamp, turns });
   }
 
   // Parse QA

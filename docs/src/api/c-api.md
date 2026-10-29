@@ -160,6 +160,8 @@ MastStoreResult* mast_store(
     const char* tier,               // NULL defaults to "active"
     int64_t ttl,
     bool has_ttl,                   // false to ignore ttl
+    int64_t created_at,             // when the memory happened, unix seconds
+    bool has_created_at,            // false = now
     MastFfiError** err
 );
 ```
@@ -180,6 +182,28 @@ MastRecallResult* mast_recall(
 ```
 
 Vector search only. Returns `NULL` on error. Free with `mast_free_recall_result()`.
+
+#### mast_recall_full
+
+```c
+MastRecallFullResult* mast_recall_full(
+    MastHandle* handle,
+    const char* collection,
+    const char* query,              // NULL for no query
+    const char* text_query,         // NULL for no full-text query
+    const MastEmbedderVtable* embedder,
+    const char* search_mode,        // "vector", "fulltext", "hybrid"; NULL = "vector"
+    float vector_weight,            // hybrid only
+    float text_weight,              // hybrid only
+    size_t limit,
+    const char* filter_json,        // NULL or "" for no filter
+    int64_t reference_time,         // when the question is asked, unix seconds
+    bool has_reference_time,        // false = now
+    MastFfiError** err
+);
+```
+
+Phrases like "two weeks ago" in `query` count back from `reference_time`. Free with `mast_free_recall_full_result()`.
 
 ---
 
@@ -247,10 +271,16 @@ bool mast_relate(
     const char* target,
     const char* relation,
     float weight,
+    int64_t valid_from,             // when the fact started being true, unix seconds
+    bool has_valid_from,
+    int64_t valid_to,               // when it stopped being true, exclusive
+    bool has_valid_to,
     char** out_id,                  // receives edge ID (free with mast_free_string)
     MastFfiError** err
 );
 ```
+
+An edge with the same source, target, relation and `valid_from` is updated in place.
 
 #### mast_unrelate
 
@@ -264,6 +294,45 @@ bool mast_unrelate(
     MastFfiError** err
 );
 ```
+
+Removes every edge for this source, target and relation, across all validity intervals.
+
+#### mast_invalidate
+
+```c
+bool mast_invalidate(
+    MastHandle* handle,
+    const char* collection,
+    const char* source,
+    const char* target,
+    const char* relation,
+    int64_t ended_at,               // when the fact stopped being true, unix seconds
+    bool has_ended_at,              // false = now
+    size_t* out_closed,             // receives the number of edges closed; may be NULL
+    MastFfiError** err
+);
+```
+
+Sets `valid_to` on the open edges for this fact. Fails if no edge is open.
+
+#### mast_traverse
+
+```c
+MastGraphResult* mast_traverse(
+    MastHandle* handle,
+    const char* collection,
+    const char* start,
+    size_t max_depth,
+    const char* relation_filter,    // NULL for all relations
+    float min_weight,
+    bool has_min_weight,
+    int64_t as_of,                  // follow only edges valid at this time
+    bool has_as_of,                 // false = all edges
+    MastFfiError** err
+);
+```
+
+Each `MastEdgeEntry` carries `valid_from`/`has_valid_from` and `valid_to`/`has_valid_to`. Free with `mast_free_graph_result()`.
 
 ---
 

@@ -6,6 +6,7 @@
   "description": "LOCOMO benchmark harness for MAST",
   "scripts": {
     "bench": "tsx src/run.ts",
+    "split": "tsx src/split.ts",
     "build": "tsc"
   },
   "dependencies": {

@@ -38,6 +38,7 @@ fn seed_memories(
             ]),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         })
         .collect();
 
@@ -65,6 +66,7 @@ fn bench_store_single(c: &mut Criterion) {
                     metadata: HashMap::new(),
                     tier: Tier::Active,
                     ttl: None,
+                    created_at: None,
                 };
                 rt.block_on(mast.store(request, &embedder)).unwrap();
                 i += 1;
@@ -92,6 +94,7 @@ fn bench_store_batch(c: &mut Criterion) {
                             metadata: HashMap::new(),
                             tier: Tier::Active,
                             ttl: None,
+                            created_at: None,
                         })
                         .collect();
                     let request = BatchStoreRequest {
@@ -129,6 +132,8 @@ fn bench_recall_vector(c: &mut Criterion) {
                         filter: None,
                         tier_weights: None,
                         time_decay: None,
+                        reference_time: None,
+                        time_anchor: None,
                     };
                     rt.block_on(mast.recall(request, &embedder)).unwrap();
                 });
@@ -155,6 +160,8 @@ fn bench_recall_filtered(c: &mut Criterion) {
                 filter: Some(MetadataFilter::Eq("group".into(), "2".into())),
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             };
             rt.block_on(mast.recall(request, &embedder)).unwrap();
         });
@@ -178,6 +185,8 @@ fn bench_recall_bm25(c: &mut Criterion) {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             };
             rt.block_on(mast.recall(request, &embedder)).unwrap();
         });
@@ -204,6 +213,8 @@ fn bench_recall_hybrid(c: &mut Criterion) {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             };
             rt.block_on(mast.recall(request, &embedder)).unwrap();
         });
@@ -241,6 +252,7 @@ fn bench_vacuum(c: &mut Criterion) {
             metadata: HashMap::new(),
             tier: Tier::Active,
             ttl: Some(1),
+            created_at: None,
         };
         rt.block_on(mast.store(request, &embedder)).unwrap();
     }
@@ -252,6 +264,7 @@ fn bench_vacuum(c: &mut Criterion) {
             metadata: HashMap::new(),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         };
         rt.block_on(mast.store(request, &embedder)).unwrap();
     }
@@ -311,6 +324,8 @@ fn bench_snapshot(c: &mut Criterion) {
             relation: "linked".into(),
             weight: 1.0,
             memory_ids: vec![],
+            valid_from: None,
+            valid_to: None,
         })
         .unwrap();
     }
@@ -362,6 +377,8 @@ fn bench_relate(c: &mut Criterion) {
                 relation: "linked".into(),
                 weight: 1.0,
                 memory_ids: vec![],
+                valid_from: None,
+                valid_to: None,
             })
             .unwrap();
             i += 1;
@@ -383,6 +400,8 @@ fn bench_traverse(c: &mut Criterion) {
                 relation: "linked".into(),
                 weight: 1.0,
                 memory_ids: vec![],
+                valid_from: None,
+                valid_to: None,
             })
             .unwrap();
         }
@@ -396,6 +415,7 @@ fn bench_traverse(c: &mut Criterion) {
                 max_depth: 3,
                 relation_filter: None,
                 min_weight: None,
+                as_of: None,
             })
             .unwrap();
         });

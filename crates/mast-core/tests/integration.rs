@@ -40,6 +40,7 @@ async fn store_and_recall_basic() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -62,6 +63,8 @@ async fn store_and_recall_basic() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -91,6 +94,7 @@ async fn store_with_precomputed_embedding() {
                 metadata: HashMap::new(),
                 tier: Tier::Core,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -116,6 +120,7 @@ async fn recall_with_precomputed_query_vec() {
             metadata: HashMap::new(),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         },
         &embedder,
     )
@@ -130,6 +135,7 @@ async fn recall_with_precomputed_query_vec() {
             metadata: HashMap::new(),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         },
         &embedder,
     )
@@ -148,6 +154,8 @@ async fn recall_with_precomputed_query_vec() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -174,6 +182,7 @@ async fn recall_with_metadata_filter() {
             metadata: HashMap::from([("color".into(), "red".into())]),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         },
         &embedder,
     )
@@ -188,6 +197,7 @@ async fn recall_with_metadata_filter() {
             metadata: HashMap::from([("color".into(), "blue".into())]),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         },
         &embedder,
     )
@@ -206,6 +216,8 @@ async fn recall_with_metadata_filter() {
                 filter: Some(MetadataFilter::Eq("color".into(), "blue".into())),
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -231,6 +243,7 @@ async fn cross_collection_isolation() {
             metadata: HashMap::new(),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         },
         &embedder,
     )
@@ -245,6 +258,7 @@ async fn cross_collection_isolation() {
             metadata: HashMap::new(),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         },
         &embedder,
     )
@@ -263,6 +277,8 @@ async fn cross_collection_isolation() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -284,6 +300,8 @@ async fn cross_collection_isolation() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -310,6 +328,7 @@ async fn get_memory_by_id() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -340,6 +359,7 @@ async fn info_returns_collections() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -355,6 +375,7 @@ async fn info_returns_collections() {
             metadata: HashMap::new(),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         },
         &embedder,
     )
@@ -393,6 +414,7 @@ async fn close_and_reopen_preserves_data() {
                     metadata: HashMap::from([("key".into(), "val".into())]),
                     tier: Tier::Core,
                     ttl: None,
+                    created_at: None,
                 },
                 &embedder,
             )
@@ -423,6 +445,8 @@ async fn close_and_reopen_preserves_data() {
                     filter: None,
                     tier_weights: None,
                     time_decay: None,
+                    reference_time: None,
+                    time_anchor: None,
                 },
                 &embedder,
             )
@@ -456,6 +480,8 @@ async fn empty_collection_recall() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -483,6 +509,8 @@ async fn recall_requires_query_or_embedding() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -508,6 +536,7 @@ async fn store_multiple_and_recall_ranked() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -527,6 +556,8 @@ async fn store_multiple_and_recall_ranked() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -555,6 +586,7 @@ async fn recall_limit_respected() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -574,6 +606,8 @@ async fn recall_limit_respected() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -601,6 +635,7 @@ async fn store_empty_embedding_rejected() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -625,6 +660,7 @@ async fn store_dimension_mismatch_rejected() {
             metadata: HashMap::new(),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         },
         &embedder,
     )
@@ -640,6 +676,7 @@ async fn store_dimension_mismatch_rejected() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -667,6 +704,7 @@ async fn recall_query_dimension_mismatch_rejected() {
             metadata: HashMap::new(),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         },
         &embedder,
     )
@@ -685,6 +723,8 @@ async fn recall_query_dimension_mismatch_rejected() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -716,6 +756,8 @@ async fn recall_empty_query_embedding_rejected() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -741,6 +783,7 @@ async fn recall_limit_zero_uses_default() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -760,6 +803,8 @@ async fn recall_limit_zero_uses_default() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -784,6 +829,7 @@ async fn store_empty_content() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -811,6 +857,7 @@ async fn get_from_wrong_collection_returns_none() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -837,6 +884,7 @@ async fn metadata_filter_in_through_recall() {
                 metadata: HashMap::from([("color".into(), color.into())]),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -859,6 +907,8 @@ async fn metadata_filter_in_through_recall() {
                 )),
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -889,6 +939,7 @@ async fn metadata_filter_and_through_recall() {
             ]),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         },
         &embedder,
     )
@@ -906,6 +957,7 @@ async fn metadata_filter_and_through_recall() {
             ]),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         },
         &embedder,
     )
@@ -927,6 +979,8 @@ async fn metadata_filter_and_through_recall() {
                 ])),
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -952,6 +1006,7 @@ async fn metadata_filter_matches_nothing() {
             metadata: HashMap::from([("key".into(), "val".into())]),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         },
         &embedder,
     )
@@ -970,6 +1025,8 @@ async fn metadata_filter_matches_nothing() {
                 filter: Some(MetadataFilter::Eq("key".into(), "nonexistent".into())),
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -998,6 +1055,7 @@ async fn reopen_preserves_metadata_index() {
                 metadata: HashMap::from([("env".into(), "prod".into())]),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -1012,6 +1070,7 @@ async fn reopen_preserves_metadata_index() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -1037,6 +1096,8 @@ async fn reopen_preserves_metadata_index() {
                     filter: Some(MetadataFilter::Eq("env".into(), "prod".into())),
                     tier_weights: None,
                     time_decay: None,
+                    reference_time: None,
+                    time_anchor: None,
                 },
                 &embedder,
             )
@@ -1066,6 +1127,7 @@ async fn store_after_reopen_continues_seq() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -1087,6 +1149,7 @@ async fn store_after_reopen_continues_seq() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -1105,6 +1168,8 @@ async fn store_after_reopen_continues_seq() {
                     filter: None,
                     tier_weights: None,
                     time_decay: None,
+                    reference_time: None,
+                    time_anchor: None,
                 },
                 &embedder,
             )
@@ -1134,6 +1199,7 @@ async fn unicode_content_and_metadata() {
                 ]),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -1156,6 +1222,8 @@ async fn unicode_content_and_metadata() {
                 filter: Some(MetadataFilter::Eq("note".into(), "日本語テスト".into())),
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -1186,6 +1254,7 @@ async fn many_metadata_pairs() {
                 metadata: metadata.clone(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -1208,6 +1277,8 @@ async fn many_metadata_pairs() {
                 filter: Some(MetadataFilter::Eq("key_42".into(), "val_42".into())),
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -1250,6 +1321,7 @@ async fn embedder_failure_propagates() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -1295,6 +1367,8 @@ async fn recall_embedder_failure_propagates() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -1326,6 +1400,7 @@ async fn drop_preserves_index() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -1351,6 +1426,8 @@ async fn drop_preserves_index() {
                     filter: None,
                     tier_weights: None,
                     time_decay: None,
+                    reference_time: None,
+                    time_anchor: None,
                 },
                 &embedder,
             )
@@ -1379,6 +1456,7 @@ async fn query_embedding_takes_precedence_over_query() {
             metadata: HashMap::new(),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         },
         &embedder,
     )
@@ -1397,6 +1475,8 @@ async fn query_embedding_takes_precedence_over_query() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -1443,6 +1523,7 @@ async fn precomputed_store_bypasses_failing_embedder() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &PanicEmbedder,
         )
@@ -1484,6 +1565,7 @@ async fn precomputed_recall_bypasses_failing_embedder() {
             metadata: HashMap::new(),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         },
         &embedder,
     )
@@ -1502,6 +1584,8 @@ async fn precomputed_recall_bypasses_failing_embedder() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &PanicEmbedder,
         )
@@ -1543,6 +1627,7 @@ async fn embedder_returns_wrong_dimensions_on_store() {
             metadata: HashMap::new(),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         },
         &mock,
     )
@@ -1558,6 +1643,7 @@ async fn embedder_returns_wrong_dimensions_on_store() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &WrongDimsEmbedder,
         )
@@ -1600,6 +1686,7 @@ async fn embedder_returns_wrong_dimensions_on_recall() {
             metadata: HashMap::new(),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         },
         &mock,
     )
@@ -1618,6 +1705,8 @@ async fn embedder_returns_wrong_dimensions_on_recall() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &WrongDimsEmbedder,
         )
@@ -1646,6 +1735,7 @@ async fn store_delete_recall() {
                 metadata: HashMap::from([("k".into(), "v".into())]),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -1668,6 +1758,8 @@ async fn store_delete_recall() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -1691,6 +1783,7 @@ async fn store_list() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -1717,6 +1810,7 @@ async fn recall_updates_access_stats() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -1737,6 +1831,8 @@ async fn recall_updates_access_stats() {
             filter: None,
             tier_weights: None,
             time_decay: None,
+            reference_time: None,
+            time_anchor: None,
         },
         &embedder,
     )
@@ -1765,6 +1861,7 @@ async fn recall_with_tier_weights() {
             metadata: HashMap::new(),
             tier: Tier::Core,
             ttl: None,
+            created_at: None,
         },
         &embedder,
     )
@@ -1779,6 +1876,7 @@ async fn recall_with_tier_weights() {
             metadata: HashMap::new(),
             tier: Tier::Archive,
             ttl: None,
+            created_at: None,
         },
         &embedder,
     )
@@ -1802,6 +1900,8 @@ async fn recall_with_tier_weights() {
                     archive: 0.1,
                 }),
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -1829,6 +1929,7 @@ async fn recall_with_time_decay() {
             metadata: HashMap::new(),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         },
         &embedder,
     )
@@ -1849,6 +1950,8 @@ async fn recall_with_time_decay() {
                 time_decay: Some(TimeDecay {
                     half_life_secs: 3600,
                 }),
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -1877,7 +1980,8 @@ async fn ttl_filtered_in_recall() {
                 embedding: Some(vec![1.0, 0.0, 0.0, 0.0]),
                 metadata: HashMap::new(),
                 tier: Tier::Active,
-                ttl: Some(999999), // long TTL — should not expire
+                ttl: Some(999999), // long TTL — should not expire,
+                created_at: None,
             },
             &embedder,
         )
@@ -1898,6 +2002,8 @@ async fn ttl_filtered_in_recall() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -1920,7 +2026,8 @@ async fn vacuum_removes_expired() {
             embedding: Some(vec![1.0, 0.0, 0.0, 0.0]),
             metadata: HashMap::new(),
             tier: Tier::Active,
-            ttl: Some(0), // TTL = 0 means already expired
+            ttl: Some(0), // TTL = 0 means already expired,
+            created_at: None,
         },
         &embedder,
     )
@@ -1936,6 +2043,7 @@ async fn vacuum_removes_expired() {
             metadata: HashMap::new(),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         },
         &embedder,
     )
@@ -1970,6 +2078,7 @@ async fn compact_basic() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -1985,6 +2094,7 @@ async fn compact_basic() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -2040,6 +2150,7 @@ async fn compact_dry_run() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -2089,6 +2200,7 @@ async fn compact_skips_already_compacted() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -2136,9 +2248,8 @@ async fn compact_skips_already_compacted() {
     assert_eq!(result.compacted_count, 0);
 }
 
-#[tokio::test]
-async fn compacted_excluded_from_recall() {
-    let (_dir, config) = temp_config();
+/// Store one memory, compact it, and recall with its exact embedding.
+async fn recall_after_compacting_one(config: MastConfig) -> (Mast, Vec<RecallResult>, ulid::Ulid) {
     let embedder = MockEmbedder::new(4);
     let compactor = MockCompactor;
     let mut mast = Mast::open(config).unwrap();
@@ -2152,6 +2263,7 @@ async fn compacted_excluded_from_recall() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -2187,24 +2299,44 @@ async fn compacted_excluded_from_recall() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
         .await
         .unwrap();
 
-    // Only the new compacted memory should appear, not the original
-    for r in &results {
-        assert!(
-            r.memory.compacted_at.is_none(),
-            "compacted memory should not appear in recall"
-        );
-    }
+    (mast, results, m1.id)
+}
 
-    // But list() still shows them with compacted_at set
+#[tokio::test]
+async fn compacted_sources_recalled_at_reduced_weight() {
+    let (_dir, config) = temp_config();
+    let (mast, results, source_id) = recall_after_compacting_one(config).await;
+
+    let source = results
+        .iter()
+        .find(|r| r.memory.id == source_id)
+        .expect("compacted source should still be recallable");
+    assert!(source.memory.compacted_at.is_some());
+    // exact match (1.0) * active tier (0.9) * default compacted_source_weight (0.5)
+    assert!((source.score - 0.45).abs() < 1e-5, "score was {}", source.score);
+
     let all = mast.list("test").unwrap();
     let compacted: Vec<_> = all.iter().filter(|m| m.compacted_at.is_some()).collect();
     assert_eq!(compacted.len(), 1);
+}
+
+#[tokio::test]
+async fn compacted_sources_excluded_when_weight_is_zero() {
+    let (_dir, config) = temp_config();
+    let (_mast, results, source_id) =
+        recall_after_compacting_one(config.with_compacted_source_weight(0.0)).await;
+
+    assert!(!results.is_empty(), "the compacted memory itself should be recalled");
+    assert!(results.iter().all(|r| r.memory.id != source_id));
+    assert!(results.iter().all(|r| r.memory.compacted_at.is_none()));
 }
 
 // ---- Graph tests ----
@@ -2221,6 +2353,8 @@ async fn relate_and_traverse() {
         relation: "knows".into(),
         weight: 0.9,
         memory_ids: vec![],
+        valid_from: None,
+        valid_to: None,
     })
     .unwrap();
 
@@ -2231,6 +2365,8 @@ async fn relate_and_traverse() {
         relation: "knows".into(),
         weight: 0.8,
         memory_ids: vec![],
+        valid_from: None,
+        valid_to: None,
     })
     .unwrap();
 
@@ -2241,6 +2377,7 @@ async fn relate_and_traverse() {
             max_depth: 3,
             relation_filter: None,
             min_weight: None,
+            as_of: None,
         })
         .unwrap();
 
@@ -2260,6 +2397,8 @@ async fn relate_upsert() {
             relation: "knows".into(),
             weight: 0.5,
             memory_ids: vec![],
+            valid_from: None,
+            valid_to: None,
         })
         .unwrap();
 
@@ -2271,6 +2410,8 @@ async fn relate_upsert() {
             relation: "knows".into(),
             weight: 0.9,
             memory_ids: vec![],
+            valid_from: None,
+            valid_to: None,
         })
         .unwrap();
 
@@ -2295,6 +2436,8 @@ async fn unrelate() {
         relation: "knows".into(),
         weight: 0.9,
         memory_ids: vec![],
+        valid_from: None,
+        valid_to: None,
     })
     .unwrap();
 
@@ -2316,6 +2459,8 @@ async fn traverse_depth_limit() {
         relation: "r".into(),
         weight: 1.0,
         memory_ids: vec![],
+        valid_from: None,
+        valid_to: None,
     })
     .unwrap();
 
@@ -2326,6 +2471,8 @@ async fn traverse_depth_limit() {
         relation: "r".into(),
         weight: 1.0,
         memory_ids: vec![],
+        valid_from: None,
+        valid_to: None,
     })
     .unwrap();
 
@@ -2336,6 +2483,8 @@ async fn traverse_depth_limit() {
         relation: "r".into(),
         weight: 1.0,
         memory_ids: vec![],
+        valid_from: None,
+        valid_to: None,
     })
     .unwrap();
 
@@ -2347,6 +2496,7 @@ async fn traverse_depth_limit() {
             max_depth: 1,
             relation_filter: None,
             min_weight: None,
+            as_of: None,
         })
         .unwrap();
 
@@ -2366,6 +2516,8 @@ async fn traverse_relation_filter() {
         relation: "knows".into(),
         weight: 1.0,
         memory_ids: vec![],
+        valid_from: None,
+        valid_to: None,
     })
     .unwrap();
 
@@ -2376,6 +2528,8 @@ async fn traverse_relation_filter() {
         relation: "likes".into(),
         weight: 1.0,
         memory_ids: vec![],
+        valid_from: None,
+        valid_to: None,
     })
     .unwrap();
 
@@ -2386,6 +2540,7 @@ async fn traverse_relation_filter() {
             max_depth: 3,
             relation_filter: Some("knows".into()),
             min_weight: None,
+            as_of: None,
         })
         .unwrap();
 
@@ -2405,6 +2560,8 @@ async fn traverse_min_weight() {
         relation: "r".into(),
         weight: 0.3,
         memory_ids: vec![],
+        valid_from: None,
+        valid_to: None,
     })
     .unwrap();
 
@@ -2415,6 +2572,8 @@ async fn traverse_min_weight() {
         relation: "r".into(),
         weight: 0.8,
         memory_ids: vec![],
+        valid_from: None,
+        valid_to: None,
     })
     .unwrap();
 
@@ -2425,6 +2584,7 @@ async fn traverse_min_weight() {
             max_depth: 3,
             relation_filter: None,
             min_weight: Some(0.5),
+            as_of: None,
         })
         .unwrap();
 
@@ -2444,6 +2604,8 @@ async fn subgraph() {
         relation: "r".into(),
         weight: 1.0,
         memory_ids: vec![],
+        valid_from: None,
+        valid_to: None,
     })
     .unwrap();
 
@@ -2454,6 +2616,8 @@ async fn subgraph() {
         relation: "r".into(),
         weight: 1.0,
         memory_ids: vec![],
+        valid_from: None,
+        valid_to: None,
     })
     .unwrap();
 
@@ -2481,6 +2645,7 @@ async fn batch_store() {
                         metadata: HashMap::new(),
                         tier: Tier::Active,
                         ttl: None,
+                        created_at: None,
                     },
                     BatchStoreItem {
                         content: "second".into(),
@@ -2488,6 +2653,7 @@ async fn batch_store() {
                         metadata: HashMap::new(),
                         tier: Tier::Active,
                         ttl: None,
+                        created_at: None,
                     },
                     BatchStoreItem {
                         content: "third".into(),
@@ -2495,6 +2661,7 @@ async fn batch_store() {
                         metadata: HashMap::from([("k".into(), "v".into())]),
                         tier: Tier::Core,
                         ttl: Some(3600),
+                        created_at: None,
                     },
                 ],
             },
@@ -2534,6 +2701,7 @@ async fn batch_store_recall() {
                     metadata: HashMap::new(),
                     tier: Tier::Active,
                     ttl: None,
+                    created_at: None,
                 },
                 BatchStoreItem {
                     content: "other".into(),
@@ -2541,6 +2709,7 @@ async fn batch_store_recall() {
                     metadata: HashMap::new(),
                     tier: Tier::Active,
                     ttl: None,
+                    created_at: None,
                 },
             ],
         },
@@ -2561,6 +2730,8 @@ async fn batch_store_recall() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -2658,6 +2829,7 @@ async fn compact_zero_batch_size_returns_error() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -2723,6 +2895,7 @@ async fn store_batch_short_embedder_response_returns_error() {
                         metadata: HashMap::new(),
                         tier: Tier::Active,
                         ttl: None,
+                        created_at: None,
                     },
                     BatchStoreItem {
                         content: "second".into(),
@@ -2730,6 +2903,7 @@ async fn store_batch_short_embedder_response_returns_error() {
                         metadata: HashMap::new(),
                         tier: Tier::Active,
                         ttl: None,
+                        created_at: None,
                     },
                 ],
             },
@@ -2822,6 +2996,7 @@ async fn store_rollback_on_index_failure() {
                 metadata: HashMap::from([("k".into(), "v".into())]),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -2866,6 +3041,7 @@ async fn store_batch_rollback_on_index_failure() {
                         metadata: HashMap::from([("tag".into(), "a".into())]),
                         tier: Tier::Active,
                         ttl: None,
+                        created_at: None,
                     },
                     BatchStoreItem {
                         content: "batch_b".into(),
@@ -2873,6 +3049,7 @@ async fn store_batch_rollback_on_index_failure() {
                         metadata: HashMap::from([("tag".into(), "b".into())]),
                         tier: Tier::Active,
                         ttl: None,
+                        created_at: None,
                     },
                 ],
             },
@@ -2969,6 +3146,7 @@ async fn recall_fulltext_basic() {
             metadata: HashMap::new(),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         }, &embedder).await.unwrap();
     }
 
@@ -2982,6 +3160,8 @@ async fn recall_fulltext_basic() {
         filter: None,
         tier_weights: None,
         time_decay: None,
+        reference_time: None,
+        time_anchor: None,
     }, &embedder).await.unwrap();
 
     assert!(!results.is_empty());
@@ -3006,6 +3186,7 @@ async fn recall_hybrid_basic() {
             metadata: HashMap::new(),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         }, &embedder).await.unwrap();
     }
 
@@ -3019,6 +3200,8 @@ async fn recall_hybrid_basic() {
         filter: None,
         tier_weights: None,
         time_decay: None,
+        reference_time: None,
+        time_anchor: None,
     }, &embedder).await.unwrap();
 
     assert!(!results.is_empty());
@@ -3040,6 +3223,7 @@ async fn snapshot_and_restore_integration() {
             metadata: HashMap::from([("idx".into(), i.to_string())]),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         }, &embedder).await.unwrap();
     }
 
@@ -3050,6 +3234,8 @@ async fn snapshot_and_restore_integration() {
         relation: "linked".into(),
         weight: 1.0,
         memory_ids: vec![],
+        valid_from: None,
+        valid_to: None,
     }).unwrap();
 
     let mut buf = Vec::new();
@@ -3082,6 +3268,8 @@ async fn snapshot_and_restore_integration() {
         filter: None,
         tier_weights: None,
         time_decay: None,
+        reference_time: None,
+        time_anchor: None,
     }, &embedder).await.unwrap();
     assert_eq!(results.len(), 5);
 
@@ -3096,6 +3284,8 @@ async fn snapshot_and_restore_integration() {
         filter: None,
         tier_weights: None,
         time_decay: None,
+        reference_time: None,
+        time_anchor: None,
     }, &embedder).await.unwrap();
     assert_eq!(ft_results.len(), 5);
 }
@@ -3117,6 +3307,7 @@ async fn metadata_filter_or_through_recall() {
                 metadata: HashMap::from([("color".into(), color.into())]),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -3139,6 +3330,8 @@ async fn metadata_filter_or_through_recall() {
                 ])),
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -3176,6 +3369,7 @@ async fn metadata_filter_nested_and_or() {
                 ]),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -3202,6 +3396,8 @@ async fn metadata_filter_nested_and_or() {
                 ])),
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -3229,6 +3425,7 @@ async fn metadata_filter_or_matches_nothing() {
             metadata: HashMap::from([("color".into(), "red".into())]),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         },
         &embedder,
     )
@@ -3250,6 +3447,8 @@ async fn metadata_filter_or_matches_nothing() {
                 ])),
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -3276,6 +3475,7 @@ async fn recall_hybrid_vector_only_no_ft_matches() {
             metadata: HashMap::new(),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         },
         &embedder,
     )
@@ -3298,6 +3498,8 @@ async fn recall_hybrid_vector_only_no_ft_matches() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -3323,6 +3525,7 @@ async fn recall_hybrid_ft_only_no_vector_matches() {
             metadata: HashMap::new(),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         },
         &embedder,
     )
@@ -3345,6 +3548,8 @@ async fn recall_hybrid_ft_only_no_vector_matches() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -3378,6 +3583,8 @@ async fn recall_hybrid_both_empty() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -3401,6 +3608,7 @@ async fn recall_hybrid_single_result_normalization() {
             metadata: HashMap::new(),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         },
         &embedder,
     )
@@ -3423,6 +3631,8 @@ async fn recall_hybrid_single_result_normalization() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -3457,6 +3667,7 @@ async fn compact_age_strategy() {
             metadata: HashMap::new(),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         },
         &embedder,
     )
@@ -3471,6 +3682,7 @@ async fn compact_age_strategy() {
             metadata: HashMap::new(),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         },
         &embedder,
     )
@@ -3518,6 +3730,7 @@ async fn compact_age_strategy_none_old_enough() {
             metadata: HashMap::new(),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         },
         &embedder,
     )
@@ -3570,6 +3783,7 @@ async fn compact_access_decay_strategy() {
                     metadata: HashMap::new(),
                     tier: Tier::Active,
                     ttl: None,
+                    created_at: None,
                 },
                 &embedder,
             )
@@ -3585,6 +3799,7 @@ async fn compact_access_decay_strategy() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -3603,6 +3818,8 @@ async fn compact_access_decay_strategy() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -3665,6 +3882,7 @@ async fn compact_hybrid_strategy_fresh_not_matched() {
             metadata: HashMap::new(),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         },
         &embedder,
     )
@@ -3708,6 +3926,7 @@ async fn compact_strategy_skips_wrong_tier() {
             metadata: HashMap::new(),
             tier: Tier::Core,
             ttl: None,
+            created_at: None,
         },
         &embedder,
     )

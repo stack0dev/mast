@@ -70,7 +70,7 @@ Optional time-to-live in seconds. A memory expires when `now - created_at >= ttl
 
 ### compacted_at
 
-Set when a memory has been compacted into a higher-tier synthesis. Compacted memories are excluded from `recall()` but remain visible in `list()` for provenance tracing.
+Set when a memory has been compacted into a higher-tier synthesis. `recall()` still returns compacted memories, with the score multiplied by `MastConfig::compacted_source_weight` (default 0.5), so a poor synthesis does not hide the original text. Set the weight to 0.0 to exclude them. `list()` shows them for provenance tracing.
 
 ### parent_ids
 
@@ -88,6 +88,7 @@ pub struct StoreRequest {
     pub metadata: HashMap<String, String>,
     pub tier: Tier,                         // defaults to Active
     pub ttl: Option<i64>,                   // None = no expiry
+    pub created_at: Option<i64>,            // when it happened, unix seconds; None = now
 }
 ```
 
@@ -97,7 +98,7 @@ If `embedding` is `None`, MAST calls the provided `Embedder` to generate one. If
 
 1. **Created** via `store()` -- assigned a ULID, embedded, indexed
 2. **Recalled** via `recall()` -- `access_count` incremented, `last_accessed` updated
-3. **Compacted** via `compact()` -- marked with `compacted_at`, hidden from recall
+3. **Compacted** via `compact()` -- marked with `compacted_at`, recalled at reduced weight
 4. **Expired** -- excluded from recall when TTL elapsed
 5. **Vacuumed** via `vacuum()` -- hard-deleted from storage and indexes
 6. **Deleted** via `delete()` -- removed from storage and indexes immediately

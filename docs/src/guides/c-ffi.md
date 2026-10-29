@@ -93,7 +93,8 @@ extern void mast_close(MastHandle* handle);
 extern MastStoreResult* mast_store(
     MastHandle* handle, const char* collection, const char* content,
     const MastEmbedderVtable* embedder, const void* metadata,
-    const char* tier, long long ttl, int has_ttl, MastFfiError** err
+    const char* tier, long long ttl, int has_ttl,
+    long long created_at, int has_created_at, MastFfiError** err
 );
 extern void mast_free_error(MastFfiError* err);
 extern void mast_free_store_result(MastStoreResult* result);
@@ -120,7 +121,7 @@ int main() {
     // Store a memory
     MastStoreResult* result = mast_store(
         db, "notes", "hello world",
-        &vtable, NULL, "active", 0, 0, &err
+        &vtable, NULL, "active", 0, 0, 0, 0, &err
     );
     if (err) {
         fprintf(stderr, "Store error: %s\n", err->message);
@@ -150,7 +151,8 @@ void mast_close(MastHandle* handle);
 MastStoreResult* mast_store(
     MastHandle* handle, const char* collection, const char* content,
     const MastEmbedderVtable* embedder, const MastMetadata* metadata,
-    const char* tier, long long ttl, int has_ttl, MastFfiError** err
+    const char* tier, long long ttl, int has_ttl,
+    long long created_at, int has_created_at, MastFfiError** err
 );
 
 MastRecallResult* mast_recall(
@@ -176,10 +178,16 @@ int mast_vacuum(MastHandle* handle, const char* collection,
 ```c
 int mast_relate(MastHandle* handle, const char* collection,
                 const char* source, const char* target, const char* relation,
-                float weight, char** out_id, MastFfiError** err);
+                float weight, long long valid_from, int has_valid_from,
+                long long valid_to, int has_valid_to, char** out_id,
+                MastFfiError** err);
 int mast_unrelate(MastHandle* handle, const char* collection,
                   const char* source, const char* target, const char* relation,
                   MastFfiError** err);
+int mast_invalidate(MastHandle* handle, const char* collection,
+                    const char* source, const char* target, const char* relation,
+                    long long ended_at, int has_ended_at, size_t* out_closed,
+                    MastFfiError** err);
 ```
 
 ### Snapshots
@@ -222,7 +230,7 @@ const char* keys[] = {"source", "topic"};
 const char* values[] = {"conversation", "preferences"};
 MastMetadata meta = { .keys = keys, .values = values, .count = 2 };
 
-mast_store(db, "notes", "content", &vtable, &meta, "active", 0, 0, &err);
+mast_store(db, "notes", "content", &vtable, &meta, "active", 0, 0, 0, 0, &err);
 ```
 
 Pass `NULL` for no metadata.

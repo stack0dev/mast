@@ -64,6 +64,26 @@ mast traverse --db my.mast \
   --collection "user:alice" \
   --start "alice" --max-depth 2
 
+# Facts that change over time (unix seconds; valid_to is exclusive)
+mast relate --db my.mast \
+  --collection "user:alice" \
+  --source "alice" --target "acme" --relation "works_at" --valid-from 1672531200
+
+mast invalidate --db my.mast \
+  --collection "user:alice" \
+  --source "alice" --target "acme" --relation "works_at" --ended-at 1704067200
+
+mast traverse --db my.mast \
+  --collection "user:alice" \
+  --start "alice" --as-of 1690000000
+
+# Import history with its real time, then ask relative to a point in time
+mast store --db my.mast --collection "user:alice" \
+  --content "Alice adopted a puppy" --created-at 1698790400 --local
+
+mast recall --db my.mast --collection "user:alice" \
+  --query "what did alice do two weeks ago" --reference-time 1700000000 --local
+
 # Snapshot and restore
 mast snapshot --db my.mast --collection "user:alice" --output backup.jsonl
 mast restore --db my.mast --input backup.jsonl --merge
@@ -74,7 +94,7 @@ mast info --db my.mast
 
 ### CLI commands
 
-`store`, `recall`, `info`, `delete`, `list`, `vacuum`, `compact`, `snapshot`, `restore`, `relate`, `traverse`
+`store`, `recall`, `info`, `delete`, `list`, `vacuum`, `compact`, `snapshot`, `restore`, `relate`, `invalidate`, `traverse`
 
 ## Library usage
 
@@ -96,6 +116,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         metadata: HashMap::from([("source".into(), "test".into())]),
         tier: Tier::Active,
         ttl: None,
+        created_at: None, // when it happened; None = now
     }, &embedder).await?;
 
     // Recall
@@ -103,8 +124,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         collection: "notes".into(),
         query: None,
         query_embedding: Some(vec![0.1, 0.9, 0.0, 0.0]),
+        text_query: None,
+        search_mode: SearchMode::Vector,
         limit: 5,
         filter: Some(MetadataFilter::Eq("source".into(), "test".into())),
+        tier_weights: None,
+        time_decay: None,
+        reference_time: None, // when the question is asked; None = now
+        time_anchor: None,    // None = read "two weeks ago" etc. from the query
     }, &embedder).await?;
 
     for r in &results {

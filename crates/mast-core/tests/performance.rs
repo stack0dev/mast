@@ -31,6 +31,7 @@ async fn store_single_throughput() {
                 metadata: HashMap::from([("idx".into(), i.to_string())]),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -77,6 +78,7 @@ async fn store_single_with_metadata_throughput() {
                 ]),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -114,6 +116,7 @@ async fn store_batch_100_throughput() {
             metadata: HashMap::from([("idx".into(), i.to_string())]),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         })
         .collect();
 
@@ -157,6 +160,7 @@ async fn store_batch_1000_throughput() {
             metadata: HashMap::from([("idx".into(), i.to_string())]),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         })
         .collect();
 
@@ -199,6 +203,7 @@ async fn seed(mast: &mut Mast, embedder: &MockEmbedder, collection: &str, count:
             ]),
             tier: Tier::Active,
             ttl: None,
+            created_at: None,
         })
         .collect();
 
@@ -236,6 +241,8 @@ async fn recall_vector_latency() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -279,6 +286,8 @@ async fn recall_fulltext_latency() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -325,6 +334,8 @@ async fn recall_hybrid_latency() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -368,6 +379,8 @@ async fn recall_filtered_latency() {
                 filter: Some(MetadataFilter::Eq("group".into(), "2".into())),
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -409,6 +422,7 @@ async fn store_high_dimensional_throughput() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )

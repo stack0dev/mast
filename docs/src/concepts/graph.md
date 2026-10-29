@@ -15,12 +15,14 @@ pub struct Edge {
     pub memory_ids: Vec<Ulid>,   // Supporting memories
     pub created_at: i64,         // Creation timestamp
     pub updated_at: i64,         // Last update timestamp
+    pub valid_from: Option<i64>, // When the fact started being true; None = always
+    pub valid_to: Option<i64>,   // When it stopped being true, exclusive; None = still true
 }
 ```
 
 ## Creating Edges
 
-Use `relate()` to create or update an edge. If an edge with the same (source, target, relation) already exists, the weight and memory_ids are updated (upsert).
+Use `relate()` to create or update an edge. If an edge with the same (source, target, relation, valid_from) already exists, the weight, memory_ids and valid_to are updated (upsert).
 
 ```rust
 let edge_id = mast.relate(RelateRequest {
@@ -30,6 +32,8 @@ let edge_id = mast.relate(RelateRequest {
     relation: "prefers".into(),
     weight: 0.9,
     memory_ids: vec![memory_id],
+    valid_from: None,
+    valid_to: None,
 })?;
 ```
 
@@ -45,7 +49,7 @@ mast.relate(RelateRequest {
     ..
 })?;
 
-// Second call updates weight (same source+target+relation)
+// Second call updates weight (same source+target+relation+valid_from)
 mast.relate(RelateRequest {
     source: "alice".into(),
     target: "dark_mode".into(),
@@ -55,13 +59,47 @@ mast.relate(RelateRequest {
 })?;
 ```
 
+## Facts That Change Over Time
+
+An edge can carry a validity interval `[valid_from, valid_to)` in unix seconds. A fact that changed is one edge per interval: relating with a new `valid_from` adds an edge instead of updating the old one.
+
+```rust
+// Alice worked at Acme, then moved to Globex.
+mast.relate(RelateRequest {
+    source: "alice".into(),
+    target: "acme".into(),
+    relation: "works_at".into(),
+    valid_from: Some(jan_2022),
+    ..
+})?;
+
+// Close the open edge when the fact stops being true.
+mast.invalidate(InvalidateRequest {
+    collection: "user:alice".into(),
+    source: "alice".into(),
+    target: "acme".into(),
+    relation: "works_at".into(),
+    ended_at: Some(mar_2024),    // None = now
+})?;
+
+mast.relate(RelateRequest {
+    source: "alice".into(),
+    target: "globex".into(),
+    relation: "works_at".into(),
+    valid_from: Some(mar_2024),
+    ..
+})?;
+```
+
+`relate()` rejects `valid_to <= valid_from`. `invalidate()` fails when no edge is open or when `ended_at` is not after `valid_from`.
+
 ## Removing Edges
 
 ```rust
 mast.unrelate("user:alice", "alice", "dark_mode", "prefers")?;
 ```
 
-Returns an error if no matching edge exists.
+Removes every edge for (source, target, relation), across all validity intervals. Returns an error if none exists.
 
 ## Traversal
 
@@ -74,6 +112,7 @@ let edges = mast.traverse(TraverseRequest {
     max_depth: 3,
     relation_filter: Some("prefers".into()),  // optional
     min_weight: Some(0.5),                     // optional
+    as_of: None,                               // optional: only edges valid at this time
 })?;
 
 for edge in &edges {
@@ -90,6 +129,7 @@ for edge in &edges {
 | `max_depth` | `usize` | Maximum BFS depth |
 | `relation_filter` | `Option<String>` | Only follow edges with this relation |
 | `min_weight` | `Option<f32>` | Only follow edges above this weight |
+| `as_of` | `Option<i64>` | Only follow edges valid at this time; `None` = all edges |
 
 Traversal visits each entity at most once (cycle-safe). It returns all edges encountered during BFS, not just the final frontier.
 
@@ -117,7 +157,7 @@ Edges are stored in redb with three tables:
 
 | Table | Key | Value |
 |-------|-----|-------|
-| `EDGES` | `(collection, edge_id)` | Serialized `Edge` |
+| `EDGES` | `(collection, edge_id)` | Serialized `Edge` (versioned envelope; pre-validity edges read with no interval) |
 | `EDGE_INDEX_FWD` | `(collection, source, relation)` | List of edge IDs |
 | `EDGE_INDEX_REV` | `(collection, target, relation)` | List of edge IDs |
 

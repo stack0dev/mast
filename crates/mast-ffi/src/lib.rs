@@ -415,6 +415,10 @@ pub struct MastEdgeEntry {
     pub weight: f32,
     pub created_at: i64,
     pub updated_at: i64,
+    pub valid_from: i64,
+    pub has_valid_from: bool,
+    pub valid_to: i64,
+    pub has_valid_to: bool,
 }
 
 #[repr(C)]
@@ -477,6 +481,8 @@ pub extern "C" fn mast_store(
     tier: *const c_char,
     ttl: i64,
     has_ttl: bool,
+    created_at: i64,
+    has_created_at: bool,
     err: *mut *mut MastFfiError,
 ) -> *mut MastStoreResult {
     let h = unsafe { &mut *handle };
@@ -503,6 +509,7 @@ pub extern "C" fn mast_store(
         metadata: meta,
         tier: tier_val,
         ttl: ttl_val,
+        created_at: has_created_at.then_some(created_at),
     };
 
     match h.runtime.block_on(h.mast.store(request, &ffi_embedder)) {
@@ -550,6 +557,8 @@ pub extern "C" fn mast_recall(
         filter: None,
         tier_weights: None,
         time_decay: None,
+        reference_time: None,
+        time_anchor: None,
     };
 
     match h.runtime.block_on(h.mast.recall(request, &ffi_embedder)) {
@@ -708,6 +717,10 @@ pub extern "C" fn mast_relate(
     target: *const c_char,
     relation: *const c_char,
     weight: f32,
+    valid_from: i64,
+    has_valid_from: bool,
+    valid_to: i64,
+    has_valid_to: bool,
     out_id: *mut *mut c_char,
     err: *mut *mut MastFfiError,
 ) -> bool {
@@ -724,6 +737,8 @@ pub extern "C" fn mast_relate(
         relation: rel,
         weight,
         memory_ids: vec![],
+        valid_from: has_valid_from.then_some(valid_from),
+        valid_to: has_valid_to.then_some(valid_to),
     };
 
     match h.mast.relate(request) {
@@ -758,6 +773,43 @@ pub extern "C" fn mast_unrelate(
 
     match h.mast.unrelate(&col, &src, &tgt, &rel) {
         Ok(()) => true,
+        Err(e) => {
+            set_error(err, e);
+            false
+        }
+    }
+}
+
+/// Set `valid_to` on the open edges for this fact. Writes how many were
+/// closed to `out_closed` when it is not null.
+#[no_mangle]
+pub extern "C" fn mast_invalidate(
+    handle: *mut MastHandle,
+    collection: *const c_char,
+    source: *const c_char,
+    target: *const c_char,
+    relation: *const c_char,
+    ended_at: i64,
+    has_ended_at: bool,
+    out_closed: *mut usize,
+    err: *mut *mut MastFfiError,
+) -> bool {
+    let h = unsafe { &mut *handle };
+    let request = InvalidateRequest {
+        collection: unsafe { CStr::from_ptr(collection) }.to_string_lossy().into_owned(),
+        source: unsafe { CStr::from_ptr(source) }.to_string_lossy().into_owned(),
+        target: unsafe { CStr::from_ptr(target) }.to_string_lossy().into_owned(),
+        relation: unsafe { CStr::from_ptr(relation) }.to_string_lossy().into_owned(),
+        ended_at: has_ended_at.then_some(ended_at),
+    };
+
+    match h.mast.invalidate(request) {
+        Ok(closed) => {
+            if !out_closed.is_null() {
+                unsafe { *out_closed = closed };
+            }
+            true
+        }
         Err(e) => {
             set_error(err, e);
             false
@@ -942,6 +994,8 @@ pub extern "C" fn mast_recall_full(
     text_weight: f32,
     limit: usize,
     filter_json: *const c_char,
+    reference_time: i64,
+    has_reference_time: bool,
     err: *mut *mut MastFfiError,
 ) -> *mut MastRecallFullResult {
     let h = unsafe { &mut *handle };
@@ -1004,6 +1058,8 @@ pub extern "C" fn mast_recall_full(
         filter,
         tier_weights: None,
         time_decay: None,
+        reference_time: has_reference_time.then_some(reference_time),
+        time_anchor: None,
     };
 
     match h.runtime.block_on(h.mast.recall(request, &ffi_embedder)) {
@@ -1195,6 +1251,10 @@ fn edges_to_graph_result(edges: Vec<Edge>) -> *mut MastGraphResult {
                 weight: e.weight,
                 created_at: e.created_at,
                 updated_at: e.updated_at,
+                valid_from: e.valid_from.unwrap_or(0),
+                has_valid_from: e.valid_from.is_some(),
+                valid_to: e.valid_to.unwrap_or(0),
+                has_valid_to: e.valid_to.is_some(),
             }
         })
         .collect();
@@ -1215,6 +1275,8 @@ pub extern "C" fn mast_traverse(
     relation_filter: *const c_char,
     min_weight: f32,
     has_min_weight: bool,
+    as_of: i64,
+    has_as_of: bool,
     err: *mut *mut MastFfiError,
 ) -> *mut MastGraphResult {
     let h = unsafe { &mut *handle };
@@ -1235,6 +1297,7 @@ pub extern "C" fn mast_traverse(
         max_depth,
         relation_filter: rel_filter,
         min_weight: min_w,
+        as_of: has_as_of.then_some(as_of),
     };
 
     match h.mast.traverse(request) {

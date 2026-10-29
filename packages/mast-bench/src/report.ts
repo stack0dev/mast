@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import type {
   QAResult,
   ExperimentResult,
@@ -70,53 +71,82 @@ function fmtScore(n: number): string {
   return n.toFixed(3);
 }
 
+const CATEGORY_NAMES: Record<number, string> = {
+  1: "Multi-hop",
+  2: "Temporal",
+  3: "Open",
+  4: "Single",
+  5: "Advers.",
+};
+const CATEGORIES = [1, 2, 3, 4, 5];
+
+/** One row per experiment: a value per category, then overall. */
+function table(
+  report: BenchmarkReport,
+  perCategory: (cat: CategoryBreakdown) => string,
+  overall: (exp: ExperimentResult) => string,
+): string[] {
+  let header = `${pad("Search", 10)} ${pad("TopK", 5)}`;
+  for (const c of CATEGORIES) header += ` ${pad(CATEGORY_NAMES[c], 9)}`;
+  header += ` ${pad("Overall", 8)}`;
+  const lines = [header, "─".repeat(header.length)];
+
+  for (const exp of report.experiments) {
+    let row = `${pad(exp.config.searchMode.mode, 10)} ${pad(String(exp.config.topK), 5)}`;
+    for (const c of CATEGORIES) {
+      const cat = exp.categories.find((x) => x.category === c);
+      row += ` ${pad(cat ? perCategory(cat) : "-", 9)}`;
+    }
+    row += ` ${pad(overall(exp), 8)}`;
+    lines.push(row);
+  }
+  return lines;
+}
+
+/**
+ * Retrieval and answer quality are separate tables: retrieval recall says whether an
+ * evidence turn was in the top-K; answer scores say whether the model answered right.
+ */
 export function formatSummary(report: BenchmarkReport): string {
+  const questions = report.experiments[0]?.results.length ?? 0;
   const lines: string[] = [];
   lines.push("LOCOMO Benchmark — MAST Results");
-  lines.push(`Model: ${report.model} | Samples: ${report.sampleCount}`);
+  lines.push(
+    `Split: ${report.split} (${questions} questions) | Samples: ${report.sampleCount} | Model: ${report.model}`,
+  );
   lines.push(`Total time: ${(report.totalDurationMs / 1000).toFixed(1)}s`);
   lines.push("");
 
-  const recallOnly = report.model === "(recall-only)";
-  const hasJudge = report.experiments.some((e) => e.overallJudge != null);
+  lines.push("Retrieval recall (an evidence turn is in the top K)");
+  lines.push(
+    ...table(
+      report,
+      (cat) => fmtPct(cat.recallHitRate),
+      (exp) => fmtPct(exp.overallRecallHit),
+    ),
+  );
 
-  const catNums = [1, 2, 3, 4, 5];
+  if (report.model !== "(recall-only)") {
+    lines.push("");
+    lines.push("Answer F1 (adversarial: 1 when the model declines)");
+    lines.push(
+      ...table(
+        report,
+        (cat) => fmtScore(cat.meanF1),
+        (exp) => fmtScore(exp.overallF1),
+      ),
+    );
 
-  if (recallOnly) {
-    // Recall-only: show per-category recall hit rates
-    let header = `${pad("Search", 10)} ${pad("TopK", 5)}`;
-    for (const c of catNums) header += ` ${pad(`Cat${c}`, 7)}`;
-    header += ` ${pad("Overall", 8)}`;
-    lines.push(header);
-    lines.push("─".repeat(header.length));
-
-    for (const exp of report.experiments) {
-      let row = `${pad(exp.config.searchMode.mode, 10)} ${pad(String(exp.config.topK), 5)}`;
-      for (const catNum of catNums) {
-        const cat = exp.categories.find((c) => c.category === catNum);
-        row += ` ${pad(cat ? fmtPct(cat.recallHitRate) : "  -  ", 7)}`;
-      }
-      row += ` ${pad(fmtPct(exp.overallRecallHit), 8)}`;
-      lines.push(row);
-    }
-  } else {
-    // Full mode: F1 per category + recall + optional judge
-    let header = `${pad("Search", 10)} ${pad("TopK", 5)}`;
-    for (const c of catNums) header += ` ${pad(`Cat${c}`, 7)}`;
-    header += ` ${pad("Overall", 8)} ${pad("Recall%", 8)}`;
-    if (hasJudge) header += ` ${pad("Judge", 6)}`;
-    lines.push(header);
-    lines.push("─".repeat(header.length));
-
-    for (const exp of report.experiments) {
-      let row = `${pad(exp.config.searchMode.mode, 10)} ${pad(String(exp.config.topK), 5)}`;
-      for (const catNum of catNums) {
-        const cat = exp.categories.find((c) => c.category === catNum);
-        row += ` ${pad(cat ? fmtScore(cat.meanF1) : "  -  ", 7)}`;
-      }
-      row += ` ${pad(fmtScore(exp.overallF1), 8)} ${pad(fmtPct(exp.overallRecallHit), 8)}`;
-      if (hasJudge) row += ` ${pad(exp.overallJudge != null ? fmtScore(exp.overallJudge) : "-", 6)}`;
-      lines.push(row);
+    if (report.experiments.some((e) => e.overallJudge != null)) {
+      lines.push("");
+      lines.push("LLM judge (adversarial not judged)");
+      lines.push(
+        ...table(
+          report,
+          (cat) => (cat.meanJudge != null ? fmtScore(cat.meanJudge) : "-"),
+          (exp) => (exp.overallJudge != null ? fmtScore(exp.overallJudge) : "-"),
+        ),
+      );
     }
   }
 
@@ -132,6 +162,7 @@ export function writeResults(
   // Full results JSON (strip raw results to keep file manageable)
   const summary = {
     model: report.model,
+    split: report.split,
     sampleCount: report.sampleCount,
     totalDurationMs: report.totalDurationMs,
     experiments: report.experiments.map((e) => ({
@@ -169,4 +200,19 @@ export function writeResults(
 
   console.log("\n" + text);
   console.log(`\nResults written to ${outputDir}/`);
+}
+
+const RECORDED_FILES = ["results.json", "detailed.json", "summary.txt"];
+
+/** Copy a run's results into results/<name>/ so they can be committed. */
+export function recordResults(outputDir: string, name: string): void {
+  if (!/^[\w.-]+$/.test(name)) {
+    throw new Error(`--record name may only use letters, digits, ".", "_" and "-": ${name}`);
+  }
+  const dest = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "results", name);
+  fs.mkdirSync(dest, { recursive: true });
+  for (const file of RECORDED_FILES) {
+    fs.copyFileSync(path.join(outputDir, file), path.join(dest, file));
+  }
+  console.log(`Recorded results in ${dest}/`);
 }

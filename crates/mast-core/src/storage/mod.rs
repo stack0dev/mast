@@ -956,7 +956,7 @@ impl Storage {
     /// Write an edge within an existing transaction. Does NOT commit.
     pub fn write_edge_in_txn(txn: &WriteTransaction, edge: &Edge) -> Result<(), MastError> {
         let edge_id_bytes = edge.id.to_bytes();
-        let encoded = bincode::serialize(edge)?;
+        let encoded = serde::serialize_edge(edge)?;
 
         {
             let mut edges = txn.open_table(EDGES)?;
@@ -999,7 +999,7 @@ impl Storage {
 
     pub fn write_edge(&self, edge: &Edge) -> Result<(), MastError> {
         let edge_id_bytes = edge.id.to_bytes();
-        let encoded = bincode::serialize(edge)?;
+        let encoded = serde::serialize_edge(edge)?;
 
         let txn = self.db.begin_write()?;
         {
@@ -1045,7 +1045,7 @@ impl Storage {
 
     pub fn update_edge(&self, edge: &Edge) -> Result<(), MastError> {
         let edge_id_bytes = edge.id.to_bytes();
-        let encoded = bincode::serialize(edge)?;
+        let encoded = serde::serialize_edge(edge)?;
 
         let txn = self.db.begin_write()?;
         {
@@ -1066,7 +1066,7 @@ impl Storage {
 
         match table.get((collection, edge_id_bytes.as_slice()))? {
             Some(data) => {
-                let edge: Edge = bincode::deserialize(data.value())?;
+                let edge = serde::deserialize_edge(data.value())?;
                 Ok(Some(edge))
             }
             None => Ok(None),
@@ -1149,7 +1149,7 @@ impl Storage {
                 let edge_ids: Vec<[u8; 16]> = bincode::deserialize(data.value())?;
                 for eid in edge_ids {
                     if let Some(edge_data) = edges_table.get((collection, eid.as_slice()))? {
-                        let edge: Edge = bincode::deserialize(edge_data.value())?;
+                        let edge = serde::deserialize_edge(edge_data.value())?;
                         result.push(edge);
                     }
                 }
@@ -1164,7 +1164,7 @@ impl Storage {
                     let edge_ids: Vec<[u8; 16]> = bincode::deserialize(value.value())?;
                     for eid in edge_ids {
                         if let Some(edge_data) = edges_table.get((collection, eid.as_slice()))? {
-                            let edge: Edge = bincode::deserialize(edge_data.value())?;
+                            let edge = serde::deserialize_edge(edge_data.value())?;
                             result.push(edge);
                         }
                     }
@@ -1175,12 +1175,14 @@ impl Storage {
         Ok(result)
     }
 
+    /// True when an edge with this source, target, relation and `valid_from` exists.
     pub fn edge_exists(
         &self,
         collection: &str,
         source: &str,
         target: &str,
         relation: &str,
+        valid_from: Option<i64>,
     ) -> Result<bool, MastError> {
         let txn = self.db.begin_read()?;
         let fwd = txn.open_table(EDGE_INDEX_FWD)?;
@@ -1193,8 +1195,8 @@ impl Storage {
 
         for eid in edge_ids {
             if let Some(edge_data) = edges_table.get((collection, eid.as_slice()))? {
-                let edge: Edge = bincode::deserialize(edge_data.value())?;
-                if edge.target == target {
+                let edge = serde::deserialize_edge(edge_data.value())?;
+                if edge.target == target && edge.valid_from == valid_from {
                     return Ok(true);
                 }
             }
@@ -1213,7 +1215,7 @@ impl Storage {
             let (key, value) = item?;
             let (col, _eid) = key.value();
             if col == collection {
-                let edge: Edge = bincode::deserialize(value.value())?;
+                let edge = serde::deserialize_edge(value.value())?;
                 edges.push(edge);
             }
         }
@@ -1533,6 +1535,8 @@ mod tests {
             memory_ids: vec![],
             created_at: 1000,
             updated_at: 1000,
+            valid_from: None,
+            valid_to: None,
         };
         let eid = edge.id;
 
@@ -1555,6 +1559,8 @@ mod tests {
             memory_ids: vec![],
             created_at: 1000,
             updated_at: 1000,
+            valid_from: None,
+            valid_to: None,
         };
         storage.write_edge(&edge).unwrap();
 
@@ -1578,6 +1584,8 @@ mod tests {
             memory_ids: vec![],
             created_at: 1000,
             updated_at: 1000,
+            valid_from: None,
+            valid_to: None,
         };
         let eid = edge.id;
         storage.write_edge(&edge).unwrap();
@@ -1604,6 +1612,8 @@ mod tests {
             memory_ids: vec![],
             created_at: 1000,
             updated_at: 1000,
+            valid_from: None,
+            valid_to: None,
         };
         let e2 = Edge {
             id: Ulid::new(),
@@ -1615,6 +1625,8 @@ mod tests {
             memory_ids: vec![],
             created_at: 1000,
             updated_at: 1000,
+            valid_from: None,
+            valid_to: None,
         };
         storage.write_edge(&e1).unwrap();
         storage.write_edge(&e2).unwrap();

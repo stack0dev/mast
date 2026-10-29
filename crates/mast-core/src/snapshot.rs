@@ -144,6 +144,7 @@ impl Mast {
                             &edge.source,
                             &edge.target,
                             &edge.relation,
+                            edge.valid_from,
                         )?
                     {
                         skipped_count += 1;
@@ -250,6 +251,7 @@ mod tests {
                         metadata: HashMap::from([("idx".into(), i.to_string())]),
                         tier: Tier::Active,
                         ttl: None,
+                        created_at: None,
                     },
                     &embedder,
                 )
@@ -266,6 +268,8 @@ mod tests {
                 relation: "knows".into(),
                 weight: 0.9,
                 memory_ids: vec![],
+                valid_from: None,
+                valid_to: None,
             })
             .unwrap();
 
@@ -310,6 +314,8 @@ mod tests {
                     filter: None,
                     tier_weights: None,
                     time_decay: None,
+                    reference_time: None,
+                    time_anchor: None,
                 },
                 &embedder,
             )
@@ -389,6 +395,7 @@ mod tests {
                     metadata: HashMap::new(),
                     tier: Tier::Active,
                     ttl: None,
+                    created_at: None,
                 },
                 &embedder,
             )
@@ -422,6 +429,7 @@ mod tests {
                     metadata: HashMap::new(),
                     tier: Tier::Active,
                     ttl: None,
+                    created_at: None,
                 },
                 &embedder,
             )
@@ -460,6 +468,7 @@ mod tests {
                     metadata: HashMap::new(),
                     tier: Tier::Active,
                     ttl: None,
+                    created_at: None,
                 },
                 &embedder,
             )
@@ -481,6 +490,7 @@ mod tests {
                     metadata: HashMap::new(),
                     tier: Tier::Active,
                     ttl: None,
+                    created_at: None,
                 },
                 &embedder,
             )
@@ -508,6 +518,8 @@ mod tests {
             relation: "knows".into(),
             weight: 1.0,
             memory_ids: vec![],
+            valid_from: None,
+            valid_to: None,
         })
         .unwrap();
 

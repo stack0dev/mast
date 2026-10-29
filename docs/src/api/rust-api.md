@@ -18,7 +18,7 @@ Opens or creates a MAST database at the configured path. Creates the file and al
 
 #### `store(&mut self, request: StoreRequest, embedder: &dyn Embedder) -> Result<Memory, MastError>`
 
-Stores a single memory. Generates an embedding if `request.embedding` is `None`. Indexes the memory for vector search, full-text search, and metadata filtering. Returns the created `Memory`.
+Stores a single memory. Generates an embedding if `request.embedding` is `None`. Sets `created_at` from `request.created_at`, or now when it is `None`. Indexes the memory for vector search, full-text search, and metadata filtering. Returns the created `Memory`.
 
 **Errors:**
 - `InvalidInput` if embedding is empty or dimensions mismatch
@@ -42,8 +42,10 @@ Searches for memories matching the query. Supports Vector, FullText, and Hybrid 
 
 **Behavior:**
 - `limit: 0` falls back to `config.default_limit`
-- Excludes compacted memories (`compacted_at.is_some()`)
+- Compacted memories score `config.compacted_source_weight` (default 0.5) times as much; a weight of 0.0 or less excludes them
 - Excludes expired memories (`now - created_at >= ttl`)
+- Time decay measures age from `request.reference_time` (default: now)
+- A relative time phrase in the query ("two weeks ago"), or `request.time_anchor`, boosts memories created near that time by up to 40%
 - Results sorted descending by score
 
 ### CRUD Operations
@@ -85,15 +87,19 @@ Removes all expired memories from a collection. A memory is expired when `now - 
 
 #### `relate(&self, request: RelateRequest) -> Result<Ulid, MastError>`
 
-Creates or updates an edge. If an edge with the same (source, target, relation) exists, updates weight and memory_ids (upsert). Returns the edge ID.
+Creates or updates an edge. If an edge with the same (source, target, relation, valid_from) exists, updates weight, memory_ids and valid_to (upsert). Returns the edge ID. `InvalidInput` when `valid_to <= valid_from`.
+
+#### `invalidate(&self, request: InvalidateRequest) -> Result<usize, MastError>`
+
+Sets `valid_to` (default: now) on the open edges for (source, target, relation). Returns how many it closed. `NotFound` if no edge is open; `InvalidInput` if `ended_at <= valid_from`.
 
 #### `unrelate(&self, collection: &str, source: &str, target: &str, relation: &str) -> Result<(), MastError>`
 
-Removes an edge. Returns `NotFound` if no matching edge exists.
+Removes every edge for (source, target, relation), across all validity intervals. Returns `NotFound` if none exists.
 
 #### `traverse(&self, request: TraverseRequest) -> Result<Vec<Edge>, MastError>`
 
-BFS traversal from a starting entity. Returns all edges encountered, respecting `max_depth`, `relation_filter`, and `min_weight`. Cycle-safe (visits each entity at most once).
+BFS traversal from a starting entity. Returns all edges encountered, respecting `max_depth`, `relation_filter`, `min_weight`, and `as_of` (only edges valid at that time). Cycle-safe (visits each entity at most once).
 
 #### `subgraph(&self, collection: &str) -> Result<Graph, MastError>`
 
@@ -129,10 +135,12 @@ pub struct MastConfig {
     pub default_dimensions: usize,     // default: 1536
     pub default_tier_weights: TierWeights,
     pub default_time_decay: Option<TimeDecay>,
+    pub durability: Durability,
+    pub compacted_source_weight: f32,  // default: 0.5; 0.0 removes compacted memories from recall
 }
 ```
 
-Builder methods: `with_db_path()`, `with_default_collection()`, `with_default_limit()`, `with_default_dimensions()`, `with_default_tier_weights()`, `with_default_time_decay()`.
+Builder methods: `with_db_path()`, `with_default_collection()`, `with_default_limit()`, `with_default_dimensions()`, `with_default_tier_weights()`, `with_default_time_decay()`, `with_durability()`, `with_compacted_source_weight()`.
 
 ---
 
@@ -150,7 +158,9 @@ See [Memories](../concepts/memories.md) and [Search](../concepts/search.md) for 
 | `CompactRequest` | Input for `compact()` |
 | `CompactResult` | Output from `compact()` |
 | `RelateRequest` | Input for `relate()` |
+| `InvalidateRequest` | Input for `invalidate()` |
 | `TraverseRequest` | Input for `traverse()` |
+| `TimeAnchor` | Target time and window for the recall time boost |
 | `Edge` | Graph edge |
 | `Graph` | Collection of edges |
 | `CollectionInfo` | Collection metadata |

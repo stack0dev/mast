@@ -124,6 +124,10 @@ typedef struct MastMastEdgeEntry {
   float weight;
   int64_t created_at;
   int64_t updated_at;
+  int64_t valid_from;
+  bool has_valid_from;
+  int64_t valid_to;
+  bool has_valid_to;
 } MastMastEdgeEntry;
 
 typedef struct MastMastGraphResult {
@@ -148,6 +152,8 @@ struct MastMastStoreResult *mast_store(struct MastMastHandle *handle,
                                        const char *tier,
                                        int64_t ttl,
                                        bool has_ttl,
+                                       int64_t created_at,
+                                       bool has_created_at,
                                        struct MastMastFfiError **err);
 
 struct MastMastRecallResult *mast_recall(struct MastMastHandle *handle,
@@ -181,6 +187,10 @@ bool mast_relate(struct MastMastHandle *handle,
                  const char *target,
                  const char *relation,
                  float weight,
+                 int64_t valid_from,
+                 bool has_valid_from,
+                 int64_t valid_to,
+                 bool has_valid_to,
                  char **out_id,
                  struct MastMastFfiError **err);
 
@@ -190,6 +200,20 @@ bool mast_unrelate(struct MastMastHandle *handle,
                    const char *target,
                    const char *relation,
                    struct MastMastFfiError **err);
+
+/**
+ * Set `valid_to` on the open edges for this fact. Writes how many were
+ * closed to `out_closed` when it is not null.
+ */
+bool mast_invalidate(struct MastMastHandle *handle,
+                     const char *collection,
+                     const char *source,
+                     const char *target,
+                     const char *relation,
+                     int64_t ended_at,
+                     bool has_ended_at,
+                     uintptr_t *out_closed,
+                     struct MastMastFfiError **err);
 
 struct MastMastSnapshotResult *mast_snapshot(struct MastMastHandle *handle,
                                              const char *collection,
@@ -215,6 +239,8 @@ struct MastMastRecallFullResult *mast_recall_full(struct MastMastHandle *handle,
                                                   float text_weight,
                                                   uintptr_t limit,
                                                   const char *filter_json,
+                                                  int64_t reference_time,
+                                                  bool has_reference_time,
                                                   struct MastMastFfiError **err);
 
 struct MastMastCompactResult *mast_compact(struct MastMastHandle *handle,
@@ -235,6 +261,8 @@ struct MastMastGraphResult *mast_traverse(struct MastMastHandle *handle,
                                           const char *relation_filter,
                                           float min_weight,
                                           bool has_min_weight,
+                                          int64_t as_of,
+                                          bool has_as_of,
                                           struct MastMastFfiError **err);
 
 struct MastMastGraphResult *mast_subgraph(struct MastMastHandle *handle,

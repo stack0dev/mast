@@ -61,6 +61,7 @@ let memory = mast.store(
         metadata: HashMap::from([("topic".into(), "rust".into())]),
         tier: Tier::Active,
         ttl: None,
+        created_at: None,
     },
     &embedder,
 ).await?;
@@ -79,6 +80,7 @@ let memories = mast.store_batch(
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             BatchStoreItem {
                 content: "Item two".into(),
@@ -86,6 +88,7 @@ let memories = mast.store_batch(
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: Some(3600),
+                created_at: None,
             },
         ],
     },
@@ -106,6 +109,7 @@ let memory = mast.store(
         metadata: HashMap::new(),
         tier: Tier::Active,
         ttl: None,
+        created_at: None,
     },
     &embedder,  // not called
 ).await?;
@@ -127,6 +131,8 @@ let results = mast.recall(
         filter: None,
         tier_weights: None,
         time_decay: None,
+        reference_time: None,
+        time_anchor: None,
     },
     &embedder,
 ).await?;
@@ -146,6 +152,8 @@ let results = mast.recall(
         filter: None,
         tier_weights: None,
         time_decay: None,
+        reference_time: None,
+        time_anchor: None,
     },
     &embedder,
 ).await?;
@@ -168,6 +176,8 @@ let results = mast.recall(
         filter: None,
         tier_weights: None,
         time_decay: None,
+        reference_time: None,
+        time_anchor: None,
     },
     &embedder,
 ).await?;
@@ -217,6 +227,8 @@ let edge_id = mast.relate(RelateRequest {
     relation: "provides".into(),
     weight: 0.95,
     memory_ids: vec![],
+    valid_from: None,
+    valid_to: None,
 })?;
 
 // Remove an edge
@@ -229,6 +241,7 @@ let edges = mast.traverse(TraverseRequest {
     max_depth: 3,
     relation_filter: None,
     min_weight: Some(0.5),
+    as_of: None,
 })?;
 
 // Get all edges in a collection

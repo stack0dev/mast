@@ -60,6 +60,7 @@ async fn example_ai_chat_memory() {
                     ]),
                     tier: Tier::Active,
                     ttl: None,
+                    created_at: None,
                 },
                 &embedder,
             )
@@ -82,6 +83,8 @@ async fn example_ai_chat_memory() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -107,6 +110,8 @@ async fn example_ai_chat_memory() {
                 filter: Some(MetadataFilter::Eq("role".into(), "assistant".into())),
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -151,7 +156,7 @@ async fn example_ai_chat_memory() {
     assert_eq!(summary.parent_ids.len(), 4);
     assert_eq!(summary.tier, Tier::Archive);
 
-    // -- Recall again: compacted originals are excluded, summary participates --
+    // -- Recall again: the summary participates, compacted originals stay at half weight --
     let post_compact = mast
         .recall(
             RecallRequest {
@@ -164,23 +169,21 @@ async fn example_ai_chat_memory() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
         .await
         .unwrap();
 
-    // The 4 compacted originals should not appear
-    let returned_ids: Vec<_> = post_compact.iter().map(|r| r.memory.id).collect();
-    for compacted_id in &early_ids {
-        assert!(
-            !returned_ids.contains(compacted_id),
-            "compacted memory {compacted_id} should be excluded from recall"
-        );
+    // 10 originals + 1 summary match; the limit keeps 10. A compacted original
+    // scores at most similarity (1.0) * active tier (0.9) * compacted_source_weight (0.5).
+    assert_eq!(post_compact.len(), 10);
+    for r in post_compact.iter().filter(|r| early_ids.contains(&r.memory.id)) {
+        assert!(r.memory.compacted_at.is_some());
+        assert!(r.score <= 0.45 + 1e-6, "compacted original scored {}", r.score);
     }
-
-    // Remaining 6 originals + 1 summary = 7 total
-    assert_eq!(post_compact.len(), 7);
 
     // -- Tier weights modify scores --
     // Recall with default weights, then with archive=0.0 to suppress it entirely
@@ -196,6 +199,8 @@ async fn example_ai_chat_memory() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -222,6 +227,8 @@ async fn example_ai_chat_memory() {
                     archive: 0.0, // zero out archived memories
                 }),
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -272,6 +279,7 @@ async fn example_knowledge_graph() {
                     metadata: HashMap::from([("concept".into(), name.to_string())]),
                     tier: Tier::Core,
                     ttl: None,
+                    created_at: None,
                 },
                 &embedder,
             )
@@ -302,6 +310,8 @@ async fn example_knowledge_graph() {
             relation: relation.to_string(),
             weight: *weight,
             memory_ids: vec![ids[source], ids[target]],
+            valid_from: None,
+            valid_to: None,
         })
         .unwrap();
     }
@@ -314,6 +324,7 @@ async fn example_knowledge_graph() {
             max_depth: 1,
             relation_filter: None,
             min_weight: None,
+            as_of: None,
         })
         .unwrap();
 
@@ -332,6 +343,7 @@ async fn example_knowledge_graph() {
             max_depth: 2,
             relation_filter: None,
             min_weight: None,
+            as_of: None,
         })
         .unwrap();
 
@@ -347,6 +359,7 @@ async fn example_knowledge_graph() {
             max_depth: 3,
             relation_filter: Some("has_concept".into()),
             min_weight: None,
+            as_of: None,
         })
         .unwrap();
 
@@ -365,6 +378,7 @@ async fn example_knowledge_graph() {
             max_depth: 3,
             relation_filter: None,
             min_weight: Some(0.9),
+            as_of: None,
         })
         .unwrap();
 
@@ -393,6 +407,7 @@ async fn example_knowledge_graph() {
             max_depth: 3,
             relation_filter: None,
             min_weight: None,
+            as_of: None,
         })
         .unwrap();
 
@@ -410,6 +425,8 @@ async fn example_knowledge_graph() {
         relation: "has_concept".into(),
         weight: 0.5, // downgrade
         memory_ids: vec![],
+        valid_from: None,
+        valid_to: None,
     })
     .unwrap();
 
@@ -421,6 +438,7 @@ async fn example_knowledge_graph() {
             max_depth: 1,
             relation_filter: None,
             min_weight: Some(0.9),
+            as_of: None,
         })
         .unwrap();
 
@@ -467,6 +485,7 @@ async fn example_rag_knowledge_base() {
                 ]),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -487,6 +506,8 @@ async fn example_rag_knowledge_base() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -508,6 +529,8 @@ async fn example_rag_knowledge_base() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -536,6 +559,8 @@ async fn example_rag_knowledge_base() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -557,6 +582,8 @@ async fn example_rag_knowledge_base() {
                 filter: Some(MetadataFilter::Eq("version".into(), "v2".into())),
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -587,6 +614,8 @@ async fn example_rag_knowledge_base() {
                 ])),
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -611,6 +640,8 @@ async fn example_rag_knowledge_base() {
                 filter: Some(MetadataFilter::Eq("category".into(), "changelog".into())),
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -648,6 +679,7 @@ async fn example_multi_tenant_isolation() {
                 metadata: HashMap::from([("tenant".into(), "a".into())]),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -669,6 +701,7 @@ async fn example_multi_tenant_isolation() {
                 metadata: HashMap::from([("tenant".into(), "b".into())]),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -689,6 +722,7 @@ async fn example_multi_tenant_isolation() {
                 metadata: HashMap::from([("tenant".into(), "c".into())]),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -709,6 +743,8 @@ async fn example_multi_tenant_isolation() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -797,6 +833,7 @@ async fn example_personal_journal() {
                     ]),
                     tier: Tier::Active,
                     ttl: *ttl,
+                    created_at: None,
                 },
                 &embedder,
             )
@@ -822,6 +859,8 @@ async fn example_personal_journal() {
                 filter: Some(MetadataFilter::Eq("mood".into(), "happy".into())),
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -849,6 +888,8 @@ async fn example_personal_journal() {
                 ])),
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -892,6 +933,8 @@ async fn example_personal_journal() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -924,6 +967,8 @@ async fn example_personal_journal() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -957,6 +1002,7 @@ async fn example_snapshot_backup_pipeline() {
                     metadata: HashMap::from([("idx".into(), i.to_string())]),
                     tier: Tier::Active,
                     ttl: None,
+                    created_at: None,
                 },
                 &embedder,
             )
@@ -974,6 +1020,8 @@ async fn example_snapshot_backup_pipeline() {
             relation: "prerequisite".into(),
             weight: 1.0,
             memory_ids: vec![],
+            valid_from: None,
+            valid_to: None,
         })
         .unwrap();
     }
@@ -1004,6 +1052,8 @@ async fn example_snapshot_backup_pipeline() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -1028,6 +1078,7 @@ async fn example_snapshot_backup_pipeline() {
                 metadata: HashMap::from([("idx".into(), i.to_string())]),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -1088,6 +1139,7 @@ async fn example_hybrid_search_comparison() {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
             &embedder,
         )
@@ -1108,6 +1160,8 @@ async fn example_hybrid_search_comparison() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -1135,6 +1189,8 @@ async fn example_hybrid_search_comparison() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -1159,6 +1215,8 @@ async fn example_hybrid_search_comparison() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -1190,6 +1248,8 @@ async fn example_hybrid_search_comparison() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )
@@ -1211,6 +1271,8 @@ async fn example_hybrid_search_comparison() {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
             &embedder,
         )

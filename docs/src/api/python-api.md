@@ -28,6 +28,7 @@ store(
     metadata: dict[str, str] | None = None,
     tier: str | None = None,
     ttl: int | None = None,
+    created_at: int | None = None,
 ) -> PyMemory
 ```
 
@@ -41,6 +42,7 @@ Stores a memory. The `embedder` must have an `embed(text: str) -> list[float]` m
 | `metadata` | `dict` | `None` | Key-value metadata |
 | `tier` | `str` | `"active"` | "core", "active", "background", "archive" |
 | `ttl` | `int` | `None` | Time-to-live in seconds |
+| `created_at` | `int` | now | When the memory happened, in unix seconds |
 
 ---
 
@@ -55,6 +57,7 @@ recall(
     search_mode: str | None = None,
     limit: int | None = None,
     filter: dict[str, str] | None = None,
+    reference_time: int | None = None,
 ) -> list[PyRecallResult]
 ```
 
@@ -69,6 +72,7 @@ Searches for memories. At least one of `query` or `text_query` is required.
 | `search_mode` | `str` | `"vector"` | "vector", "fulltext", "hybrid" |
 | `limit` | `int` | `10` | Max results |
 | `filter` | `dict` | `None` | Metadata key=value filter (AND semantics) |
+| `reference_time` | `int` | now | When the question is asked, in unix seconds. Phrases like "two weeks ago" in `query` count back from it |
 
 ---
 
@@ -131,10 +135,12 @@ relate(
     target: str,
     relation: str,
     weight: float | None = None,
+    valid_from: int | None = None,
+    valid_to: int | None = None,
 ) -> str
 ```
 
-Creates or updates a graph edge. Returns the edge ID as a ULID string. Default weight is 1.0.
+Creates or updates a graph edge. Returns the edge ID as a ULID string. Default weight is 1.0. `valid_from` and `valid_to` (unix seconds, `valid_to` exclusive) mark when the fact is true; an edge with the same source, target, relation and `valid_from` is updated in place.
 
 ---
 
@@ -144,7 +150,23 @@ Creates or updates a graph edge. Returns the edge ID as a ULID string. Default w
 unrelate(collection: str, source: str, target: str, relation: str) -> None
 ```
 
-Removes a graph edge. Raises `RuntimeError` if no matching edge exists.
+Removes every edge for this source, target and relation, across all validity intervals. Raises `RuntimeError` if none exists.
+
+---
+
+### invalidate
+
+```python
+invalidate(
+    collection: str,
+    source: str,
+    target: str,
+    relation: str,
+    ended_at: int | None = None,
+) -> int
+```
+
+Sets `valid_to` (default: now) on the open edges for this fact. Returns how many it closed. Raises `RuntimeError` if no edge is open.
 
 ---
 
@@ -157,10 +179,11 @@ traverse(
     max_depth: int | None = None,
     relation: str | None = None,
     min_weight: float | None = None,
+    as_of: int | None = None,
 ) -> list[PyEdge]
 ```
 
-BFS traversal from a starting entity. Default `max_depth` is 3.
+BFS traversal from a starting entity. Default `max_depth` is 3. With `as_of` (unix seconds), only edges valid at that time are followed.
 
 ---
 
@@ -233,6 +256,8 @@ Flushes indexes and closes the database.
 | `target` | `str` | Target entity |
 | `relation` | `str` | Relation type |
 | `weight` | `float` | Edge weight |
+| `valid_from` | `int \| None` | Start of the time the fact is true, in unix seconds |
+| `valid_to` | `int \| None` | End of the time the fact is true, exclusive |
 
 ### PySnapshotResult
 

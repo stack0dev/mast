@@ -147,6 +147,10 @@ pub struct PyEdge {
     pub relation: String,
     #[pyo3(get)]
     pub weight: f32,
+    #[pyo3(get)]
+    pub valid_from: Option<i64>,
+    #[pyo3(get)]
+    pub valid_to: Option<i64>,
 }
 
 impl From<Edge> for PyEdge {
@@ -157,6 +161,8 @@ impl From<Edge> for PyEdge {
             target: e.target,
             relation: e.relation,
             weight: e.weight,
+            valid_from: e.valid_from,
+            valid_to: e.valid_to,
         }
     }
 }
@@ -205,7 +211,7 @@ impl MastPy {
         })
     }
 
-    #[pyo3(signature = (collection, content, embedder, metadata=None, tier=None, ttl=None))]
+    #[pyo3(signature = (collection, content, embedder, metadata=None, tier=None, ttl=None, created_at=None))]
     fn store<'py>(
         &self,
         py: Python<'py>,
@@ -215,6 +221,7 @@ impl MastPy {
         metadata: Option<HashMap<String, String>>,
         tier: Option<&str>,
         ttl: Option<i64>,
+        created_at: Option<i64>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let emb = PyEmbedder { obj: embedder };
         let tier_val = tier
@@ -228,6 +235,7 @@ impl MastPy {
             metadata: metadata.unwrap_or_default(),
             tier: tier_val,
             ttl,
+            created_at,
         };
 
         let inner = self.inner.clone();
@@ -246,7 +254,7 @@ impl MastPy {
         })
     }
 
-    #[pyo3(signature = (collection, embedder, query=None, text_query=None, search_mode=None, limit=None, filter=None))]
+    #[pyo3(signature = (collection, embedder, query=None, text_query=None, search_mode=None, limit=None, filter=None, reference_time=None))]
     fn recall<'py>(
         &self,
         py: Python<'py>,
@@ -257,6 +265,7 @@ impl MastPy {
         search_mode: Option<&str>,
         limit: Option<usize>,
         filter: Option<HashMap<String, String>>,
+        reference_time: Option<i64>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let emb = PyEmbedder { obj: embedder };
         let mode: SearchMode = search_mode
@@ -285,6 +294,8 @@ impl MastPy {
             filter: metadata_filter,
             tier_weights: None,
             time_decay: None,
+            reference_time,
+            time_anchor: None,
         };
 
         let inner = self.inner.clone();
@@ -355,7 +366,7 @@ impl MastPy {
         Ok(result.expired_count)
     }
 
-    #[pyo3(signature = (collection, source, target, relation, weight=None))]
+    #[pyo3(signature = (collection, source, target, relation, weight=None, valid_from=None, valid_to=None))]
     fn relate(
         &self,
         collection: &str,
@@ -363,6 +374,8 @@ impl MastPy {
         target: &str,
         relation: &str,
         weight: Option<f32>,
+        valid_from: Option<i64>,
+        valid_to: Option<i64>,
     ) -> PyResult<String> {
         let mast = self.inner.lock().map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
         let request = RelateRequest {
@@ -372,6 +385,8 @@ impl MastPy {
             relation: relation.to_string(),
             weight: weight.unwrap_or(1.0),
             memory_ids: vec![],
+            valid_from,
+            valid_to,
         };
         let id = mast.relate(request).map_err(to_pyerr)?;
         Ok(id.to_string())
@@ -389,7 +404,28 @@ impl MastPy {
             .map_err(to_pyerr)
     }
 
-    #[pyo3(signature = (collection, start, max_depth=None, relation=None, min_weight=None))]
+    /// Set `valid_to` on the open edges for this fact. Returns how many were closed.
+    #[pyo3(signature = (collection, source, target, relation, ended_at=None))]
+    fn invalidate(
+        &self,
+        collection: &str,
+        source: &str,
+        target: &str,
+        relation: &str,
+        ended_at: Option<i64>,
+    ) -> PyResult<usize> {
+        let mast = self.inner.lock().map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+        mast.invalidate(InvalidateRequest {
+            collection: collection.to_string(),
+            source: source.to_string(),
+            target: target.to_string(),
+            relation: relation.to_string(),
+            ended_at,
+        })
+        .map_err(to_pyerr)
+    }
+
+    #[pyo3(signature = (collection, start, max_depth=None, relation=None, min_weight=None, as_of=None))]
     fn traverse(
         &self,
         _py: Python<'_>,
@@ -398,6 +434,7 @@ impl MastPy {
         max_depth: Option<usize>,
         relation: Option<&str>,
         min_weight: Option<f32>,
+        as_of: Option<i64>,
     ) -> PyResult<Vec<PyEdge>> {
         let mast = self.inner.lock().map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
         let request = TraverseRequest {
@@ -406,6 +443,7 @@ impl MastPy {
             max_depth: max_depth.unwrap_or(3),
             relation_filter: relation.map(|s| s.to_string()),
             min_weight,
+            as_of,
         };
         let edges = mast.traverse(request).map_err(to_pyerr)?;
         Ok(edges.into_iter().map(PyEdge::from).collect())

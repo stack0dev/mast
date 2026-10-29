@@ -29,6 +29,8 @@ store(
   metadata?: Record<string, string>,
   tier?: string,
   ttl?: number,
+  embedding?: number[],
+  createdAt?: number,
 ): JsMemory
 ```
 
@@ -43,6 +45,8 @@ Stores a memory. The `embedFn` receives text and must return a number array.
 | `metadata` | `object` | `undefined` | Key-value metadata |
 | `tier` | `string` | `"active"` | "core", "active", "background", "archive" |
 | `ttl` | `number` | `undefined` | Time-to-live in seconds |
+| `embedding` | `number[]` | `undefined` | Pre-computed vector; skips `embedFn` |
+| `createdAt` | `number` | now | When the memory happened, in unix seconds |
 
 ---
 
@@ -57,6 +61,8 @@ recall(
   textQuery?: string,
   searchMode?: string,
   limit?: number,
+  queryEmbedding?: number[],
+  referenceTime?: number,
 ): JsRecallResult[]
 ```
 
@@ -71,6 +77,8 @@ Searches for memories. At least one of `query` or `textQuery` is required.
 | `textQuery` | `string` | `undefined` | Keywords (for full-text search) |
 | `searchMode` | `string` | `"vector"` | "vector", "fulltext", "hybrid" |
 | `limit` | `number` | `10` | Max results |
+| `queryEmbedding` | `number[]` | `undefined` | Pre-computed query vector |
+| `referenceTime` | `number` | now | When the question is asked, in unix seconds. Phrases like "two weeks ago" in `query` count back from it |
 
 ---
 
@@ -133,10 +141,12 @@ relate(
   target: string,
   relation: string,
   weight?: number,
+  validFrom?: number,
+  validTo?: number,
 ): string
 ```
 
-Creates or updates a graph edge. Returns the edge ID as a ULID string. Default weight is 1.0.
+Creates or updates a graph edge. Returns the edge ID as a ULID string. Default weight is 1.0. `validFrom` and `validTo` (unix seconds, `validTo` exclusive) mark when the fact is true; an edge with the same source, target, relation and `validFrom` is updated in place.
 
 ---
 
@@ -146,7 +156,23 @@ Creates or updates a graph edge. Returns the edge ID as a ULID string. Default w
 unrelate(collection: string, source: string, target: string, relation: string): void
 ```
 
-Removes a graph edge. Throws if no matching edge exists.
+Removes every edge for this source, target and relation, across all validity intervals. Throws if none exists.
+
+---
+
+### invalidate
+
+```typescript
+invalidate(
+  collection: string,
+  source: string,
+  target: string,
+  relation: string,
+  endedAt?: number,
+): number
+```
+
+Sets `validTo` (default: now) on the open edges for this fact. Returns how many it closed. Throws if no edge is open.
 
 ---
 
@@ -159,10 +185,11 @@ traverse(
   maxDepth?: number,
   relation?: string,
   minWeight?: number,
+  asOf?: number,
 ): JsEdge[]
 ```
 
-BFS traversal from a starting entity. Default `maxDepth` is 3.
+BFS traversal from a starting entity. Default `maxDepth` is 3. With `asOf` (unix seconds), only edges valid at that time are followed.
 
 ---
 
@@ -241,6 +268,8 @@ interface JsEdge {
   target: string;
   relation: string;
   weight: number;               // f64
+  validFrom?: number;           // Unix seconds; absent = always
+  validTo?: number;             // Unix seconds, exclusive; absent = still true
 }
 ```
 

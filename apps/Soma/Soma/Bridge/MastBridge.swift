@@ -78,6 +78,7 @@ actor MastBridge {
         metadata: [String: String] = [:],
         tier: MastTier = .active,
         ttl: Int64? = nil,
+        createdAt: Date? = nil,
         embed: @escaping (String) async -> [Float],
         dimensions: Int
     ) throws -> String {
@@ -109,6 +110,8 @@ actor MastBridge {
                                 cTier,
                                 ttl ?? 0,
                                 ttl != nil,
+                                createdAt.map { Int64($0.timeIntervalSince1970) } ?? 0,
+                                createdAt != nil,
                                 &errPtr
                             )
                             defer { vtable.release() }
@@ -158,6 +161,7 @@ actor MastBridge {
         mode: MastSearchMode = .vector,
         limit: Int = 10,
         filterJSON: String? = nil,
+        referenceTime: Date? = nil,
         embed: @escaping (String) async -> [Float],
         dimensions: Int
     ) throws -> [MastRecallResult] {
@@ -185,6 +189,8 @@ actor MastBridge {
                                 mode.textWeight,
                                 limit,
                                 cFilter,
+                                referenceTime.map { Int64($0.timeIntervalSince1970) } ?? 0,
+                                referenceTime != nil,
                                 &errPtr
                             )
                         }
@@ -250,7 +256,9 @@ actor MastBridge {
         source: String,
         target: String,
         relation: String,
-        weight: Float
+        weight: Float,
+        validFrom: Date? = nil,
+        validTo: Date? = nil
     ) throws -> String {
         let h = try requireHandle()
         var outId: UnsafeMutablePointer<CChar>?
@@ -260,7 +268,14 @@ actor MastBridge {
             source.withCString { cSrc in
                 target.withCString { cTgt in
                     relation.withCString { cRel in
-                        _ = mast_relate(h, cCol, cSrc, cTgt, cRel, weight, &outId, &errPtr)
+                        _ = mast_relate(
+                            h, cCol, cSrc, cTgt, cRel, weight,
+                            validFrom.map { Int64($0.timeIntervalSince1970) } ?? 0,
+                            validFrom != nil,
+                            validTo.map { Int64($0.timeIntervalSince1970) } ?? 0,
+                            validTo != nil,
+                            &outId, &errPtr
+                        )
                     }
                 }
             }
@@ -296,6 +311,39 @@ actor MastBridge {
         }
 
         try checkError(errPtr)
+    }
+
+    // MARK: - Invalidate
+
+    /// Marks a fact as no longer true. Returns how many open edges were closed.
+    func invalidate(
+        collection: String,
+        source: String,
+        target: String,
+        relation: String,
+        endedAt: Date? = nil
+    ) throws -> Int {
+        let h = try requireHandle()
+        var closed = 0
+        var errPtr: UnsafeMutablePointer<MastMastFfiError>?
+
+        collection.withCString { cCol in
+            source.withCString { cSrc in
+                target.withCString { cTgt in
+                    relation.withCString { cRel in
+                        _ = mast_invalidate(
+                            h, cCol, cSrc, cTgt, cRel,
+                            endedAt.map { Int64($0.timeIntervalSince1970) } ?? 0,
+                            endedAt != nil,
+                            &closed, &errPtr
+                        )
+                    }
+                }
+            }
+        }
+
+        try checkError(errPtr)
+        return closed
     }
 
     // MARK: - Compact
@@ -369,7 +417,8 @@ actor MastBridge {
         start: String,
         maxDepth: Int,
         relationFilter: String? = nil,
-        minWeight: Float? = nil
+        minWeight: Float? = nil,
+        asOf: Date? = nil
     ) throws -> [MastEdge] {
         let h = try requireHandle()
         var errPtr: UnsafeMutablePointer<MastMastFfiError>?
@@ -385,6 +434,8 @@ actor MastBridge {
                         cRelFilter,
                         minWeight ?? 0.0,
                         minWeight != nil,
+                        asOf.map { Int64($0.timeIntervalSince1970) } ?? 0,
+                        asOf != nil,
                         &errPtr
                     )
                 }
@@ -568,7 +619,11 @@ extension MastBridge {
             relation: String(cString: entry.relation),
             weight: entry.weight,
             createdAt: Date(timeIntervalSince1970: TimeInterval(entry.created_at)),
-            updatedAt: Date(timeIntervalSince1970: TimeInterval(entry.updated_at))
+            updatedAt: Date(timeIntervalSince1970: TimeInterval(entry.updated_at)),
+            validFrom: entry.has_valid_from
+                ? Date(timeIntervalSince1970: TimeInterval(entry.valid_from)) : nil,
+            validTo: entry.has_valid_to
+                ? Date(timeIntervalSince1970: TimeInterval(entry.valid_to)) : nil
         )
     }
 

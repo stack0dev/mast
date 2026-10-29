@@ -60,6 +60,9 @@ pub struct StoreRequest {
     pub metadata: HashMap<String, String>,
     pub tier: Tier,
     pub ttl: Option<i64>,
+    /// When the memory happened, in unix seconds. `None` = now. Set it when
+    /// importing history so time decay, TTL and temporal recall use the real time.
+    pub created_at: Option<i64>,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -110,6 +113,20 @@ pub struct RecallRequest {
     pub filter: Option<MetadataFilter>,
     pub tier_weights: Option<TierWeights>,
     pub time_decay: Option<TimeDecay>,
+    /// When the question is asked, in unix seconds. `None` = now. Time decay
+    /// and relative phrases in the query ("two weeks ago") resolve against it.
+    pub reference_time: Option<i64>,
+    /// Boost memories created near this time. `None` = parse a relative time
+    /// phrase from the query text, if there is one.
+    pub time_anchor: Option<TimeAnchor>,
+}
+
+/// A point in time that recall favours: memories created within `window_secs`
+/// of `target` get a score boost that falls off linearly with distance.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TimeAnchor {
+    pub target: i64,
+    pub window_secs: i64,
 }
 
 #[derive(Debug, Clone)]
@@ -182,6 +199,8 @@ pub struct BatchStoreItem {
     pub metadata: HashMap<String, String>,
     pub tier: Tier,
     pub ttl: Option<i64>,
+    /// When the memory happened, in unix seconds. `None` = now.
+    pub created_at: Option<i64>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -195,6 +214,19 @@ pub struct Edge {
     pub memory_ids: Vec<Ulid>,
     pub created_at: i64,
     pub updated_at: i64,
+    /// Start of the time the fact is true, in unix seconds. `None` = always.
+    #[serde(default)]
+    pub valid_from: Option<i64>,
+    /// End of the time the fact is true, in unix seconds, exclusive. `None` = still true.
+    #[serde(default)]
+    pub valid_to: Option<i64>,
+}
+
+impl Edge {
+    /// True when the fact holds at `at`. The interval is half-open: `[valid_from, valid_to)`.
+    pub fn is_valid_at(&self, at: i64) -> bool {
+        self.valid_from.is_none_or(|from| from <= at) && self.valid_to.is_none_or(|to| at < to)
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -205,6 +237,18 @@ pub struct RelateRequest {
     pub relation: String,
     pub weight: f32,
     pub memory_ids: Vec<Ulid>,
+    pub valid_from: Option<i64>,
+    pub valid_to: Option<i64>,
+}
+
+#[derive(Debug, Clone)]
+pub struct InvalidateRequest {
+    pub collection: String,
+    pub source: String,
+    pub target: String,
+    pub relation: String,
+    /// When the fact stopped being true, in unix seconds. `None` = now.
+    pub ended_at: Option<i64>,
 }
 
 #[derive(Debug, Clone)]
@@ -214,6 +258,8 @@ pub struct TraverseRequest {
     pub max_depth: usize,
     pub relation_filter: Option<String>,
     pub min_weight: Option<f32>,
+    /// Follow only edges valid at this time, in unix seconds. `None` = all edges.
+    pub as_of: Option<i64>,
 }
 
 #[derive(Debug, Clone)]
@@ -363,6 +409,7 @@ mod tests {
             metadata: HashMap::new(),
             tier: Tier::Core,
             ttl: None,
+            created_at: None,
         };
         assert_eq!(req.collection, "col");
         assert_eq!(req.embedding.as_ref().unwrap().len(), 2);
@@ -380,6 +427,8 @@ mod tests {
             filter: Some(MetadataFilter::Eq("k".into(), "v".into())),
             tier_weights: None,
             time_decay: None,
+            reference_time: None,
+            time_anchor: None,
         };
         assert_eq!(req.limit, 5);
         assert!(req.filter.is_some());
@@ -442,6 +491,8 @@ mod tests {
             memory_ids: vec![Ulid::new()],
             created_at: 1000,
             updated_at: 2000,
+            valid_from: Some(1000),
+            valid_to: None,
         };
         let bytes = bincode::serialize(&edge).unwrap();
         let decoded: Edge = bincode::deserialize(&bytes).unwrap();
@@ -449,5 +500,32 @@ mod tests {
         assert_eq!(decoded.source, edge.source);
         assert_eq!(decoded.target, edge.target);
         assert_eq!(decoded.relation, edge.relation);
+        assert_eq!(decoded.valid_from, edge.valid_from);
+        assert_eq!(decoded.valid_to, edge.valid_to);
+    }
+
+    #[test]
+    fn edge_validity_is_half_open() {
+        let edge = Edge {
+            id: Ulid::new(),
+            collection: "test".into(),
+            source: "alice".into(),
+            target: "acme".into(),
+            relation: "works_at".into(),
+            weight: 1.0,
+            memory_ids: vec![],
+            created_at: 0,
+            updated_at: 0,
+            valid_from: Some(100),
+            valid_to: Some(200),
+        };
+        assert!(!edge.is_valid_at(99));
+        assert!(edge.is_valid_at(100));
+        assert!(edge.is_valid_at(199));
+        assert!(!edge.is_valid_at(200));
+
+        let open = Edge { valid_from: None, valid_to: None, ..edge };
+        assert!(open.is_valid_at(i64::MIN));
+        assert!(open.is_valid_at(i64::MAX));
     }
 }

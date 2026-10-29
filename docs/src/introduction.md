@@ -19,7 +19,7 @@ Every existing agent memory system wraps general-purpose databases -- Postgres, 
 | **Single-file storage** | redb-backed ACID storage in one file |
 | **Vector search** | Cosine similarity via usearch HNSW index |
 | **Full-text search** | Built-in BM25 with tokenizer and stop words |
-| **Hybrid search** | Min-max normalized blend of vector + full-text |
+| **Hybrid search** | Weighted sum of vector similarity and BM25 scaled to the best match |
 | **Metadata filtering** | Eq, In, And, Or filters with nesting |
 | **Memory tiers** | Core, Active, Background, Archive |
 | **Compaction** | Pluggable synthesis via `Compactor` trait |

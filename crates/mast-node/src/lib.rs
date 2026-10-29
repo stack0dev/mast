@@ -92,6 +92,8 @@ pub struct JsEdge {
     pub target: String,
     pub relation: String,
     pub weight: f64,
+    pub valid_from: Option<i64>,
+    pub valid_to: Option<i64>,
 }
 
 impl From<Edge> for JsEdge {
@@ -102,6 +104,8 @@ impl From<Edge> for JsEdge {
             target: e.target,
             relation: e.relation,
             weight: e.weight as f64,
+            valid_from: e.valid_from,
+            valid_to: e.valid_to,
         }
     }
 }
@@ -129,6 +133,7 @@ pub struct JsBatchItem {
     pub metadata: Option<HashMap<String, String>>,
     pub tier: Option<String>,
     pub ttl: Option<i64>,
+    pub created_at: Option<i64>,
 }
 
 #[napi]
@@ -170,6 +175,7 @@ impl MastDb {
         tier: Option<String>,
         ttl: Option<i64>,
         embedding: Option<Vec<f64>>,
+        created_at: Option<i64>,
     ) -> napi::Result<JsMemory> {
         let embedder = JsEmbedder {
             embed_fn,
@@ -188,6 +194,7 @@ impl MastDb {
             metadata: metadata.unwrap_or_default(),
             tier: tier_val,
             ttl,
+            created_at,
         };
 
         let mut mast = self
@@ -230,6 +237,7 @@ impl MastDb {
                     metadata: item.metadata.unwrap_or_default(),
                     tier,
                     ttl: item.ttl,
+                    created_at: item.created_at,
                 }
             })
             .collect();
@@ -261,6 +269,7 @@ impl MastDb {
         search_mode: Option<String>,
         limit: Option<i64>,
         query_embedding: Option<Vec<f64>>,
+        reference_time: Option<i64>,
     ) -> napi::Result<Vec<JsRecallResult>> {
         let embedder = JsEmbedder {
             embed_fn,
@@ -283,6 +292,8 @@ impl MastDb {
             filter: None,
             tier_weights: None,
             time_decay: None,
+            reference_time,
+            time_anchor: None,
         };
 
         let mut mast = self
@@ -373,6 +384,8 @@ impl MastDb {
         target: String,
         relation: String,
         weight: Option<f64>,
+        valid_from: Option<i64>,
+        valid_to: Option<i64>,
     ) -> napi::Result<String> {
         let mast = self
             .inner
@@ -385,6 +398,8 @@ impl MastDb {
             relation,
             weight: weight.unwrap_or(1.0) as f32,
             memory_ids: vec![],
+            valid_from,
+            valid_to,
         };
         let id = mast.relate(request).map_err(to_napi_err)?;
         Ok(id.to_string())
@@ -406,6 +421,32 @@ impl MastDb {
             .map_err(to_napi_err)
     }
 
+    /// Set `validTo` on the open edges for this fact. Returns how many were closed.
+    #[napi]
+    pub fn invalidate(
+        &self,
+        collection: String,
+        source: String,
+        target: String,
+        relation: String,
+        ended_at: Option<i64>,
+    ) -> napi::Result<i64> {
+        let mast = self
+            .inner
+            .lock()
+            .map_err(|e| napi::Error::from_reason(e.to_string()))?;
+        let closed = mast
+            .invalidate(InvalidateRequest {
+                collection,
+                source,
+                target,
+                relation,
+                ended_at,
+            })
+            .map_err(to_napi_err)?;
+        Ok(closed as i64)
+    }
+
     #[napi]
     pub fn traverse(
         &self,
@@ -414,6 +455,7 @@ impl MastDb {
         max_depth: Option<i64>,
         relation: Option<String>,
         min_weight: Option<f64>,
+        as_of: Option<i64>,
     ) -> napi::Result<Vec<JsEdge>> {
         let mast = self
             .inner
@@ -425,6 +467,7 @@ impl MastDb {
             max_depth: max_depth.unwrap_or(3) as usize,
             relation_filter: relation,
             min_weight: min_weight.map(|w| w as f32),
+            as_of,
         };
         let edges = mast.traverse(request).map_err(to_napi_err)?;
         Ok(edges.into_iter().map(JsEdge::from).collect())
@@ -494,6 +537,7 @@ impl MastDb {
         metadata: Option<HashMap<String, String>>,
         tier: Option<String>,
         ttl: Option<i64>,
+        created_at: Option<i64>,
     ) -> napi::Result<AsyncTask<StoreTask>> {
         let embedder = JsEmbedder {
             embed_fn,
@@ -510,6 +554,7 @@ impl MastDb {
             metadata: metadata.unwrap_or_default(),
             tier: tier_val,
             ttl,
+            created_at,
         };
 
         Ok(AsyncTask::new(StoreTask {
@@ -530,6 +575,7 @@ impl MastDb {
         text_query: Option<String>,
         search_mode: Option<String>,
         limit: Option<i64>,
+        reference_time: Option<i64>,
     ) -> napi::Result<AsyncTask<RecallTask>> {
         let embedder = JsEmbedder {
             embed_fn,
@@ -549,6 +595,8 @@ impl MastDb {
             filter: None,
             tier_weights: None,
             time_decay: None,
+            reference_time,
+            time_anchor: None,
         };
 
         Ok(AsyncTask::new(RecallTask {
@@ -585,6 +633,7 @@ impl MastDb {
         metadata: Option<HashMap<String, String>>,
         tier: Option<String>,
         ttl: Option<i64>,
+        created_at: Option<i64>,
     ) -> napi::Result<JsMemory> {
         let embedder_guard = self.get_or_init_local_embedder()?;
         let embedder = embedder_guard.as_ref().unwrap();
@@ -599,6 +648,7 @@ impl MastDb {
             metadata: metadata.unwrap_or_default(),
             tier: tier_val,
             ttl,
+            created_at,
         };
 
         let mut mast = self
@@ -620,6 +670,7 @@ impl MastDb {
         text_query: Option<String>,
         search_mode: Option<String>,
         limit: Option<i64>,
+        reference_time: Option<i64>,
     ) -> napi::Result<Vec<JsRecallResult>> {
         let embedder_guard = self.get_or_init_local_embedder()?;
         let embedder = embedder_guard.as_ref().unwrap();
@@ -637,6 +688,8 @@ impl MastDb {
             filter: None,
             tier_weights: None,
             time_decay: None,
+            reference_time,
+            time_anchor: None,
         };
 
         let mut mast = self
@@ -683,6 +736,7 @@ impl napi::Task for StoreTask {
                 metadata: HashMap::new(),
                 tier: Tier::Active,
                 ttl: None,
+                created_at: None,
             },
         );
         let memory = self
@@ -725,6 +779,8 @@ impl napi::Task for RecallTask {
                 filter: None,
                 tier_weights: None,
                 time_decay: None,
+                reference_time: None,
+                time_anchor: None,
             },
         );
         let results = self

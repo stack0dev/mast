@@ -1,9 +1,10 @@
 import type { MastDb } from "mast-memory";
 import type { LocomoSample } from "./types.js";
 import type { LLMClient } from "./llm.js";
+import { INGEST_VERSION } from "./ingest.js";
 
 function extractionCollectionName(sampleId: number): string {
-  return `locomo_${sampleId}_ext`;
+  return `locomo_${sampleId}_ext_v${INGEST_VERSION}`;
 }
 
 export { extractionCollectionName };
@@ -19,7 +20,7 @@ function buildSessionText(
 ): { text: string; diaIds: string[] } {
   const session = sample.conversation.sessions[sessionIndex];
   const diaIds: string[] = [];
-  const lines: string[] = [];
+  const lines: string[] = [`Conversation on ${session.dateTime}:`];
 
   for (const turn of session.turns) {
     diaIds.push(turn.dia_id);
@@ -71,11 +72,14 @@ export async function extractSample(
       .filter((line) => line.length > 0);
 
     for (const fact of facts) {
-      db.storeLocal(collection, fact, {
-        session: sessionLabel,
-        source_dia_ids: sourceDiaIds,
-        type: "extracted",
-      });
+      db.storeLocal(
+        collection,
+        fact,
+        { session: sessionLabel, source_dia_ids: sourceDiaIds, type: "extracted" },
+        null,
+        null,
+        sample.conversation.sessions[si].timestamp,
+      );
       totalFacts++;
     }
   }

@@ -16,6 +16,10 @@ export interface LocomoQA {
 }
 
 export interface LocomoSession {
+  /** As written in the dataset, e.g. "1:56 pm on 8 May, 2023". */
+  dateTime: string;
+  /** The same time in unix seconds, read as UTC. */
+  timestamp: number;
   turns: LocomoTurn[];
 }
 
@@ -41,6 +45,9 @@ export interface ExperimentConfig {
   topK: number;
 }
 
+/** Which questions to run. Tune on "dev"; report "held-out". */
+export type SplitName = "dev" | "held-out" | "all";
+
 export interface RunConfig {
   dataPath: string;
   outputDir: string;
@@ -57,6 +64,9 @@ export interface RunConfig {
   resume: boolean;
   extract: boolean;
   extractModel: string;
+  split: SplitName;
+  /** Copy the results into results/<record>/ to commit them. */
+  record?: string;
 }
 
 // ── Results ──
@@ -98,6 +108,7 @@ export interface ExperimentResult {
 
 export interface BenchmarkReport {
   model: string;
+  split: SplitName;
   sampleCount: number;
   experiments: ExperimentResult[];
   totalDurationMs: number;

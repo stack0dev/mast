@@ -19,6 +19,9 @@ pub struct MastConfig {
     pub default_tier_weights: TierWeights,
     pub default_time_decay: Option<TimeDecay>,
     pub durability: Durability,
+    /// Score multiplier for memories that were compacted into a newer memory.
+    /// `0.0` or less removes them from recall.
+    pub compacted_source_weight: f32,
 }
 
 impl Default for MastConfig {
@@ -31,6 +34,7 @@ impl Default for MastConfig {
             default_tier_weights: TierWeights::default(),
             default_time_decay: None,
             durability: Durability::default(),
+            compacted_source_weight: 0.5,
         }
     }
 }
@@ -68,6 +72,11 @@ impl MastConfig {
 
     pub fn with_durability(mut self, durability: Durability) -> Self {
         self.durability = durability;
+        self
+    }
+
+    pub fn with_compacted_source_weight(mut self, weight: f32) -> Self {
+        self.compacted_source_weight = weight;
         self
     }
 }

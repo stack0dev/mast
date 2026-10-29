@@ -1,0 +1,308 @@
+{
+  "model": "(recall-only)",
+  "split": "dev",
+  "sampleCount": 10,
+  "totalDurationMs": 6323,
+  "experiments": [
+    {
+      "config": {
+        "searchMode": {
+          "mode": "vector"
+        },
+        "topK": 5
+      },
+      "categories": [
+        {
+          "category": 1,
+          "count": 57,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.2807017543859649
+        },
+        {
+          "category": 2,
+          "count": 65,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.4461538461538462
+        },
+        {
+          "category": 3,
+          "count": 20,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.1
+        },
+        {
+          "category": 4,
+          "count": 169,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.42011834319526625
+        },
+        {
+          "category": 5,
+          "count": 90,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.2777777777777778
+        }
+      ],
+      "overallF1": 0,
+      "overallBleu1": 0,
+      "overallRecallHit": 0.3566084788029925,
+      "durationMs": 1383,
+      "questionCount": 401
+    },
+    {
+      "config": {
+        "searchMode": {
+          "mode": "vector"
+        },
+        "topK": 10
+      },
+      "categories": [
+        {
+          "category": 1,
+          "count": 57,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.45614035087719296
+        },
+        {
+          "category": 2,
+          "count": 65,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.5846153846153846
+        },
+        {
+          "category": 3,
+          "count": 20,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.25
+        },
+        {
+          "category": 4,
+          "count": 169,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.4970414201183432
+        },
+        {
+          "category": 5,
+          "count": 90,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.3888888888888889
+        }
+      ],
+      "overallF1": 0,
+      "overallBleu1": 0,
+      "overallRecallHit": 0.4688279301745636,
+      "durationMs": 1343,
+      "questionCount": 401
+    },
+    {
+      "config": {
+        "searchMode": {
+          "mode": "fulltext"
+        },
+        "topK": 5
+      },
+      "categories": [
+        {
+          "category": 1,
+          "count": 57,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.3684210526315789
+        },
+        {
+          "category": 2,
+          "count": 65,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.676923076923077
+        },
+        {
+          "category": 3,
+          "count": 20,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.25
+        },
+        {
+          "category": 4,
+          "count": 169,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.6094674556213018
+        },
+        {
+          "category": 5,
+          "count": 90,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.6666666666666666
+        }
+      ],
+      "overallF1": 0,
+      "overallBleu1": 0,
+      "overallRecallHit": 0.5810473815461347,
+      "durationMs": 235,
+      "questionCount": 401
+    },
+    {
+      "config": {
+        "searchMode": {
+          "mode": "fulltext"
+        },
+        "topK": 10
+      },
+      "categories": [
+        {
+          "category": 1,
+          "count": 57,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.47368421052631576
+        },
+        {
+          "category": 2,
+          "count": 65,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.7076923076923077
+        },
+        {
+          "category": 3,
+          "count": 20,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.35
+        },
+        {
+          "category": 4,
+          "count": 169,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.6982248520710059
+        },
+        {
+          "category": 5,
+          "count": 90,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.7111111111111111
+        }
+      ],
+      "overallF1": 0,
+      "overallBleu1": 0,
+      "overallRecallHit": 0.6533665835411472,
+      "durationMs": 398,
+      "questionCount": 401
+    },
+    {
+      "config": {
+        "searchMode": {
+          "mode": "hybrid"
+        },
+        "topK": 5
+      },
+      "categories": [
+        {
+          "category": 1,
+          "count": 57,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.47368421052631576
+        },
+        {
+          "category": 2,
+          "count": 65,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.6461538461538462
+        },
+        {
+          "category": 3,
+          "count": 20,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.3
+        },
+        {
+          "category": 4,
+          "count": 169,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.6686390532544378
+        },
+        {
+          "category": 5,
+          "count": 90,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.6555555555555556
+        }
+      ],
+      "overallF1": 0,
+      "overallBleu1": 0,
+      "overallRecallHit": 0.6159600997506235,
+      "durationMs": 1398,
+      "questionCount": 401
+    },
+    {
+      "config": {
+        "searchMode": {
+          "mode": "hybrid"
+        },
+        "topK": 10
+      },
+      "categories": [
+        {
+          "category": 1,
+          "count": 57,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.6842105263157895
+        },
+        {
+          "category": 2,
+          "count": 65,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.7076923076923077
+        },
+        {
+          "category": 3,
+          "count": 20,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.35
+        },
+        {
+          "category": 4,
+          "count": 169,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.7455621301775148
+        },
+        {
+          "category": 5,
+          "count": 90,
+          "meanF1": 0,
+          "meanBleu1": 0,
+          "recallHitRate": 0.7666666666666667
+        }
+      ],
+      "overallF1": 0,
+      "overallBleu1": 0,
+      "overallRecallHit": 0.71571072319202,
+      "durationMs": 1552,
+      "questionCount": 401
+    }
+  ]
+}

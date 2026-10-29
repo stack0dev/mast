@@ -42,6 +42,10 @@ struct MastEdge: Identifiable, Sendable {
     let weight: Float
     let createdAt: Date
     let updatedAt: Date
+    /// When the fact started being true. `nil` = always.
+    let validFrom: Date?
+    /// When the fact stopped being true, exclusive. `nil` = still true.
+    let validTo: Date?
 }
 
 // MARK: - Compact Result

@@ -6,17 +6,28 @@ import { collectionName } from "./ingest.js";
 import { extractionCollectionName } from "./extract.js";
 
 const ANSWER_SYSTEM = `You answer questions about conversations using ONLY the provided context.
+Each context line starts with the date that part of the conversation happened.
 Rules:
 - Be concise and specific
-- For temporal questions, pay attention to dates and sequence of events
+- For temporal questions, use those dates. Resolve relative times ("last week", "yesterday") against the date of the line they appear in
 - If multiple pieces of context are relevant, synthesize them
 - If the information is not mentioned in the context, respond exactly: "Not mentioned."`;
 
+/** Unix seconds → "8 May 2023", in UTC like the session dates. */
+function formatDate(unixSeconds: number): string {
+  return new Date(unixSeconds * 1000).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
+
 function formatContext(
-  memories: Array<{ memory: { content: string; metadata: Record<string, string> }; score: number }>,
+  memories: Array<{ memory: { content: string; createdAt: number }; score: number }>,
 ): string {
   return memories
-    .map((m, i) => `[${i + 1}] ${m.memory.content}`)
+    .map((m, i) => `[${i + 1}] (${formatDate(m.memory.createdAt)}) ${m.memory.content}`)
     .join("\n");
 }
 
@@ -44,7 +55,10 @@ export async function evaluateQuestion(
   const textQuery = searchMode.mode === "vector" ? undefined : qa.question;
   const mode = searchModeString(searchMode);
 
-  const recalled = db.recallLocal(collection, query, textQuery, mode, topK);
+  // Questions are asked after the last session.
+  const sessions = sample.conversation.sessions;
+  const referenceTime = sessions[sessions.length - 1].timestamp;
+  const recalled = db.recallLocal(collection, query, textQuery, mode, topK, referenceTime);
 
   // Check recall hit — any evidence dia_id found in recalled memories
   const recalledIds: string[] = [];
@@ -116,11 +130,11 @@ export async function evaluateSample(
   searchMode: SearchModeConfig,
   topK: number,
   concurrency: number,
+  qaIndices: number[],
   judgeLlm?: LLMClient,
   useExtracted?: boolean,
 ): Promise<QAResult[]> {
   const results: QAResult[] = [];
-  const qaIndices = sample.qa.map((_, i) => i);
 
   // Process in batches for concurrency control
   for (let i = 0; i < qaIndices.length; i += concurrency) {

@@ -54,6 +54,7 @@ let memory = mast.store(
         ]),
         tier: Tier::Active,
         ttl: None,
+        created_at: None,
     },
     &embedder,
 ).await?;
@@ -75,6 +76,8 @@ let results = mast.recall(
         filter: None,
         tier_weights: None,
         time_decay: None,
+        reference_time: None,
+        time_anchor: None,
     },
     &embedder,
 ).await?;
@@ -98,6 +101,8 @@ let results = mast.recall(
         filter: None,
         tier_weights: None,
         time_decay: None,
+        reference_time: None,
+        time_anchor: None,
     },
     &embedder,
 ).await?;
@@ -115,6 +120,8 @@ mast.relate(RelateRequest {
     relation: "prefers".into(),
     weight: 0.9,
     memory_ids: vec![memory.id],
+    valid_from: None,
+    valid_to: None,
 })?;
 ```
 

@@ -604,19 +604,21 @@ This section reflects behavior implemented today. It separates **Current Guarant
 - **Current Guarantee**
   - Memory records use a versioned envelope: byte `0x01` prefix = v1 (current), no recognized prefix = v0 (legacy).
   - v0 data (written before Phase 2) is auto-migrated on read: `ttl=None`, `compacted_at=None`, `parent_ids=[]`.
+  - Edge records use the same envelope. v0 edges (written before validity intervals) read as `valid_from=None`, `valid_to=None`.
   - No scan-and-rewrite migration is required when upgrading.
-- **Current Limitation**
-  - Only Memory records are versioned. Edge records use raw bincode (no envelope).
+  - JSON snapshots without edge `valid_from`/`valid_to` fields restore with both set to `None`.
 
 ### 11) Recall Scoring
 
 - **Current Guarantee**
-  - `score = similarity * tier_weight * time_decay_factor`
-  - `similarity = 1.0 - distance` (cosine distance from usearch).
+  - `score = relevance * tier_weight * time_decay_factor * compacted_factor * anchor_boost`
+  - Vector relevance: `similarity = 1.0 - distance` (cosine distance from usearch). Full-text relevance: BM25.
+  - Hybrid relevance: `vector_weight * vector_score + text_weight * (bm25_score / best_bm25_score)`, where each part already includes the tier, decay and compacted factors. Vector similarity is on a fixed scale and is not rescaled; BM25 is divided by the best BM25 score among the candidates. Chosen over min-max and reciprocal rank fusion on the LOCOMO dev split (see `packages/mast-bench/README.md`).
   - `tier_weight` sourced from `RecallRequest.tier_weights` or `MastConfig.default_tier_weights`. Defaults: Core=1.0, Active=0.9, Background=0.7, Archive=0.5.
-  - `time_decay_factor = 0.5^(age_secs / half_life_secs)`. If no decay configured, factor is 1.0.
-  - Memories with `compacted_at.is_some()` are excluded from recall results.
-  - Memories with expired TTL (`now - created_at >= ttl`) are excluded from recall results.
+  - `time_decay_factor = 0.5^(age_secs / half_life_secs)`, with age measured from `RecallRequest.reference_time` (default: now). If no decay configured, factor is 1.0.
+  - `compacted_factor` is 1.0, or `MastConfig.compacted_source_weight` (default 0.5) for memories with `compacted_at` set. A weight of 0.0 or less removes compacted memories from recall.
+  - `anchor_boost` is described in §19.
+  - Memories with expired TTL (`now - created_at >= ttl`, wall-clock now) are excluded from recall results.
   - `access_count` incremented and `last_accessed` updated on all returned memories after recall.
 
 ### 12) Batch Store
@@ -631,7 +633,7 @@ This section reflects behavior implemented today. It separates **Current Guarant
 
 - **Current Guarantee**
   - `compact()` selects memories from `source_tier`, filters by strategy, synthesizes via pluggable `Compactor` trait, stores result at `target_tier` with `parent_ids` linking to sources.
-  - Source memories are marked with `compacted_at` timestamp (hidden from recall, still visible in `list()`).
+  - Source memories are marked with `compacted_at` timestamp. Recall still returns them, scaled by `compacted_source_weight` (§11), so a poor synthesis does not hide the original text.
   - `dry_run=true` returns candidates without writing.
   - `max_batch_size` must be > 0.
   - Compensating rollback: if index insertion fails after storage commit, the new memory is deleted from storage.
@@ -643,9 +645,11 @@ This section reflects behavior implemented today. It separates **Current Guarant
 ### 14) Graph Layer
 
 - **Current Guarantee**
-  - `relate()` creates or upserts an edge (same source+target+relation = update weight/memory_ids).
-  - `unrelate()` removes an edge by (source, target, relation).
-  - `traverse()` performs BFS from a start entity, respecting `max_depth`, `relation_filter`, and `min_weight`.
+  - Edges carry an optional validity interval `[valid_from, valid_to)` in unix seconds. `None` means unbounded on that side.
+  - `relate()` creates or upserts an edge. The upsert key is (source, target, relation, valid_from): a fact that changed over time is one edge per interval. `valid_to <= valid_from` is rejected.
+  - `invalidate()` sets `valid_to` (default: now) on the open edges for (source, target, relation) and returns how many it closed. It fails when no edge is open or when `ended_at <= valid_from`.
+  - `unrelate()` removes every edge for (source, target, relation), across all intervals.
+  - `traverse()` performs BFS from a start entity, respecting `max_depth`, `relation_filter`, `min_weight`, and `as_of`. With `as_of` set, only edges valid at that time are followed; without it, all edges are.
   - `subgraph()` returns all edges in a collection.
   - Edges stored in redb with forward and reverse index tables for O(1) entity lookups.
 - **Current Limitation**
@@ -655,7 +659,7 @@ This section reflects behavior implemented today. It separates **Current Guarant
 
 - **Current Guarantee**
   - `Memory.ttl` is an optional duration in seconds. `None` = no expiry.
-  - Expired condition: `now - created_at >= ttl`.
+  - Expired condition: `now - created_at >= ttl`. `created_at` is the time passed to `store()` (§19) when one was given, so an imported memory with a TTL can expire on arrival.
   - Expired memories are excluded from `recall()` results automatically.
   - `vacuum()` scans a collection and hard-deletes all expired memories (storage + index).
   - Returns `VacuumResult { collection, expired_count }`.
@@ -687,6 +691,17 @@ This section reflects behavior implemented today. It separates **Current Guarant
   - `close()` is available for explicit flush with error propagation.
 - **Current Limitation**
   - If the process crashes before `Drop` runs, unflushed vector index updates are lost.
+
+### 19) Event Time and Temporal Recall
+
+- **Current Guarantee**
+  - `StoreRequest.created_at` and `BatchStoreItem.created_at` set when the memory happened (unix seconds). `None` = now. Time decay, TTL and the anchor boost all use it.
+  - `RecallRequest.reference_time` is when the question is asked. `None` = now.
+  - `RecallRequest.time_anchor` names a target time and window. When it is `None`, recall parses a relative phrase from `query` (or `text_query`) against `reference_time`: "yesterday", "today", "recently", "lately", "last week|month|year", and "<n> day(s)|week(s)|month(s)|year(s) ago".
+  - With an anchor, `anchor_boost = 1 + 0.4 * max(0, 1 - |created_at - target| / window)`. Recall then ranks at least 50 candidates (or `5 * limit`) before cutting to `limit`, so a memory just outside the top `limit` can move into it.
+  - Without an anchor, `anchor_boost` is 1.0 and no extra candidates are fetched.
+- **Current Limitation**
+  - English phrases only. Absolute dates in the query ("in May 2023") are not parsed.
 
 ---
 

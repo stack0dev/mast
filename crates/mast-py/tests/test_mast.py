@@ -94,6 +94,21 @@ class TestMast:
             assert edges[0].target == "bob"
             m.close()
 
+    def test_edge_validity(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            m = Mast(os.path.join(tmpdir, "test.mast"))
+
+            m.relate("test", "alice", "acme", "works_at", valid_from=100)
+            assert m.invalidate("test", "alice", "acme", "works_at", ended_at=200) == 1
+
+            edges = m.traverse("test", "alice", as_of=150)
+            assert [(e.valid_from, e.valid_to) for e in edges] == [(100, 200)]
+            assert m.traverse("test", "alice", as_of=200) == []
+
+            with pytest.raises(Exception, match="valid_to"):
+                m.relate("test", "alice", "globex", "works_at", valid_from=300, valid_to=300)
+            m.close()
+
     def test_snapshot_and_restore(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             db1 = os.path.join(tmpdir, "db1.mast")

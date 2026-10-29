@@ -121,3 +121,31 @@ Keyword search, data portability, and multi-language support.
 - `MockCompactor`: concatenation-based synthesis
 - `tempfile::tempdir()` for isolated test databases
 - wiremock-based HTTP tests for OpenAI embedder
+
+## Time and Retrieval Changes (2026-10-29)
+
+### Event time
+- `StoreRequest.created_at` and `BatchStoreItem.created_at`: store a memory with the time it happened. `None` = now.
+- `RecallRequest.reference_time`: when the question is asked. Time decay counts back from it.
+- Relative time phrases in a recall query ("two weeks ago", "last month") boost memories created near that time by up to 40%. `RecallRequest.time_anchor` sets the target directly.
+
+### Hybrid scoring
+- Hybrid score is now `vector_weight * similarity + text_weight * (bm25 / best_bm25)`, replacing min-max normalization of both lists. LOCOMO held-out retrieval: 57.1% → 58.2% at top-5, 67.2% → 68.8% at top-10.
+
+### Compaction
+- Compacted memories stay in recall at `MastConfig.compacted_source_weight` (default 0.5) instead of being excluded. 0.0 restores exclusion.
+
+### Graph
+- Edges have an optional validity interval `[valid_from, valid_to)`. `relate()` takes it; the upsert key now includes `valid_from`.
+- `invalidate()` closes the open edges for a fact.
+- `TraverseRequest.as_of` follows only edges valid at that time.
+- `unrelate()` removes every interval for a fact.
+- Edge records use the versioned envelope. Existing edges read with no interval.
+
+### Bindings and CLI
+- Node, Python, C FFI and the Swift bridge expose the new fields and `invalidate`.
+- CLI: `--created-at` on `store`, `--reference-time` on `recall`, `--valid-from`/`--valid-to` on `relate`, `--as-of` on `traverse`, new `invalidate` command.
+
+### Benchmark
+- LOCOMO turns are stored with their session date, and the answer prompt shows it.
+- Fixed dev / held-out split (`--split`, default `dev`), recorded per-question results (`--record`), and separate tables for retrieval recall and answer quality.

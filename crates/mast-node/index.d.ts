@@ -28,6 +28,8 @@ export interface JsEdge {
   target: string
   relation: string
   weight: number
+  validFrom?: number
+  validTo?: number
 }
 export interface JsSnapshotResult {
   collection: string
@@ -47,26 +49,29 @@ export interface JsBatchItem {
   metadata?: Record<string, string>
   tier?: string
   ttl?: number
+  createdAt?: number
 }
 export declare class MastDb {
   constructor(path: string, durability?: string | undefined | null)
-  store(collection: string, content: string, embedFn: (arg: string) => any, dimensions: number, metadata?: Record<string, string> | undefined | null, tier?: string | undefined | null, ttl?: number | undefined | null, embedding?: Array<number> | undefined | null): JsMemory
+  store(collection: string, content: string, embedFn: (arg: string) => any, dimensions: number, metadata?: Record<string, string> | undefined | null, tier?: string | undefined | null, ttl?: number | undefined | null, embedding?: Array<number> | undefined | null, createdAt?: number | undefined | null): JsMemory
   storeBatch(collection: string, items: Array<JsBatchItem>, embedFn: (arg: string) => any, dimensions: number): Array<JsMemory>
-  recall(collection: string, embedFn: (arg: string) => any, dimensions: number, query?: string | undefined | null, textQuery?: string | undefined | null, searchMode?: string | undefined | null, limit?: number | undefined | null, queryEmbedding?: Array<number> | undefined | null): Array<JsRecallResult>
+  recall(collection: string, embedFn: (arg: string) => any, dimensions: number, query?: string | undefined | null, textQuery?: string | undefined | null, searchMode?: string | undefined | null, limit?: number | undefined | null, queryEmbedding?: Array<number> | undefined | null, referenceTime?: number | undefined | null): Array<JsRecallResult>
   get(collection: string, id: string): JsMemory | null
   delete(collection: string, id: string): void
   list(collection: string): Array<JsMemory>
   info(): Array<JsCollectionInfo>
   vacuum(collection: string): number
-  relate(collection: string, source: string, target: string, relation: string, weight?: number | undefined | null): string
+  relate(collection: string, source: string, target: string, relation: string, weight?: number | undefined | null, validFrom?: number | undefined | null, validTo?: number | undefined | null): string
   unrelate(collection: string, source: string, target: string, relation: string): void
-  traverse(collection: string, start: string, maxDepth?: number | undefined | null, relation?: string | undefined | null, minWeight?: number | undefined | null): Array<JsEdge>
+  /** Set `validTo` on the open edges for this fact. Returns how many were closed. */
+  invalidate(collection: string, source: string, target: string, relation: string, endedAt?: number | undefined | null): number
+  traverse(collection: string, start: string, maxDepth?: number | undefined | null, relation?: string | undefined | null, minWeight?: number | undefined | null, asOf?: number | undefined | null): Array<JsEdge>
   subgraph(collection: string): Array<JsEdge>
   snapshot(collection: string, output: string): JsSnapshotResult
   restore(input: string, merge?: boolean | undefined | null): JsRestoreResult
   close(): void
-  storeAsync(collection: string, content: string, embedFn: (arg: string) => any, dimensions: number, metadata?: Record<string, string> | undefined | null, tier?: string | undefined | null, ttl?: number | undefined | null): Promise<unknown>
-  recallAsync(collection: string, embedFn: (arg: string) => any, dimensions: number, query?: string | undefined | null, textQuery?: string | undefined | null, searchMode?: string | undefined | null, limit?: number | undefined | null): Promise<unknown>
-  storeLocal(collection: string, content: string, metadata?: Record<string, string> | undefined | null, tier?: string | undefined | null, ttl?: number | undefined | null): JsMemory
-  recallLocal(collection: string, query?: string | undefined | null, textQuery?: string | undefined | null, searchMode?: string | undefined | null, limit?: number | undefined | null): Array<JsRecallResult>
+  storeAsync(collection: string, content: string, embedFn: (arg: string) => any, dimensions: number, metadata?: Record<string, string> | undefined | null, tier?: string | undefined | null, ttl?: number | undefined | null, createdAt?: number | undefined | null): Promise<unknown>
+  recallAsync(collection: string, embedFn: (arg: string) => any, dimensions: number, query?: string | undefined | null, textQuery?: string | undefined | null, searchMode?: string | undefined | null, limit?: number | undefined | null, referenceTime?: number | undefined | null): Promise<unknown>
+  storeLocal(collection: string, content: string, metadata?: Record<string, string> | undefined | null, tier?: string | undefined | null, ttl?: number | undefined | null, createdAt?: number | undefined | null): JsMemory
+  recallLocal(collection: string, query?: string | undefined | null, textQuery?: string | undefined | null, searchMode?: string | undefined | null, limit?: number | undefined | null, referenceTime?: number | undefined | null): Array<JsRecallResult>
 }

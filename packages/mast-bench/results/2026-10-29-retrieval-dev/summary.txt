@@ -1,0 +1,13 @@
+LOCOMO Benchmark — MAST Results
+Split: dev (401 questions) | Samples: 10 | Model: (recall-only)
+Total time: 6.3s
+
+Retrieval recall (an evidence turn is in the top K)
+Search     TopK  Multi-hop Temporal  Open      Single    Advers.   Overall 
+───────────────────────────────────────────────────────────────────────────
+vector     5     28.1%     44.6%     10.0%     42.0%     27.8%     35.7%   
+vector     10    45.6%     58.5%     25.0%     49.7%     38.9%     46.9%   
+fulltext   5     36.8%     67.7%     25.0%     60.9%     66.7%     58.1%   
+fulltext   10    47.4%     70.8%     35.0%     69.8%     71.1%     65.3%   
+hybrid     5     47.4%     64.6%     30.0%     66.9%     65.6%     61.6%   
+hybrid     10    68.4%     70.8%     35.0%     74.6%     76.7%     71.6%   

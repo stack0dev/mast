@@ -1,8 +1,11 @@
 import type { MastDb } from "mast-memory";
 import type { LocomoSample } from "./types.js";
 
+/** Bump when stored content or fields change, so old databases are not reused. */
+export const INGEST_VERSION = 2;
+
 export function collectionName(sampleId: number): string {
-  return `locomo_${sampleId}`;
+  return `locomo_${sampleId}_v${INGEST_VERSION}`;
 }
 
 export function ingestSample(db: MastDb, sample: LocomoSample): number {
@@ -33,7 +36,7 @@ export function ingestSample(db: MastDb, sample: LocomoSample): number {
         dia_id: turn.dia_id,
       };
 
-      db.storeLocal(collection, content, metadata);
+      db.storeLocal(collection, content, metadata, null, null, session.timestamp);
       count++;
     }
   }

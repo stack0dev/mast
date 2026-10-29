@@ -10,7 +10,7 @@ Compaction is MAST's mechanism for evolving memories from raw events into distil
 4. **Store** the synthesized memory in the target tier with `parent_ids` linking to sources
 5. **Mark** source memories as compacted (`compacted_at` timestamp set)
 
-Compacted memories are hidden from `recall()` but remain in storage for provenance.
+Compacted memories stay in storage for provenance, and `recall()` still returns them at reduced weight: the score is multiplied by `MastConfig::compacted_source_weight` (default 0.5). Set it to 0.0 to exclude them from recall.
 
 ## Tiers
 

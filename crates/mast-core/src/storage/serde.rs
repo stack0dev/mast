@@ -1,5 +1,5 @@
 use crate::error::MastError;
-use crate::types::Memory;
+use crate::types::{Edge, Memory};
 
 const VERSION_V1: u8 = 0x01;
 
@@ -52,6 +52,60 @@ pub fn deserialize_memory(data: &[u8]) -> Result<Memory, MastError> {
                 ttl: None,
                 compacted_at: None,
                 parent_ids: vec![],
+            })
+        }
+    }
+}
+
+/// V0 layout: the original Edge struct without valid_from, valid_to.
+/// Stored as raw bincode with no version prefix.
+#[derive(serde::Serialize, serde::Deserialize)]
+struct EdgeV0 {
+    id: ulid::Ulid,
+    collection: String,
+    source: String,
+    target: String,
+    relation: String,
+    weight: f32,
+    memory_ids: Vec<ulid::Ulid>,
+    created_at: i64,
+    updated_at: i64,
+}
+
+pub fn serialize_edge(e: &Edge) -> Result<Vec<u8>, MastError> {
+    let payload = bincode::serialize(e)?;
+    let mut buf = Vec::with_capacity(1 + payload.len());
+    buf.push(VERSION_V1);
+    buf.extend_from_slice(&payload);
+    Ok(buf)
+}
+
+pub fn deserialize_edge(data: &[u8]) -> Result<Edge, MastError> {
+    if data.is_empty() {
+        return Err(MastError::Serialization("empty edge data".into()));
+    }
+
+    match data[0] {
+        VERSION_V1 => {
+            let edge: Edge = bincode::deserialize(&data[1..])?;
+            Ok(edge)
+        }
+        _ => {
+            // No recognized version byte — treat as v0 (raw bincode, original layout).
+            // A v0 record starts with the ULID's string length (26), never 0x01.
+            let v0: EdgeV0 = bincode::deserialize(data)?;
+            Ok(Edge {
+                id: v0.id,
+                collection: v0.collection,
+                source: v0.source,
+                target: v0.target,
+                relation: v0.relation,
+                weight: v0.weight,
+                memory_ids: v0.memory_ids,
+                created_at: v0.created_at,
+                updated_at: v0.updated_at,
+                valid_from: None,
+                valid_to: None,
             })
         }
     }
@@ -119,5 +173,59 @@ mod tests {
     #[test]
     fn empty_data_errors() {
         assert!(deserialize_memory(&[]).is_err());
+        assert!(deserialize_edge(&[]).is_err());
+    }
+
+    fn make_edge() -> Edge {
+        Edge {
+            id: Ulid::new(),
+            collection: "test".into(),
+            source: "alice".into(),
+            target: "acme".into(),
+            relation: "works_at".into(),
+            weight: 0.7,
+            memory_ids: vec![Ulid::new()],
+            created_at: 1000,
+            updated_at: 2000,
+            valid_from: Some(1000),
+            valid_to: Some(5000),
+        }
+    }
+
+    #[test]
+    fn edge_v1_roundtrip() {
+        let edge = make_edge();
+        let data = serialize_edge(&edge).unwrap();
+        assert_eq!(data[0], VERSION_V1);
+        let decoded = deserialize_edge(&data).unwrap();
+        assert_eq!(decoded.id, edge.id);
+        assert_eq!(decoded.weight, edge.weight);
+        assert_eq!(decoded.memory_ids, edge.memory_ids);
+        assert_eq!(decoded.valid_from, Some(1000));
+        assert_eq!(decoded.valid_to, Some(5000));
+    }
+
+    #[test]
+    fn edge_v0_compat() {
+        let v0 = EdgeV0 {
+            id: Ulid::new(),
+            collection: "old".into(),
+            source: "alice".into(),
+            target: "bob".into(),
+            relation: "knows".into(),
+            weight: 1.0,
+            memory_ids: vec![],
+            created_at: 500,
+            updated_at: 600,
+        };
+        let data = bincode::serialize(&v0).unwrap();
+        assert_ne!(data[0], VERSION_V1);
+
+        let decoded = deserialize_edge(&data).unwrap();
+        assert_eq!(decoded.id, v0.id);
+        assert_eq!(decoded.relation, "knows");
+        assert_eq!(decoded.updated_at, 600);
+        assert_eq!(decoded.valid_from, None);
+        assert_eq!(decoded.valid_to, None);
     }
 }

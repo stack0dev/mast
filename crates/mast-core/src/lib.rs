@@ -5,6 +5,7 @@ pub mod error;
 pub mod index;
 pub mod snapshot;
 pub mod storage;
+pub mod temporal;
 pub mod types;
 
 use compact::Compactor;
@@ -77,11 +78,9 @@ impl Mast {
             }
         }
 
-        let now = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_secs() as i64;
+        let now = unix_now();
 
+        let created_at = request.created_at.unwrap_or(now);
         let memory = Memory {
             id: Ulid::new(),
             collection: request.collection,
@@ -89,7 +88,7 @@ impl Mast {
             embedding,
             metadata: request.metadata,
             tier: request.tier,
-            created_at: now,
+            created_at,
             access_count: 0,
             last_accessed: now,
             ttl: request.ttl,
@@ -159,10 +158,7 @@ impl Mast {
             vec![]
         };
 
-        let now = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_secs() as i64;
+        let now = unix_now();
 
         // Build Memory objects
         let mut memories = Vec::with_capacity(request.items.len());
@@ -199,7 +195,7 @@ impl Mast {
                 embedding,
                 metadata: item.metadata,
                 tier: item.tier,
-                created_at: now,
+                created_at: item.created_at.unwrap_or(now),
                 access_count: 0,
                 last_accessed: now,
                 ttl: item.ttl,
@@ -264,41 +260,51 @@ impl Mast {
             request.limit
         };
 
-        let now = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_secs() as i64;
+        let now = unix_now();
+        let ctx = ScoreContext {
+            now,
+            reference_time: request.reference_time.unwrap_or(now),
+            tier_weights: request
+                .tier_weights
+                .unwrap_or(self.config.default_tier_weights),
+            time_decay: request.time_decay.or(self.config.default_time_decay),
+            compacted_source_weight: self.config.compacted_source_weight,
+        };
 
-        let tier_weights = request
-            .tier_weights
-            .unwrap_or(self.config.default_tier_weights);
-        let time_decay = request.time_decay.or(self.config.default_time_decay);
+        let anchor = request.time_anchor.or_else(|| {
+            request
+                .query
+                .as_deref()
+                .or(request.text_query.as_deref())
+                .and_then(|q| temporal::parse_time_anchor(q, ctx.reference_time))
+        });
 
-        let recall_results = match &request.search_mode {
-            SearchMode::Vector => {
-                self.recall_vector(&request, embedder, limit, now, &tier_weights, &time_decay)
-                    .await?
-            }
-            SearchMode::FullText => {
-                self.recall_fulltext(&request, limit, now, &tier_weights, &time_decay)?
-            }
+        // The anchor boost re-ranks, so it needs more candidates than `limit`.
+        let pool = if anchor.is_some() {
+            (limit * 5).max(ANCHOR_CANDIDATE_POOL)
+        } else {
+            limit
+        };
+
+        let mut recall_results = match &request.search_mode {
+            SearchMode::Vector => self.recall_vector(&request, embedder, pool, &ctx).await?,
+            SearchMode::FullText => self.recall_fulltext(&request, pool, &ctx)?,
             SearchMode::Hybrid {
                 vector_weight,
                 text_weight,
             } => {
-                self.recall_hybrid(
-                    &request,
-                    embedder,
-                    limit,
-                    now,
-                    &tier_weights,
-                    &time_decay,
-                    *vector_weight,
-                    *text_weight,
-                )
-                .await?
+                self.recall_hybrid(&request, embedder, pool, &ctx, *vector_weight, *text_weight)
+                    .await?
             }
         };
+
+        if let Some(anchor) = anchor {
+            for result in &mut recall_results {
+                result.score *= temporal::anchor_boost(&anchor, result.memory.created_at);
+            }
+            sort_by_score(&mut recall_results);
+        }
+        recall_results.truncate(limit);
 
         // Defer access stats — buffer until threshold
         for result in &recall_results {
@@ -320,9 +326,7 @@ impl Mast {
         request: &RecallRequest,
         embedder: &dyn Embedder,
         limit: usize,
-        now: i64,
-        tier_weights: &TierWeights,
-        time_decay: &Option<TimeDecay>,
+        ctx: &ScoreContext,
     ) -> Result<Vec<RecallResult>, MastError> {
         let query_embedding = match &request.query_embedding {
             Some(emb) => emb.clone(),
@@ -376,29 +380,14 @@ impl Mast {
         for (seq, distance) in results {
             if let Some(ulid) = self.storage.get_ulid_for_seq(&request.collection, seq)? {
                 if let Some(memory) = self.storage.read_memory(&request.collection, &ulid)? {
-                    if memory.compacted_at.is_some() {
-                        continue;
+                    if let Some(score) = ctx.score(&memory, 1.0 - distance) {
+                        recall_results.push(RecallResult { memory, score });
                     }
-                    if let Some(ttl) = memory.ttl {
-                        if now - memory.created_at >= ttl {
-                            continue;
-                        }
-                    }
-
-                    let similarity = 1.0 - distance;
-                    let tw = tier_weights.weight_for(memory.tier);
-                    let decay = Self::compute_decay(now, memory.created_at, time_decay);
-                    let score = similarity * tw * decay;
-                    recall_results.push(RecallResult { memory, score });
                 }
             }
         }
 
-        recall_results.sort_by(|a, b| {
-            b.score
-                .partial_cmp(&a.score)
-                .unwrap_or(std::cmp::Ordering::Equal)
-        });
+        sort_by_score(&mut recall_results);
         recall_results.truncate(limit);
         Ok(recall_results)
     }
@@ -407,9 +396,7 @@ impl Mast {
         &self,
         request: &RecallRequest,
         limit: usize,
-        now: i64,
-        tier_weights: &TierWeights,
-        time_decay: &Option<TimeDecay>,
+        ctx: &ScoreContext,
     ) -> Result<Vec<RecallResult>, MastError> {
         let text_query = request
             .text_query
@@ -444,77 +431,50 @@ impl Mast {
                 }
             }
             if let Some(memory) = self.storage.read_memory(&request.collection, &ulid)? {
-                if memory.compacted_at.is_some() {
-                    continue;
+                if let Some(score) = ctx.score(&memory, bm25_score) {
+                    recall_results.push(RecallResult { memory, score });
                 }
-                if let Some(ttl) = memory.ttl {
-                    if now - memory.created_at >= ttl {
-                        continue;
-                    }
-                }
-
-                let tw = tier_weights.weight_for(memory.tier);
-                let decay = Self::compute_decay(now, memory.created_at, time_decay);
-                let score = bm25_score * tw * decay;
-                recall_results.push(RecallResult { memory, score });
             }
         }
 
-        recall_results.sort_by(|a, b| {
-            b.score
-                .partial_cmp(&a.score)
-                .unwrap_or(std::cmp::Ordering::Equal)
-        });
+        sort_by_score(&mut recall_results);
         recall_results.truncate(limit);
         Ok(recall_results)
     }
 
+    /// Weighted sum of the vector and full-text scores. Vector similarity is
+    /// already on a 0..1 scale and is used as is. BM25 has no fixed scale, so it
+    /// is divided by the best BM25 score in the candidate set.
     async fn recall_hybrid(
         &self,
         request: &RecallRequest,
         embedder: &dyn Embedder,
         limit: usize,
-        now: i64,
-        tier_weights: &TierWeights,
-        time_decay: &Option<TimeDecay>,
+        ctx: &ScoreContext,
         vector_weight: f32,
         text_weight: f32,
     ) -> Result<Vec<RecallResult>, MastError> {
-        // Run vector search
         let vec_results = self
-            .recall_vector(request, embedder, limit * 3, now, tier_weights, time_decay)
+            .recall_vector(request, embedder, limit * 3, ctx)
             .await?;
+        let ft_results = self.recall_fulltext(request, limit * 3, ctx)?;
 
-        // Run fulltext search
-        let ft_results =
-            self.recall_fulltext(request, limit * 3, now, tier_weights, time_decay)?;
+        let best_text = ft_results.iter().map(|r| r.score).fold(0.0_f32, f32::max);
 
-        // Min-max normalize vector scores
-        let vec_scores: Vec<f32> = vec_results.iter().map(|r| r.score).collect();
-        let (vec_min, vec_max) = min_max(&vec_scores);
-
-        // Min-max normalize fulltext scores
-        let ft_scores: Vec<f32> = ft_results.iter().map(|r| r.score).collect();
-        let (ft_min, ft_max) = min_max(&ft_scores);
-
-        // Merge results by memory ID
         let mut merged: std::collections::HashMap<Ulid, (Memory, f32)> =
             std::collections::HashMap::new();
-
-        for r in vec_results {
-            let norm = normalize(r.score, vec_min, vec_max);
+        let vector = vec_results
+            .into_iter()
+            .map(|r| (vector_weight * r.score, r));
+        let text = ft_results.into_iter().map(|r| {
+            let scaled = if best_text > 0.0 { r.score / best_text } else { 0.0 };
+            (text_weight * scaled, r)
+        });
+        for (contribution, r) in vector.chain(text) {
             merged
                 .entry(r.memory.id)
-                .and_modify(|(_, s)| *s += vector_weight * norm)
-                .or_insert((r.memory, vector_weight * norm));
-        }
-
-        for r in ft_results {
-            let norm = normalize(r.score, ft_min, ft_max);
-            merged
-                .entry(r.memory.id)
-                .and_modify(|(_, s)| *s += text_weight * norm)
-                .or_insert((r.memory, text_weight * norm));
+                .and_modify(|(_, s)| *s += contribution)
+                .or_insert((r.memory, contribution));
         }
 
         let mut recall_results: Vec<RecallResult> = merged
@@ -522,27 +482,9 @@ impl Mast {
             .map(|(memory, score)| RecallResult { memory, score })
             .collect();
 
-        recall_results.sort_by(|a, b| {
-            b.score
-                .partial_cmp(&a.score)
-                .unwrap_or(std::cmp::Ordering::Equal)
-        });
+        sort_by_score(&mut recall_results);
         recall_results.truncate(limit);
         Ok(recall_results)
-    }
-
-    fn compute_decay(now: i64, created_at: i64, time_decay: &Option<TimeDecay>) -> f32 {
-        if let Some(ref td) = time_decay {
-            let age_secs = (now - created_at).max(0) as f64;
-            let half_life = td.half_life_secs as f64;
-            if half_life > 0.0 {
-                0.5_f64.powf(age_secs / half_life) as f32
-            } else {
-                1.0
-            }
-        } else {
-            1.0
-        }
     }
 
     pub fn get(&self, collection: &str, id: &Ulid) -> Result<Option<Memory>, MastError> {
@@ -618,10 +560,7 @@ impl Mast {
     }
 
     pub fn vacuum(&mut self, collection: &str) -> Result<VacuumResult, MastError> {
-        let now = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_secs() as i64;
+        let now = unix_now();
 
         let memories = self.storage.list_memories(collection)?;
         let expired_ids: Vec<Ulid> = memories
@@ -657,10 +596,7 @@ impl Mast {
             ));
         }
 
-        let now = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_secs() as i64;
+        let now = unix_now();
 
         let memories = self.storage.list_memories(&request.collection)?;
 
@@ -795,13 +731,19 @@ impl Mast {
 
     // --- Graph API ---
 
+    /// Add an edge, or update the edge with the same source, target, relation
+    /// and `valid_from`. A fact that changed over time is one edge per interval.
     pub fn relate(&self, request: RelateRequest) -> Result<Ulid, MastError> {
-        let now = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_secs() as i64;
+        if let (Some(from), Some(to)) = (request.valid_from, request.valid_to) {
+            if to <= from {
+                return Err(MastError::InvalidInput(format!(
+                    "valid_to ({to}) must be after valid_from ({from})"
+                )));
+            }
+        }
 
-        // Check for existing edge with same (source, target, relation)
+        let now = unix_now();
+
         let existing = self.storage.get_edges_for_entity(
             &request.collection,
             &request.source,
@@ -810,11 +752,11 @@ impl Mast {
         )?;
 
         for edge in existing {
-            if edge.target == request.target {
-                // Upsert: update weight and memory_ids
+            if edge.target == request.target && edge.valid_from == request.valid_from {
                 let updated = Edge {
                     weight: request.weight,
                     memory_ids: request.memory_ids,
+                    valid_to: request.valid_to,
                     updated_at: now,
                     ..edge
                 };
@@ -823,7 +765,6 @@ impl Mast {
             }
         }
 
-        // Create new edge
         let edge = Edge {
             id: Ulid::new(),
             collection: request.collection,
@@ -834,12 +775,56 @@ impl Mast {
             memory_ids: request.memory_ids,
             created_at: now,
             updated_at: now,
+            valid_from: request.valid_from,
+            valid_to: request.valid_to,
         };
         let id = edge.id;
         self.storage.write_edge(&edge)?;
         Ok(id)
     }
 
+    /// Mark a fact as no longer true by setting `valid_to` on its open edges.
+    /// Returns the number of edges closed.
+    pub fn invalidate(&self, request: InvalidateRequest) -> Result<usize, MastError> {
+        let ended_at = request.ended_at.unwrap_or_else(unix_now);
+
+        let open: Vec<Edge> = self
+            .storage
+            .get_edges_for_entity(
+                &request.collection,
+                &request.source,
+                Some(&request.relation),
+                storage::EdgeDirection::Forward,
+            )?
+            .into_iter()
+            .filter(|e| e.target == request.target && e.valid_to.is_none())
+            .collect();
+
+        if open.is_empty() {
+            return Err(MastError::NotFound(format!(
+                "no open edge from '{}' to '{}' with relation '{}'",
+                request.source, request.target, request.relation
+            )));
+        }
+        if let Some(from) = open.iter().filter_map(|e| e.valid_from).find(|&f| ended_at <= f) {
+            return Err(MastError::InvalidInput(format!(
+                "ended_at ({ended_at}) must be after valid_from ({from})"
+            )));
+        }
+
+        let now = unix_now();
+        for edge in &open {
+            self.storage.update_edge(&Edge {
+                valid_to: Some(ended_at),
+                updated_at: now,
+                ..edge.clone()
+            })?;
+        }
+        Ok(open.len())
+    }
+
+    /// Delete every edge from `source` to `target` with `relation`, across all
+    /// validity intervals.
     pub fn unrelate(
         &self,
         collection: &str,
@@ -854,17 +839,19 @@ impl Mast {
             storage::EdgeDirection::Forward,
         )?;
 
-        for edge in edges {
-            if edge.target == target {
-                self.storage
-                    .delete_edge(collection, &edge.id, source, target, relation)?;
-                return Ok(());
-            }
+        let mut removed = 0;
+        for edge in edges.iter().filter(|e| e.target == target) {
+            self.storage
+                .delete_edge(collection, &edge.id, source, target, relation)?;
+            removed += 1;
         }
 
-        Err(MastError::NotFound(format!(
-            "no edge from '{source}' to '{target}' with relation '{relation}'"
-        )))
+        if removed == 0 {
+            return Err(MastError::NotFound(format!(
+                "no edge from '{source}' to '{target}' with relation '{relation}'"
+            )));
+        }
+        Ok(())
     }
 
     pub fn traverse(&self, request: TraverseRequest) -> Result<Vec<Edge>, MastError> {
@@ -888,9 +875,13 @@ impl Mast {
             )?;
 
             for edge in edges {
-                // Filter by min_weight
                 if let Some(min_w) = request.min_weight {
                     if edge.weight < min_w {
+                        continue;
+                    }
+                }
+                if let Some(as_of) = request.as_of {
+                    if !edge.is_valid_at(as_of) {
                         continue;
                     }
                 }
@@ -946,25 +937,59 @@ impl Mast {
     }
 }
 
-fn min_max(scores: &[f32]) -> (f32, f32) {
-    if scores.is_empty() {
-        return (0.0, 1.0);
-    }
-    let min = scores
-        .iter()
-        .copied()
-        .fold(f32::INFINITY, f32::min);
-    let max = scores
-        .iter()
-        .copied()
-        .fold(f32::NEG_INFINITY, f32::max);
-    (min, max)
+/// Candidates fetched before the time anchor boost re-ranks them.
+const ANCHOR_CANDIDATE_POOL: usize = 50;
+
+fn unix_now() -> i64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_secs() as i64
 }
 
-fn normalize(score: f32, min: f32, max: f32) -> f32 {
-    if (max - min).abs() < f32::EPSILON {
-        1.0
-    } else {
-        (score - min) / (max - min)
+fn sort_by_score(results: &mut [RecallResult]) {
+    results.sort_by(|a, b| {
+        b.score
+            .partial_cmp(&a.score)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
+}
+
+/// Everything besides relevance that goes into a recall score.
+struct ScoreContext {
+    now: i64,
+    reference_time: i64,
+    tier_weights: TierWeights,
+    time_decay: Option<TimeDecay>,
+    compacted_source_weight: f32,
+}
+
+impl ScoreContext {
+    /// Final score for a memory with the given relevance, or `None` when the
+    /// memory is not returned: its TTL expired, or it was compacted and
+    /// compacted sources are switched off.
+    fn score(&self, memory: &Memory, relevance: f32) -> Option<f32> {
+        if let Some(ttl) = memory.ttl {
+            if self.now - memory.created_at >= ttl {
+                return None;
+            }
+        }
+        let compacted = match memory.compacted_at {
+            Some(_) if self.compacted_source_weight <= 0.0 => return None,
+            Some(_) => self.compacted_source_weight,
+            None => 1.0,
+        };
+        Some(relevance * self.tier_weights.weight_for(memory.tier) * self.decay(memory.created_at) * compacted)
+    }
+
+    /// `0.5^(age / half_life)`, with age measured back from the reference time.
+    fn decay(&self, created_at: i64) -> f32 {
+        match self.time_decay {
+            Some(td) if td.half_life_secs > 0 => {
+                let age_secs = (self.reference_time - created_at).max(0) as f64;
+                0.5_f64.powf(age_secs / td.half_life_secs as f64) as f32
+            }
+            _ => 1.0,
+        }
     }
 }
